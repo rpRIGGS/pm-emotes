@@ -350,7 +350,7 @@ local function addProp(data)
     LoadPropDict(data.prop1)
     -- Model streaming can yield while the preview menu closes or changes selection.
     -- Never spawn a prop for a deleted preview ped.
-    if not DoesEntityExist(target) then
+    if not DoesEntityExist(target) or (data.previewVersion and data.previewVersion ~= previewPropVersion) then
         SetModelAsNoLongerNeeded(data.prop1)
         return false
     end
@@ -391,7 +391,7 @@ end
 ---@param ped? integer
 ---@param playerId? integer
 ---@param skipWait? boolean Skip the EmoteDuration wait (used for preview peds)
-function addProps(animOption, textureVariation, ped, playerId, skipWait)
+function addProps(animOption, textureVariation, ped, playerId, skipWait, previewVersion)
     if not skipWait then
         Wait(animOption and animOption.EmoteDuration or 0)
     end
@@ -406,7 +406,8 @@ function addProps(animOption, textureVariation, ped, playerId, skipWait)
             textureVariation = textureVariation,
             ped = ped,
             noCollision = noCollision,
-            playerId = playerId
+            playerId = playerId,
+            previewVersion = previewVersion
         })
     end
 
@@ -419,6 +420,11 @@ function addProps(animOption, textureVariation, ped, playerId, skipWait)
     then
         DestroyAllProps(skipWait == true)
     end
+end
+
+function PMInvalidatePreviewProps()
+    previewPropVersion = previewPropVersion + 1
+    DestroyAllProps(true)
 end
 
 function EmotePlayOnNonPlayerPed(ped, name)
@@ -482,7 +488,7 @@ function EmotePlayOnNonPlayerPed(ped, name)
     -- A preview needs its prop when the animation begins, not after its duration.
     -- The preview lifecycle deletes these props on every selection and on menu close.
     previewPropVersion = previewPropVersion + 1
-    addProps(animOption, nil, ped, nil, true)
+    addProps(animOption, nil, ped, nil, true, previewPropVersion)
 end
 
 function EmoteMenuStartClone(name, emoteType)
