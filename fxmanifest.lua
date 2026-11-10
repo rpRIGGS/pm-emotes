@@ -70,6 +70,7 @@ client_scripts {
     'client/Syncing.lua',
     'client/Walk.lua',
     'client/Placement.lua',
+    'client/PMSeating.lua',
     'client/emojis.lua',
 }
 
