@@ -77,3 +77,19 @@
 .pm-preview-stage {background:transparent;border-color:rgba(115,145,255,.32)}
 .pm-preview-reticle {pointer-events:none;opacity:.35}
 .pm-preview-heading,.pm-preview-help {text-shadow:0 2px 6px #070b14}
+
+/* The redesigned widescreen interface is centered regardless of upstream MenuPosition. */
+body,body.align-left {align-items:center !important;justify-content:center;padding:0 1.5rem}
+.pm-workspace .menu-container {overflow:hidden}
+.pm-workspace .content-container {overflow-y:auto}
+.pm-workspace .menu {overflow-y:auto;align-content:start}
+.pm-preview-panel {position:relative}
+@media(max-width:680px) {
+  .main-container {width:98vw;height:90vh;max-height:90vh}
+  .side-navigation {flex:0 0 64px;max-width:64px;width:64px}
+  .side-navigation:hover,.side-navigation:has(button:focus-visible){max-width:64px}
+  .side-navigation .btn-sidebar-label {display:none}
+  .pm-preview-panel {min-width:120px;flex-basis:28%;padding:10px}
+  .pm-preview-heading {font-size:9px}
+  .pm-preview-help {font-size:10px}
+}
