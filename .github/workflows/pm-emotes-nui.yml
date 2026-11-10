@@ -17,6 +17,13 @@ jobs:
           for file in client/NUI/js/*.js; do
             node --input-type=module --check < "$file"
           done
+      - name: Validate supplemental Lua catalog syntax
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lua5.4
+          for file in client/PMDanceCatalog*.lua; do
+            luac5.4 -p "$file"
+          done
       - name: Validate NUI file references and required hooks
         run: |
           python3 - <<'PY'
