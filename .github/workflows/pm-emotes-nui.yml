@@ -24,6 +24,7 @@ jobs:
           luac5.4 -p client/AnimationList.lua
           luac5.4 -p client/PMSeating.lua
           luac5.4 -p client/PMSyncedCatalog.lua
+          luac5.4 -p client/PMReferenceScenarios.lua
           for file in client/PMDanceCatalog*.lua; do
             luac5.4 -p "$file"
           done
@@ -44,6 +45,9 @@ jobs:
           synced = Path("client/PMSyncedCatalog.lua").read_text()
           assert synced.count('RP.Shared["pmsync') == 60, "expected 30 synchronized pairs"
           assert "'client/PMSyncedCatalog.lua'" in manifest, "synced module not loaded"
+          scenarios = Path("client/PMReferenceScenarios.lua").read_text()
+          assert scenarios.count('RP.Emotes["pm') == 15, "expected 15 reference scenario emotes"
+          assert "'client/PMReferenceScenarios.lua'" in manifest, "reference scenarios not loaded"
           assert "RegisterCommand('pmsit'" in seating and "RegisterCommand('pmstand'" in seating
           assert "function PMToggleNearbySeat()" in seating
           assert "RegisterNUICallback('SIT_NEARBY'" in Path("client/NUI/EmoteMenuNUI.lua").read_text()
