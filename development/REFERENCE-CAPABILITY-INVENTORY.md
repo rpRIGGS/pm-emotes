@@ -80,3 +80,27 @@ A first substantial dance-catalog implementation has now been committed:
 - The supplemental files are now subject to Lua syntax checks in GitHub Actions.
 
 **Important:** this is catalog implementation, not confirmation that all clips stream and play in FiveM. The full reference includes 29 disabled dance entries, which were deliberately excluded. Other catalogs (chair models, synced pairs, animals, etc.) remain to be implemented or mapped individually.
+
+## NUI and workflow parity audit (code-level)
+
+The reference's `[QB]/emotes/fxmanifest.lua` still imports `@npx/client/lib.js`, `@npx/server/lib.js` and `@eon-sync/client/lib.lua`; its QBCore folder therefore does **not** imply that the full implementation is self-contained QBCore. PM must preserve its own working QBCore-compatible backend and avoid those runtime dependencies.
+
+| User-visible workflow | PM implementation path | Verified by inspection | Runtime acceptance still required |
+|---|---|---|---|
+| Open/close NUI and input focus | `client/NUI/EmoteMenuNUI.lua`, `main.js` | OPEN_MENU, CLOSE_MENU, focus handling present | Open/close from all configured bindings; no stuck controls |
+| Category rail and custom categories | `EmoteMenuNUI.lua` `loadEmoteDataToNUI`; `main.js` LOAD_EMOTE_DATA | Dynamic categories present; stable fallback icon added | Custom category creation, order, icon and navigation |
+| Search and filtering | `SEARCH_EMOTES`, `HandleEmoteSearch`, `HandleEmoteFilter` | Callback and JS handlers present | Search while navigating, keyboard focus, large catalogs |
+| Preview selected emote | `PREVIEW_EMOTE`, `PMPreview.lua`, `Emote.lua` | Clone, camera, playback and cleanup paths present | Camera framing, scenario behavior, fast-switch props |
+| Play/cancel/reset | `ROUTE_EMOTE`, `CANCEL_EMOTE` | Callback paths present | Correct playback, reset and cancellation |
+| Paired emote initiation | `ROUTE_EMOTE` groupemote, `GroupEmote.lua` | Request path present | Sender/receiver offset, consent, interruption |
+| Placement | `ROUTE_EMOTE` placement, `Placement.lua` | Placement entry path present | Position/rotation and cancel/confirm |
+| Favorite toggle and persistence | `FAVORITE_EMOTE`, `Favorites.lua` | Serverless KVP favorites present | Rebuild, reload, keyboard and mouse |
+| Keybind management | `KEYBIND_EMOTE`, `Keybinds.lua` | Set/clear callbacks present | Persist, overwrite, clear, execute |
+| Walk and expression reset | `ROUTE_EMOTE` _reset | Dedicated reset logic present | Persistence and reset |
+| Sound and localization | `PLAY_SOUND_FRONTEND`, `GET_LOCALES` | Callback paths present | Missing locale handling |
+| Mouse/keyboard navigation | `navigation.js`, `main.js` | Navigation, focus, pointer paths present | Tab, shift, search focus, context menu |
+| Model-aware seat interaction | No matching PM chair-prop map identified | **Not implemented / not proven** | Prop lookup, offsets, occupancy, cancel |
+| Animal-specific interactions | `AnimationList.lua` animal emotes | Partial catalog | Species restrictions, special native actions |
+| Reference UI visual parity | `index.html`, `overrides.css` | Three-panel custom layout present | Browser screenshot, in-game composition and responsive widths |
+
+**Code-inspection status is not functional verification.** A callback existing does not prove the complete end-to-end interaction works. This table is the implementation and acceptance register; do not silently promote any item to complete without its corresponding checks.
