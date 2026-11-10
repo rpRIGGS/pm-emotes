@@ -252,6 +252,18 @@ function PMToggleNearbySeat()
         return
     end
     local pos = GetOffsetFromEntityInWorldCoords(chair, config.x, config.y, config.z)
+    -- Do not place the local player on top of another nearby seated player.
+    for _, player in ipairs(GetActivePlayers()) do
+        if player ~= PlayerId() then
+            local otherPed = GetPlayerPed(player)
+            if DoesEntityExist(otherPed) and IsPedUsingAnyScenario(otherPed) then
+                if #(GetEntityCoords(otherPed) - pos) < 0.7 then
+                    SimpleNotify('This seat is occupied')
+                    return
+                end
+            end
+        end
+    end
     local heading = (GetEntityHeading(chair) + config.heading) % 360.0
     EmoteCancel(true)
     TaskStartScenarioAtPosition(ped, config.scenario, pos.x, pos.y, pos.z, heading, 0, true, true)
