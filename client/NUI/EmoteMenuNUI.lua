@@ -141,10 +141,12 @@ RegisterNUICallback('ROUTE_EMOTE', function(data, cb)
             RouteEmoteToFunction(data.emoteName, data.emoteType, 1)
         end
     elseif data.type == "groupemote" then
+        PMCloseCharacterPreview()
         ToggleNUIMenu() -- Important to close first. Group emote request blocks the thread until you actually start the request.
         OnGroupEmoteRequest(data.emoteName)
     elseif data.type == "placement" then
         if Config.PlacementEnabled then
+            PMCloseCharacterPreview()
             StartNewPlacement(data.emoteName)
             ToggleNUIMenu() -- Important to close *after* the placement request. Closing it before the request will block the preview ped on the screen.
         end
@@ -293,6 +295,7 @@ function ToggleNUIMenu()
         SetNuiFocusKeepInput(true)
         TriggerEvent("rpemotes:internal:handleNUIOpened")
     else
+        PMCloseCharacterPreview()
         SetNuiFocus(false, false)
     end
 end
