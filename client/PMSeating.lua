@@ -266,6 +266,9 @@ function PMToggleNearbySeat()
     end
     local heading = (GetEntityHeading(chair) + config.heading) % 360.0
     EmoteCancel(true)
+    -- Allow an existing emote's exit transition to settle before seating.
+    Wait(150)
+    if not DoesEntityExist(ped) or IsPedDeadOrDying(ped, true) or IsPedInAnyVehicle(ped, false) then return end
     TaskStartScenarioAtPosition(ped, config.scenario, pos.x, pos.y, pos.z, heading, 0, true, true)
     seated = true
 end
