@@ -45,6 +45,10 @@ jobs:
           assert synced.count('RP.Shared["pmsync') == 60, "expected 30 synchronized pairs"
           assert "'client/PMSyncedCatalog.lua'" in manifest, "synced module not loaded"
           assert "RegisterCommand('pmsit'" in seating and "RegisterCommand('pmstand'" in seating
+          assert "function PMToggleNearbySeat()" in seating
+          assert "RegisterNUICallback('SIT_NEARBY'" in Path("client/NUI/EmoteMenuNUI.lua").read_text()
+          assert 'data-action="sitNearby"' in Path("client/NUI/index.html").read_text()
+          assert 'case "sitNearby":' in Path("client/NUI/js/utils.js").read_text()
 
           for path in files:
               assert f"'client/{path.name}'" in manifest, f"not loaded: {path.name}"
