@@ -79,14 +79,11 @@ function PMPreviewCharacterEmote(emoteName, emoteType)
             SetFacialIdleAnimOverride(previewPed, expression.anim, 0)
             return true
         end
-        ClearFacialIdleAnimOverride(previewPed)
         return false
     end
-    ClearFacialIdleAnimOverride(previewPed)
     local emote = EmoteData[emoteName] or SharedEmoteData[emoteName]
     if not emote then return false end
-    EmotePlayOnNonPlayerPed(previewPed, emoteName)
-    return true
+    return EmotePlayOnNonPlayerPed(previewPed, emoteName) ~= false
 end
 
 AddEventHandler('onResourceStop', function(resource)
