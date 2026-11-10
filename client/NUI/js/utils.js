@@ -20,7 +20,7 @@ export function HandleSidebarButtonPress(el) {
     switch (el.dataset.action) {
         case "openMenu":
             const PREVIOUS_ACTIVE_BUTTON_CONTAINER = document.querySelector(".sidebar-button-active");
-            const PREVIOUS_ACTIVE_BUTTON = PREVIOUS_ACTIVE_BUTTON_CONTAINER.querySelector(".btn-sidebar");
+            const PREVIOUS_ACTIVE_BUTTON = PREVIOUS_ACTIVE_BUTTON_CONTAINER?.querySelector(".btn-sidebar");
 
             if (PREVIOUS_ACTIVE_BUTTON_CONTAINER) {
                 PREVIOUS_ACTIVE_BUTTON_CONTAINER.classList.remove("sidebar-button-active");
@@ -44,7 +44,7 @@ export function HandleSidebarButtonPress(el) {
                 if (OPENED_MENU?.classList.contains("keybinds-menu")) {
                     SEARCH_CONTAINER.classList.add("hidden");
                 }
-                OPENED_MENU?.classList.contains("search-menu") ? SEARCH_BAR.placeholder = Locale.translate("searchemotes") : SEARCH_BAR.placeholder = Locale.translate("filteremotes").replace("%s", BUTTON_CONTAINER.querySelector("label").textContent);
+                OPENED_MENU?.classList.contains("search-menu") ? SEARCH_BAR.placeholder = Locale.translate("searchemotes") : SEARCH_BAR.placeholder = Locale.translate("filteremotes").replace("%s", BUTTON_CONTAINER?.querySelector("label")?.textContent || "");
             }
             if (el.dataset.menu === "search-menu") return SEARCH_CONTAINER.querySelector(".search-input").focus();
             querySelectorVisible(OPENED_MENU)?.focus();
@@ -79,7 +79,13 @@ export async function HandleEmoteSearch(_search) {
     const req = await ExecuteNUICallback("SEARCH_EMOTES", {searchTerm: searchValue});
     let res = []
     if (req) res = await req.json();
-    let emotes = JSON.parse(res.emotes);
+    let emotes = [];
+    try {
+        emotes = JSON.parse(res.emotes || "[]");
+        if (!Array.isArray(emotes)) emotes = [];
+    } catch (error) {
+        console.warn("[PM Emotes] Invalid search response", error);
+    }
     
     ClearHTMLContainer(".search-menu");
     emotes.forEach((emote) => {
