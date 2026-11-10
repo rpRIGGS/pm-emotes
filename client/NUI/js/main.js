@@ -222,13 +222,15 @@ window.addEventListener('message', (event) => {
         // event.data.emoteData && event.data.categoryToEmotes && event.data.emoteCategories && event.data.emoteTypeIcons
         EMOTE_TYPE_ICONS = event.data.emoteTypeIcons || {}
         const emoteCategories = event.data.emoteCategories || {}
+        // Reloads must not duplicate sidebar buttons or rebind event listeners.
+        document.querySelectorAll(".pm-dynamic-category").forEach((node) => node.remove());
         Object.keys(emoteCategories).forEach((key) => {
             const SIDEBAR_ANCHOR = document.querySelector(".sidebar-button-anchor");
             const MENU_ANCHOR = document.querySelector(".menu-anchor");
 
             SIDEBAR_ANCHOR.insertAdjacentHTML("afterend",
                 `
-                    <li class="sidebar-button-container">
+                    <li class="sidebar-button-container pm-dynamic-category">
                         <button id="${emoteCategories[key].id}-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="${emoteCategories[key].id}-menu">${emoteCategories[key].icon}</button>
                         <label for="${emoteCategories[key].id}-menu-btn" class="btn-sidebar-label" data-locale="${key}">${key}</label>
                     </li>
@@ -236,12 +238,12 @@ window.addEventListener('message', (event) => {
 
             MENU_ANCHOR.insertAdjacentHTML("afterend",
                 `
-                <article class="menu ${emoteCategories[key].id}-menu doublecolumn btn-list">
+                <article class="menu pm-dynamic-category ${emoteCategories[key].id}-menu doublecolumn btn-list">
                 </article>
                 `)
         })
         MENUS = CONTENT_CONTAINER.querySelectorAll(".menu");
-        _setupMenuEventListeners(MENUS);
+        _setupMenuEventListeners(CONTENT_CONTAINER.querySelectorAll(".pm-dynamic-category.menu"));
         ExecuteNUICallback("INITIAL_DATA_LOADED", {})
     }
 
