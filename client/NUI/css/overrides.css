@@ -93,3 +93,13 @@ body,body.align-left {align-items:center !important;justify-content:center;paddi
   .pm-preview-heading {font-size:9px}
   .pm-preview-help {font-size:10px}
 }
+
+/* Keep the category rail in normal flow and the central list scrollable. */
+.pm-workspace .menu-container {display:flex;min-height:0;flex:1 1 auto}
+.pm-workspace .side-navigation {position:relative;inset:auto;z-index:2;min-height:0;overflow-y:auto;overflow-x:hidden}
+.pm-workspace .sidebar-button-container {min-width:0;width:100%;box-sizing:border-box}
+.pm-workspace .content-container {flex:1 1 auto;min-height:0;min-width:0;margin:0;display:flex;flex-direction:column;overflow:hidden}
+.pm-workspace .content-container .menu {flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden}
+.pm-workspace .search-container {flex-shrink:0}
+.pm-workspace .pm-preview-panel {min-height:0;box-sizing:border-box}
+.pm-workspace .pm-preview-stage {pointer-events:none}
