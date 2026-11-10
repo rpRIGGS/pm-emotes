@@ -40,6 +40,22 @@ jobs:
               assert f"'client/{path.name}'" in manifest, f"not loaded: {path.name}"
           print(f"Validated {len(ids)} unique PM dance entries in manifest-loaded catalogs")
           PY
+      - name: Validate synchronization and catalog UI contracts
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          sync = Path("client/Syncing.lua").read_text()
+          group = Path("client/GroupEmote.lua").read_text()
+          main = Path("client/NUI/js/main.js").read_text()
+          assert "if player == -1 then return nil end" in sync, "sync must reject disconnected partner"
+          assert "if not partnerPed then return end" in sync, "sync receiver guard missing"
+          assert "if not pedInFront then return end" in sync, "sync sender guard missing"
+          assert "if src ~= localPlayer then" in group, "group requests must exclude sender"
+          assert 'const markup = (event.data[key] || []).filter(Boolean).map' in main, "large catalog must batch DOM writes"
+          assert '_setupMenuEventListeners(MENUS);' in main, "static menu listeners missing"
+          assert 'pm-dynamic-category' in main, "dynamic menu cleanup missing"
+          print("Sync and catalog UI contracts verified")
+          PY
       - name: Validate PM preview lifecycle contracts
         run: |
           python3 - <<'PY'
