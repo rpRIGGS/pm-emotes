@@ -473,15 +473,10 @@ function EmotePlayOnNonPlayerPed(ped, name)
 
     if not animOption or not animOption.Prop then return end
 
+    -- A preview needs its prop when the animation begins, not after its duration.
+    -- The preview lifecycle deletes these props on every selection and on menu close.
     previewPropVersion = previewPropVersion + 1
-    local currentVersion = previewPropVersion
-    CreateThread(function()
-        Wait(animOption.EmoteDuration or 0)
-        -- Only attach props if this is still the current preview and ped exists
-        if currentVersion == previewPropVersion and DoesEntityExist(ped) then
-            addProps(animOption, nil, ped, nil, true)
-        end
-    end)
+    addProps(animOption, nil, ped, nil, true)
 end
 
 function EmoteMenuStartClone(name, emoteType)
