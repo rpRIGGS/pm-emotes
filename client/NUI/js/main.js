@@ -88,54 +88,85 @@ SIDE_NAVIGATION.addEventListener("click", (e) => {
     }
 })
 
-let sendPreviewRequest = true
+// Serialize previews: a fast hover/focus sequence must finish on the LAST selected emote.
+let pendingPreview = null;
+let previewBusy = false;
+let lastPreviewKey = null;
+let previewTimer = null;
+let previewSession = 0;
 
-function _setupMenuEventListeners(MENUS) {
-    MENUS.forEach((element) => {
+async function drainPreviewQueue() {
+    if (previewBusy) return;
+    previewBusy = true;
+    const session = previewSession;
+    try {
+        while (pendingPreview && session === previewSession) {
+            const next = pendingPreview;
+            pendingPreview = null;
+            try {
+                await ExecuteNUICallback("PREVIEW_EMOTE", next);
+            } catch (error) {
+                console.warn("[PM Emotes] preview callback failed", error);
+            }
+        }
+    } finally {
+        previewBusy = false;
+        if (pendingPreview && session === previewSession) drainPreviewQueue();
+    }
+}
+
+function requestPreview(target, immediate = false) {
+    const button = target?.closest?.("[data-emoteid]");
+    const name = button?.dataset.emoteid || "";
+    const type = button?.dataset.emotetype || "";
+    const key = type + ":" + name;
+    if (key === lastPreviewKey) return;
+    lastPreviewKey = key;
+    clearTimeout(previewTimer);
+    const dispatch = () => {
+        pendingPreview = { emoteName: name, emoteType: type };
+        drainPreviewQueue();
+    };
+    if (immediate) dispatch();
+    else previewTimer = setTimeout(dispatch, 110);
+    if (name && type !== "Emojis" && type !== "Walks" && type !== "Expressions") {
+        FOOTER_TEXT.textContent = `/e ${name}`;
+    } else {
+        FOOTER_TEXT.innerHTML = "&nbsp;";
+    }
+}
+
+function _setupMenuEventListeners(menus) {
+    menus.forEach((element) => {
         element.addEventListener("mouseover", (e) => {
-            const TARGET = e.target;
-            if (!TARGET.dataset.emoteid) {
-                FOOTER_TEXT.innerHTML = "&nbsp;"
-                return;
+            if (!UsingMouse) return;
+            const button = e.target.closest?.("[data-emoteid]");
+            if (button && button !== e.relatedTarget?.closest?.("[data-emoteid]")) {
+                requestPreview(button);
             }
-        })
-
+        });
         element.addEventListener("focusin", (e) => {
-            const TARGET = e.target;
-            PlaySoundFrontend("NAV_UP_DOWN")
-            if (!TARGET.dataset.emoteid || TARGET.dataset.emotetype === "Emojis" || TARGET.dataset.emotetype === "Expressions" || TARGET.dataset.emotetype === "Walks") {
-                FOOTER_TEXT.innerHTML = "&nbsp;"
-
-                let _previewData = {}
-                if (TARGET.dataset.emotetype === "Expressions") _previewData = {emoteName: TARGET.dataset.emoteid, emoteType: TARGET.dataset.emotetype}
-                if (sendPreviewRequest) {
-                    sendPreviewRequest = false
-                    ExecuteNUICallback("PREVIEW_EMOTE", {emoteName: TARGET.dataset.emoteid, emoteType: TARGET.dataset.emotetype}).finally(() => sendPreviewRequest = true)
-                }
-                return;
-            }
-
-            if (sendPreviewRequest) {
-                sendPreviewRequest = false
-                ExecuteNUICallback("PREVIEW_EMOTE", {emoteName: TARGET.dataset.emoteid, emoteType: TARGET.dataset.emotetype}).finally(() => sendPreviewRequest = true)
-            }
-
-            FOOTER_TEXT.textContent = `/${TARGET.closest(".walkstyles-menu") ? "walk" : "e"} ${TARGET.dataset.emoteid}`
-        })
-
+            const button = e.target.closest?.("[data-emoteid]");
+            if (!button) return;
+            PlaySoundFrontend("NAV_UP_DOWN");
+            requestPreview(button, true);
+        });
         element.addEventListener("click", (e) => {
+            const button = e.target.closest?.("[data-emoteid]");
+            if (!button || !button.dataset.emotetype) return;
             e.preventDefault();
-            const TARGET = e.target;
-            if (!TARGET.dataset.emoteid || !TARGET.dataset.emotetype) return;
             PlaySoundFrontend("SELECT");
             if (e.shiftKey) {
-                // Bodge to trick the browser into thinking we right-clicked, when in fact we Shift+Entered.
-                document.dispatchEvent(new CustomEvent('contextmenu', { detail: {}}));
+                document.dispatchEvent(new CustomEvent("contextmenu", {detail: {}}));
                 return;
             }
-            ExecuteNUICallback("ROUTE_EMOTE", {type: "emote", emoteName: TARGET.dataset.emoteid, emoteType: TARGET.dataset.emotetype})
-        })
-    })
+            ExecuteNUICallback("ROUTE_EMOTE", {
+                type: "emote",
+                emoteName: button.dataset.emoteid,
+                emoteType: button.dataset.emotetype
+            });
+        });
+    });
 }
 
 SEARCH_CONTAINER.addEventListener("submit", async (e) => {
@@ -164,6 +195,12 @@ SEARCH_BAR.addEventListener("input", (e) => {
 window.addEventListener('message', (event) => {
     if (event.data.type === 'OPEN_MENU') {
         document.body.style.display = event.data.value ? "flex" : "none";
+        if (!event.data.value) {
+            previewSession++;
+            clearTimeout(previewTimer);
+            pendingPreview = null;
+            lastPreviewKey = null;
+        }
         if (event.data.value) {
             const activeButton = document.querySelector(".sidebar-button-active .btn-sidebar") || document.querySelector("#emotes-menu-btn");
             activeButton?.focus();
