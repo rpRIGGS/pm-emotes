@@ -428,11 +428,9 @@ function PMInvalidatePreviewProps()
 end
 
 function EmotePlayOnNonPlayerPed(ped, name)
-    cleanScenarioObjects(ped)
-
+    -- Preview must not delete nearby scenario props belonging to the world or
+    -- other players. Scenario cleanup belongs to the real player lifecycle.
     if not DoesEntityExist(ped) then return false end
-
-    if InExitEmote then return false end
 
     -- NOTE: CancelPreviousEmote logic removed for non-player peds
     -- It was incorrectly setting the global ExitAndPlay flag
