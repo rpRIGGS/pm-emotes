@@ -66,7 +66,7 @@ end
 
 function PMPreviewCharacterEmote(emoteName, emoteType)
     if not previewActive or not previewPed or not DoesEntityExist(previewPed) then return false end
-    previewGeneration = previewGeneration + 1
+
     ClearPedTasksImmediately(previewPed)
     PMInvalidatePreviewProps()
     if not emoteName or emoteName == '' then return true end
