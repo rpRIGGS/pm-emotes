@@ -348,6 +348,12 @@ local function addProp(data)
     end
 
     LoadPropDict(data.prop1)
+    -- Model streaming can yield while the preview menu closes or changes selection.
+    -- Never spawn a prop for a deleted preview ped.
+    if not DoesEntityExist(target) then
+        SetModelAsNoLongerNeeded(data.prop1)
+        return false
+    end
 
     attachedProp = CreateObject(GetHashKey(data.prop1), x, y, z + 0.2, data.playerId ~= nil and Config.UseOldPropSpawning, false, false)
 
