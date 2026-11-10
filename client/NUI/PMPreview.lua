@@ -48,7 +48,9 @@ function PMOpenCharacterPreview()
         return false
     end
     SetCamCoord(previewCamera, camPos.x, camPos.y, camPos.z)
-    PointCamAtCoord(previewCamera, clonePos.x, clonePos.y, clonePos.z + 0.85)
+    -- Shift the focal point left so the clone appears behind the NUI's right preview pane.
+    local shiftX, shiftY = -forward.y * 1.3, forward.x * 1.3
+    PointCamAtCoord(previewCamera, clonePos.x + shiftX, clonePos.y + shiftY, clonePos.z + 0.85)
     SetCamFov(previewCamera, 40.0)
     SetCamActive(previewCamera, true)
     RenderScriptCams(true, true, 250, true, false)
