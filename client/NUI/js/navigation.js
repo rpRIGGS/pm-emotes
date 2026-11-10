@@ -8,6 +8,7 @@ const SEARCH_BAR = document.querySelector(".search-input");
 
 document.addEventListener("keydown", (e) => {
     const FOCUS_ELEMENT = document.activeElement;
+    if (FOCUS_ELEMENT === SEARCH_BAR && ["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight", " ", "PageUp", "PageDown"].includes(e.key)) return;
     switch (e.key) {
         case "PageDown":
         case "ArrowDown":
@@ -45,7 +46,7 @@ document.addEventListener("keyup", (e) => {
             if (FOCUS_ELEMENT.closest(".popover")) return;
 
             PlaySoundFrontend("BACK");
-            if (FOCUS_ELEMENT.closest(".keybinds-menu") || (FOCUS_ELEMENT.closest(".content-container") && !CONFIG.Search) ) return document.querySelector(".sidebar-button-active").querySelector(".btn")?.focus();
+            if (FOCUS_ELEMENT.closest(".keybinds-menu") || (FOCUS_ELEMENT.closest(".content-container") && CONFIG && !CONFIG.Search) ) return document.querySelector(".sidebar-button-active").querySelector(".btn")?.focus();
             if (FOCUS_ELEMENT.closest(".grid") && SEARCH_BAR.value !== "") return document.querySelector(".btn-clear-search").focus();
             if (FOCUS_ELEMENT.closest(".content-container")) return document.querySelector(".sidebar-button-active").querySelector(".btn")?.focus();
             return ExecuteNUICallback("CLOSE_MENU", {});
@@ -72,6 +73,7 @@ document.addEventListener("mouseover", (e) => {
     if (TARGET === SEARCH_BAR) return; 
     if (TARGET.nodeName === "BUTTON" || TARGET.nodeName === "INPUT" || TARGET.nodeName === "LABEL") {
         if (TARGET.nodeName === "LABEL") TARGET = document.getElementById(TARGET.htmlFor);
+        if (!TARGET) return;
         PlaySoundFrontend("NAV_UP_DOWN")
         TARGET.focus();
     }
