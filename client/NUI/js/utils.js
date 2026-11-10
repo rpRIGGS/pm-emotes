@@ -49,6 +49,9 @@ export function HandleSidebarButtonPress(el) {
             if (el.dataset.menu === "search-menu") return SEARCH_CONTAINER.querySelector(".search-input").focus();
             querySelectorVisible(OPENED_MENU)?.focus();
             break;
+        case "sitNearby":
+            ExecuteNUICallback("SIT_NEARBY", {});
+            break;
         case "cancelEmote":
             const req = ExecuteNUICallback("CANCEL_EMOTE", {}).finally((retval) => {}) 
             break;
