@@ -57,6 +57,7 @@ function PMOpenCharacterPreview()
         return false
     end
     SetCamCoord(previewCamera, camPos.x, camPos.y, camPos.z)
+    -- The target is left of the clone, putting the clone right-of-center in the camera image.
     PointCamAtCoord(previewCamera, clonePos.x - rightX * 1.2, clonePos.y - rightY * 1.2, clonePos.z + 0.9)
     SetCamFov(previewCamera, 40.0)
     SetCamActive(previewCamera, true)
