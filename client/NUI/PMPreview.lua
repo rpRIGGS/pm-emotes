@@ -1,10 +1,8 @@
 -- PM Emotes: local, non-networked preview. Never move or animate the player.
 local previewPed, previewCamera
 local previewActive = false
-local previewGeneration = 0
 
 local function clearPreview()
-    previewGeneration = previewGeneration + 1
     previewActive = false
     PMInvalidatePreviewProps()
     if previewCamera and DoesCamExist(previewCamera) then
