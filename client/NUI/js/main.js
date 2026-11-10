@@ -169,6 +169,9 @@ function _setupMenuEventListeners(menus) {
     });
 }
 
+// Static menus are bound once; newly loaded custom categories bind on creation.
+_setupMenuEventListeners(MENUS);
+
 SEARCH_CONTAINER.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (document.querySelector(".search-menu.grid")) {
