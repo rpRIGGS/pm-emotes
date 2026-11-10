@@ -51,6 +51,7 @@ client_scripts {
     'client/PMDanceCatalog03.lua',
     'client/PMDanceCatalog04.lua',
     'client/PMDanceCatalog05.lua',
+    'client/PMSyncedCatalog.lua',
     'client/Binoculars.lua',
     'client/Crouch.lua',
     'client/Emote.lua',
