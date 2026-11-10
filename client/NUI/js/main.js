@@ -80,7 +80,7 @@ document.addEventListener('localesLoaded', (e) => {
 })
 
 SIDE_NAVIGATION.addEventListener("click", (e) => {
-    const TARGET = e.target;
+    const TARGET = e.target.closest("[data-action]") || (e.target.closest(".sidebar-button-container") && e.target.closest(".sidebar-button-container").querySelector("[data-action]"));
 
     if (TARGET && TARGET.dataset.action) {
         HandleSidebarButtonPress(TARGET);
@@ -176,7 +176,7 @@ window.addEventListener('message', (event) => {
     if (event.data.type === 'LOAD_EMOTE_DATA') {
         // event.data.emoteData && event.data.categoryToEmotes && event.data.emoteCategories && event.data.emoteTypeIcons
         EMOTE_TYPE_ICONS = event.data.emoteTypeIcons || {}
-        const emoteCategories = event.data.emoteCategories
+        const emoteCategories = event.data.emoteCategories || {}
         Object.keys(emoteCategories).forEach((key) => {
             const SIDEBAR_ANCHOR = document.querySelector(".sidebar-button-anchor");
             const MENU_ANCHOR = document.querySelector(".menu-anchor");
@@ -191,7 +191,7 @@ window.addEventListener('message', (event) => {
 
             MENU_ANCHOR.insertAdjacentHTML("afterend",
                 `
-                <article class="menu ${emoteCategories[key].id}-menu doublecolumn btn-list">Hiii
+                <article class="menu ${emoteCategories[key].id}-menu doublecolumn btn-list">
                 </article>
                 `)
         })
