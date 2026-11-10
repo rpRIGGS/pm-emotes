@@ -1,0 +1,48 @@
+name: PM Emotes NUI static checks
+on:
+  push:
+    branches: [development/powermoves-nui]
+  pull_request:
+    paths:
+      - 'client/NUI/**'
+      - '.github/workflows/pm-emotes-nui.yml'
+jobs:
+  nui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check all NUI JavaScript modules
+        run: |
+          set -e
+          for file in client/NUI/js/*.js; do
+            node --input-type=module --check < "$file"
+          done
+      - name: Validate NUI file references and required hooks
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          html = Path("client/NUI/index.html").read_text()
+          class Scanner(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = set()
+                  self.refs = []
+              def handle_starttag(self, tag, attrs):
+                  d = dict(attrs)
+                  if "id" in d:
+                      assert d["id"] not in self.ids, f"duplicate id: {d['id']}"
+                      self.ids.add(d["id"])
+                  if tag == "script" and d.get("src"): self.refs.append(d["src"])
+                  if tag == "link" and d.get("href"): self.refs.append(d["href"])
+          scanner = Scanner()
+          scanner.feed(html)
+          for ref in scanner.refs:
+              assert (Path("client/NUI") / ref).is_file(), f"missing NUI asset: {ref}"
+          for name in ("pm-workspace", "pm-preview-panel", "side-navigation", "content-container"):
+              assert name in html, f"missing required UI component: {name}"
+          manifest = Path("fxmanifest.lua").read_text()
+          assert "'client/NUI/PMPreview.lua'" in manifest
+          assert "'client/NUI/EmoteMenuNUI.lua'" in manifest
+          print("NUI static checks passed")
+          PY
