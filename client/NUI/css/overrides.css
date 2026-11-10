@@ -71,3 +71,9 @@
 .side-navigation .sidebar-button-active {background:rgba(4,56,255,.12);border-left:3px solid var(--pm-blue)}
 .side-navigation .sidebar-button-active .btn-sidebar {margin-left:5px}
 .content-container .menu {min-width:0}
+
+/* The game-native scripted camera renders behind transparent NUI pixels. */
+.pm-preview-panel {background:rgba(12,18,31,.12)}
+.pm-preview-stage {background:transparent;border-color:rgba(115,145,255,.32)}
+.pm-preview-reticle {pointer-events:none;opacity:.35}
+.pm-preview-heading,.pm-preview-help {text-shadow:0 2px 6px #070b14}
