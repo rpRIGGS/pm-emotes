@@ -193,14 +193,8 @@ end)
 
 
 RegisterNUICallback('PREVIEW_EMOTE', function(data, cb)
-    local returnValue = true
-    if data.emoteName and data.emoteType then
-        returnValue = CreatePreviewPed(data.emoteName, data.emoteType)
-    else
-        CreatePreviewPed("", "")
-    end
-
-    cb({["ok"] = true, ["done"] = returnValue})
+    local success = PMPreviewCharacterEmote(data.emoteName, data.emoteType)
+    cb({["ok"] = true, ["done"] = success})
 end)
 
 RegisterNUICallback('SEARCH_EMOTES', function(data, cb)
@@ -305,6 +299,7 @@ end
 
 AddEventHandler("rpemotes:internal:handleNUIOpened", function()
     local _showEmoji = ShouldShowEmojiMenu()
+    PMOpenCharacterPreview()
     SendNUIMessage({type = "OPEN_MENU", value = true, shouldShowEmojiMenu = _showEmoji})
     SendNUIMessage({type = "TOGGLE_CURSOR_INPUT", value = false})
 
@@ -344,7 +339,7 @@ AddEventHandler("rpemotes:internal:handleNUIOpened", function()
         end
         Wait(1)
     end
-    CreatePreviewPed("", "")
+    PMCloseCharacterPreview()
     SetScaleformMovieAsNoLongerNeeded(scaleform_instructions)
     SendNUIMessage({type = "OPEN_MENU", value = false, shouldShowEmojiMenu = _showEmoji})
 end)
