@@ -241,7 +241,7 @@ local function stand()
     ClearPedTasks(PlayerPedId())
 end
 
-RegisterCommand('pmsit', function()
+function PMToggleNearbySeat()
     local ped = PlayerPedId()
     if seated then stand() return end
     if IsPedInAnyVehicle(ped, false) or IsPedDeadOrDying(ped, true) then return end
@@ -256,8 +256,9 @@ RegisterCommand('pmsit', function()
     EmoteCancel(true)
     TaskStartScenarioAtPosition(ped, config.scenario, pos.x, pos.y, pos.z, heading, 0, true, true)
     seated = true
-end, false)
+end
 
+RegisterCommand('pmsit', PMToggleNearbySeat, false)
 RegisterCommand('pmstand', stand, false)
 
 CreateThread(function()
