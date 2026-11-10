@@ -22,6 +22,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq lua5.4
           luac5.4 -p client/AnimationList.lua
+          luac5.4 -p client/PMSeating.lua
           for file in client/PMDanceCatalog*.lua; do
             luac5.4 -p "$file"
           done
@@ -36,6 +37,11 @@ jobs:
           ids = [m.group(1) for source in all_sources for m in re.finditer(r'\["(pmdance\d+)"\]', source)]
           assert len(ids) == len(set(ids)), "duplicate PM dance IDs"
           assert len(ids) == 3832, f"expected 3832 PM dances, got {len(ids)}"
+          seating = Path("client/PMSeating.lua").read_text()
+          assert seating.count("model = GetHashKey(") == 213, "chair offset catalog incomplete"
+          assert "'client/PMSeating.lua'" in manifest, "seating module not loaded"
+          assert "RegisterCommand('pmsit'" in seating and "RegisterCommand('pmstand'" in seating
+
           for path in files:
               assert f"'client/{path.name}'" in manifest, f"not loaded: {path.name}"
           print(f"Validated {len(ids)} unique PM dance entries in manifest-loaded catalogs")
