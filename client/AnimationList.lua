@@ -3130,6 +3130,489 @@ RP.Dances = {
             onFootFlag = AnimFlag.LOOP
         }
     },
+-- Additional GTA dance clips adapted from MIT-licensed lumo073/emotes-nopixel-4.0.
+-- Original project copyright (c) 2024 Jigger; see development/THIRD-PARTY-NOTICES.md.
+    ["pmdance001"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_male^6", "PM Dance 001",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance002"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_male^5", "PM Dance 002",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance003"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_female^1", "PM Dance 003",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance004"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v2_male^5", "PM Dance 004",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance005"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v1_female^4", "PM Dance 005",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance006"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v2_male^1", "PM Dance 006",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance007"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v2_female^2", "PM Dance 007",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance008"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v2_female^2", "PM Dance 008",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance009"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v2_male^4", "PM Dance 009",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance010"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v1_female^5", "PM Dance 010",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance011"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v2_male^2", "PM Dance 011",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance012"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v2_female^4", "PM Dance 012",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance013"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v1_male^2", "PM Dance 013",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance014"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v2_female^3", "PM Dance 014",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance015"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_female^6", "PM Dance 015",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance016"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v2_male^1", "PM Dance 016",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance017"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_flats_female^4", "PM Dance 017",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance018"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v1_male^6", "PM Dance 018",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance019"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v2_male^3", "PM Dance 019",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance020"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_male^2", "PM Dance 020",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance021"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_flats_female^5", "PM Dance 021",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance022"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v2_female^5", "PM Dance 022",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance023"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v2_female^4", "PM Dance 023",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance024"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_male^3", "PM Dance 024",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance025"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v2_male^1", "PM Dance 025",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance026"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_flats_female^1", "PM Dance 026",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance027"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v2_female^4", "PM Dance 027",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance028"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v2_male^4", "PM Dance 028",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance029"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_female^5", "PM Dance 029",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance030"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v2_male^3", "PM Dance 030",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance031"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v2_female^4", "PM Dance 031",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance032"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v2_male^4", "PM Dance 032",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance033"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_male^5", "PM Dance 033",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance034"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_male^4", "PM Dance 034",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance035"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v1_male^2", "PM Dance 035",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance036"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_flats_female^4", "PM Dance 036",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance037"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v1_male^5", "PM Dance 037",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance038"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v2_male^2", "PM Dance 038",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance039"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_female^4", "PM Dance 039",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance040"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v2_male^1", "PM Dance 040",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance041"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v2_male^4", "PM Dance 041",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance042"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v1_male^3", "PM Dance 042",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance043"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v1_male^4", "PM Dance 043",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance044"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v2_female^1", "PM Dance 044",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance045"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v2_female^6", "PM Dance 045",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance046"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v2_female^6", "PM Dance 046",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance047"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_flats_female^6", "PM Dance 047",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance048"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v2_female^6", "PM Dance 048",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance049"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v1_male^1", "PM Dance 049",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance050"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_flats_female^4", "PM Dance 050",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance051"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_flats_female^2", "PM Dance 051",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance052"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_male^6", "PM Dance 052",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance053"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v2_female^5", "PM Dance 053",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance054"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_female^3", "PM Dance 054",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance055"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_male^2", "PM Dance 055",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance056"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v1_female^3", "PM Dance 056",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance057"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v1_female^1", "PM Dance 057",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance058"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v2_female^5", "PM Dance 058",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance059"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v2_female^5", "PM Dance 059",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance060"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_flats_female^3", "PM Dance 060",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance061"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v2_female^5", "PM Dance 061",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance062"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v2_female^6", "PM Dance 062",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance063"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v2_male^3", "PM Dance 063",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance064"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v2_male^1", "PM Dance 064",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance065"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_female^6", "PM Dance 065",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance066"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v2_female^6", "PM Dance 066",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance067"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_female^1", "PM Dance 067",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance068"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_male^1", "PM Dance 068",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance069"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_flats_female^5", "PM Dance 069",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance070"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_female^4", "PM Dance 070",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance071"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_female^2", "PM Dance 071",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance072"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v2_male^2", "PM Dance 072",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance073"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_female^5", "PM Dance 073",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance074"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_female^4", "PM Dance 074",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance075"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v2_male^6", "PM Dance 075",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance076"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_male^5", "PM Dance 076",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance077"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_flats_female^2", "PM Dance 077",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance078"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v2_male^2", "PM Dance 078",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance079"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v2_male^3", "PM Dance 079",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance080"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v2_female^1", "PM Dance 080",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance081"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v2_male^6", "PM Dance 081",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance082"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v1_female^4", "PM Dance 082",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance083"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_female^2", "PM Dance 083",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance084"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_male^4", "PM Dance 084",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance085"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v1_female^6", "PM Dance 085",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance086"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v2_male^5", "PM Dance 086",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance087"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v1_female^2", "PM Dance 087",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance088"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v2_male^3", "PM Dance 088",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance089"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v2_female^3", "PM Dance 089",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance090"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_male^1", "PM Dance 090",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance091"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_female^2", "PM Dance 091",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance092"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v1_female^1", "PM Dance 092",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance093"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v2_female^4", "PM Dance 093",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance094"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v2_female^1", "PM Dance 094",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance095"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_female^6", "PM Dance 095",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance096"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v2_female^2", "PM Dance 096",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance097"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_female^3", "PM Dance 097",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance098"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_female^5", "PM Dance 098",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance099"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_male^1", "PM Dance 099",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance100"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v2_female^2", "PM Dance 100",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance101"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_flats_female^6", "PM Dance 101",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance102"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v2_male^6", "PM Dance 102",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance103"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_male^2", "PM Dance 103",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance104"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v1_male^4", "PM Dance 104",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance105"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_flats_female^1", "PM Dance 105",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance106"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v1_female^3", "PM Dance 106",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance107"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v2_female^1", "PM Dance 107",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance108"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_15_v1_flats_female^3", "PM Dance 108",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance109"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_13_v1_male^3", "PM Dance 109",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance110"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v1_male^1", "PM Dance 110",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance111"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_11_v1_female^5", "PM Dance 111",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance112"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_flats_female^6", "PM Dance 112",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance113"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_female^1", "PM Dance 113",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance114"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_male^4", "PM Dance 114",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance115"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v2_male^5", "PM Dance 115",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance116"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_male^3", "PM Dance 116",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance117"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v1_flats_female^3", "PM Dance 117",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance118"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v1_male^5", "PM Dance 118",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance119"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_17_v2_female^2", "PM Dance 119",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+    ["pmdance120"] = {
+        "anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v2_male^6", "PM Dance 120",
+        AnimationOptions = { onFootFlag = AnimFlag.LOOP }
+    },
+
 }
 
 
