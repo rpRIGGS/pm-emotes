@@ -69,6 +69,7 @@ function PMPreviewCharacterEmote(emoteName, emoteType)
 
     ClearPedTasksImmediately(previewPed)
     PMInvalidatePreviewProps()
+    ClearFacialIdleAnimOverride(previewPed)
     if not emoteName or emoteName == '' then return true end
     if emoteType == 'Emojis' or emoteType == 'Walks' then return true end
     if emoteType == 'Expressions' then
