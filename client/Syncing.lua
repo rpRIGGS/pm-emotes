@@ -30,8 +30,12 @@ if Config.SharedEmotesEnabled then
 end
 
 local function getPartnerPed(serverId)
+    -- Never substitute a random nearby player for a disconnected sync partner.
     local player = GetPlayerFromServerId(serverId)
-    return GetPlayerPed(player ~= -1 and player or GetClosestPlayer())
+    if player == -1 then return nil end
+    local ped = GetPlayerPed(player)
+    if not ped or ped == 0 or not DoesEntityExist(ped) then return nil end
+    return ped
 end
 
 local function attachToPartner(ped, partnerPed, options)
@@ -46,6 +50,7 @@ RegisterNetEvent("rpemotes:client:syncEmote", function(emote, player)
     Wait(300)
     targetPlayerId = player
     local partnerPed = getPartnerPed(player)
+    if not partnerPed then return end
 
     if IsPedInAnyVehicle(partnerPed, true) then
         return EmoteChatMessage(Translate('not_in_a_vehicle'))
@@ -75,12 +80,14 @@ end)
 RegisterNetEvent("rpemotes:client:syncEmoteSource", function(emote, player)
     local ped = PlayerPedId()
     local pedInFront = getPartnerPed(player)
+    if not pedInFront then return end
 
     if IsPedInAnyVehicle(ped, true) or IsPedInAnyVehicle(pedInFront, true) then
         return EmoteChatMessage(Translate('not_in_a_vehicle'))
     end
 
     local emoteData = SharedEmoteData[emote]
+    if not emoteData then return end
 
     EmoteCancel()
     Wait(300)
