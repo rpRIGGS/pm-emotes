@@ -432,7 +432,7 @@ function EmotePlayOnNonPlayerPed(ped, name)
     end
     local animOption = emoteData.AnimationOptions
 
-    LastEmote = {name = name, emoteType = emoteData.emoteType}
+    -- Previewing a non-player ped must not overwrite the player's active emote.
 
     if animOption and animOption.Prop then
         DestroyAllProps(true)
