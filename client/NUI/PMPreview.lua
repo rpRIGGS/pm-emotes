@@ -6,6 +6,7 @@ local previewGeneration = 0
 local function clearPreview()
     previewGeneration = previewGeneration + 1
     previewActive = false
+    PMInvalidatePreviewProps()
     if previewCamera and DoesCamExist(previewCamera) then
         RenderScriptCams(false, false, 0, true, false)
         SetCamActive(previewCamera, false)
@@ -13,7 +14,6 @@ local function clearPreview()
     end
     previewCamera = nil
     if previewPed and DoesEntityExist(previewPed) then
-        DestroyAllProps(true)
         SetEntityAsMissionEntity(previewPed, true, true)
         DeleteEntity(previewPed)
     end
@@ -70,7 +70,7 @@ function PMPreviewCharacterEmote(emoteName, emoteType)
     if not previewActive or not previewPed or not DoesEntityExist(previewPed) then return false end
     previewGeneration = previewGeneration + 1
     ClearPedTasksImmediately(previewPed)
-    DestroyAllProps(true)
+    PMInvalidatePreviewProps()
     if not emoteName or emoteName == '' then return true end
     if emoteType == 'Emojis' or emoteType == 'Walks' then return true end
     if emoteType == 'Expressions' then
