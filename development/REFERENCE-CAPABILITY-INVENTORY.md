@@ -69,3 +69,14 @@ The reference contains repeated IDs and some disabled animations. Exact ID and d
 3. Audit paired-emote sender/receiver mapping and missing animal actions.
 4. Decide which reference dance variants are usable and not disabled, then add missing valid entries with stable PM identifiers and preserved licensing notices.
 5. Verify all relevant behaviors in FiveM; a static catalog match cannot prove animations load.
+
+## Implementation update — 2026-11-10
+
+A first substantial dance-catalog implementation has now been committed:
+- 1,620 enabled GTA dance clips were appended to the native `RP.Dances` table in `client/AnimationList.lua`.
+- 2,212 more enabled dance clips were added in `client/PMDanceCatalog01.lua` through `client/PMDanceCatalog05.lua`, loaded in `fxmanifest.lua` after the base and custom catalogs.
+- 3,832 total supplemental dance entries were added. They use stable `pmdance...` IDs and existing RPEmotes animation options.
+- Original animation metadata source is MIT licensed; the notice is retained in `development/THIRD-PARTY-NOTICES.md`.
+- The supplemental files are now subject to Lua syntax checks in GitHub Actions.
+
+**Important:** this is catalog implementation, not confirmation that all clips stream and play in FiveM. The full reference includes 29 disabled dance entries, which were deliberately excluded. Other catalogs (chair models, synced pairs, animals, etc.) remain to be implemented or mapped individually.
