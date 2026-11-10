@@ -40,6 +40,20 @@ jobs:
               assert f"'client/{path.name}'" in manifest, f"not loaded: {path.name}"
           print(f"Validated {len(ids)} unique PM dance entries in manifest-loaded catalogs")
           PY
+      - name: Validate PM preview lifecycle contracts
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          preview = Path("client/NUI/PMPreview.lua").read_text()
+          emote = Path("client/Emote.lua").read_text()
+          assert "previewGeneration" not in preview, "obsolete preview generation counter"
+          assert "PMInvalidatePreviewProps()" in preview, "preview must invalidate async props"
+          assert "local previewPropVersion = 0" in emote, "preview prop token missing"
+          assert "data.previewVersion ~= previewPropVersion" in emote, "async prop guard missing"
+          assert "local newProp = CreateObject(" in emote, "prop handles must be local"
+          assert "return EmotePlayOnNonPlayerPed(previewPed, emoteName) ~= false" in preview
+          print("Preview lifecycle contracts verified")
+          PY
       - name: Validate NUI file references and required hooks
         run: |
           python3 - <<'PY'
