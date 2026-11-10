@@ -21,9 +21,25 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq lua5.4
+          luac5.4 -p client/AnimationList.lua
           for file in client/PMDanceCatalog*.lua; do
             luac5.4 -p "$file"
           done
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          manifest = Path("fxmanifest.lua").read_text()
+          files = sorted(Path("client").glob("PMDanceCatalog*.lua"))
+          assert len(files) == 5, f"expected 5 supplemental catalog modules, got {len(files)}"
+          base = Path("client/AnimationList.lua").read_text()
+          all_sources = [base] + [p.read_text() for p in files]
+          ids = [m.group(1) for source in all_sources for m in re.finditer(r'\["(pmdance\d+)"\]', source)]
+          assert len(ids) == len(set(ids)), "duplicate PM dance IDs"
+          assert len(ids) == 3832, f"expected 3832 PM dances, got {len(ids)}"
+          for path in files:
+              assert f"'client/{path.name}'" in manifest, f"not loaded: {path.name}"
+          print(f"Validated {len(ids)} unique PM dance entries in manifest-loaded catalogs")
+          PY
       - name: Validate NUI file references and required hooks
         run: |
           python3 - <<'PY'
