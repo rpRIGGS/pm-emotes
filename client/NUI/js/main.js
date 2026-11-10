@@ -111,7 +111,9 @@ async function drainPreviewQueue() {
         }
     } finally {
         previewBusy = false;
-        if (pendingPreview && session === previewSession) drainPreviewQueue();
+        // A previous session's in-flight callback may finish after a new menu opens.
+        // Do not strand the latest selection when that happens.
+        if (pendingPreview) drainPreviewQueue();
     }
 }
 
@@ -156,10 +158,8 @@ function _setupMenuEventListeners(menus) {
             if (!button || !button.dataset.emotetype) return;
             e.preventDefault();
             PlaySoundFrontend("SELECT");
-            if (e.shiftKey) {
-                document.dispatchEvent(new CustomEvent("contextmenu", {detail: {}}));
-                return;
-            }
+            // Shift-click must not synthesize an unbound contextmenu event.
+            // The existing Popover class owns right-click and action routing.
             ExecuteNUICallback("ROUTE_EMOTE", {
                 type: "emote",
                 emoteName: button.dataset.emoteid,
