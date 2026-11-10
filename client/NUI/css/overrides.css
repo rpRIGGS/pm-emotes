@@ -1,6 +1,48 @@
-/* 
-
-This file is here for you to override CSS variables and properties, instead of changing the main and dynamic files,
-as those files might get changed at any moment with an update.
-
-*/
+/* PowerMoves RP interface theme. Temporary gray and text logo are replaceable tokens. */
+:root {
+  --pm-blue: #0438ff;
+  --pm-gray: #252c39;
+  --pm-surface: rgba(18, 23, 34, .96);
+  --color-bg-primary: var(--pm-surface);
+  --color-bg-sidebar: rgba(26, 32, 46, .98);
+  --color-text-primary: #f1f4fc;
+  --color-text-secondary: #a3aec4;
+  --color-border: rgba(133, 150, 184, .23);
+  --color-border-accent-primary: var(--pm-blue);
+  --color-btn-bg: rgba(39, 47, 65, .94);
+  --color-btn-popover-bg: #283148;
+  --color-btn-border: rgba(136, 155, 195, .2);
+  --color-btn-hover: #354461;
+  --color-scrollbar: var(--pm-blue);
+  --color-scrollbar-hover: #5174ff;
+  --color-accent-primary: var(--pm-blue);
+  --color-accent-primary-hover: #4568ff;
+  --color-accent-secondary: var(--pm-gray);
+  --color-accent-secondary-hover: #3d4961;
+  --border-radius-menu: 16px;
+  --border-radius-search-bar: 10px;
+  --border-radius-btn-sidebar: 10px;
+  --border-radius-btn-sidebar-hover: 10px;
+  --border-radius-btn-emote: 9px;
+  --border-radius-btn-emote-hover: 9px;
+}
+.main-container {
+  border: 1px solid rgba(112, 135, 183, .24);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 90px rgba(0,0,0,.6), 0 0 30px rgba(4,56,255,.09);
+}
+.header-container {
+  background: linear-gradient(105deg, #121a2d 0%, #1b2741 65%, #102c83 100%);
+  border-bottom: 1px solid rgba(95,125,255,.4);
+  min-height: 74px;
+  display: flex;
+  align-items: center;
+  padding: 14px 24px;
+}
+.pm-brand {display:flex;align-items:center;gap:14px;color:#fff;font-family:Arial,sans-serif;letter-spacing:.09em}
+.pm-brand-mark {display:grid;place-items:center;width:48px;height:48px;border:1px solid #6583ff;border-radius:12px;background:var(--pm-blue);font-weight:900;font-size:18px}
+.pm-brand-name {font-size:21px;font-weight:800;line-height:1.1}
+.pm-brand-subtitle {font-size:10px;font-weight:700;letter-spacing:.25em;color:#9db1ff;margin-top:6px}
+.pm-brand-logo {max-height:52px;max-width:200px;object-fit:contain}
+.btn-emote:focus-visible,.btn-sidebar:focus-visible,.search-input:focus-visible {outline:2px solid #7190ff;outline-offset:2px}
