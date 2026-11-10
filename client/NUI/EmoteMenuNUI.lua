@@ -62,8 +62,13 @@ local function getEmojiFromCategoryName(str)
             return utf8.char(char)
         end
     end
-    local NUIEmoteCategoryEmoji = {"🚵", "🥳", "💃", "🤸", "🤹‍♂️", "🤹‍♀️", "🤓", "🏄‍♂️", "⛹️‍♀️", "🏋️"} -- If we cannot find an emoji in the category name, use a random one from here.
-    return NUIEmoteCategoryEmoji[math.random(1, #NUIEmoteCategoryEmoji)]
+    -- Stable icon fallback: categories must not change identity every rebuild.
+    local icons = {"🚵", "🥳", "💃", "🤸", "🤹‍♂️", "🤹‍♀️", "🤓", "🏄‍♂️", "⛹️‍♀️", "🏋️"}
+    local hash = 0
+    for i = 1, #str do
+        hash = (hash * 31 + str:byte(i)) % 2147483647
+    end
+    return icons[(hash % #icons) + 1]
 end
 
 local function getHtmlClassFromCategoryName(str)
