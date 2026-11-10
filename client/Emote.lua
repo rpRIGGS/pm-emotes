@@ -466,12 +466,12 @@ function EmotePlayOnNonPlayerPed(ped, name)
         elseif emoteData.scenarioType == ScenarioType.SCENARIO then
             TaskStartScenarioInPlace(ped, emoteData.scenario, 0, playEnterAnim)
         end
-        return
+        return true
     end
 
     if not LoadAnim(emoteData.dict) then
         EmoteChatMessage("'" .. name .. "' " .. Translate('notvalidemote') .. "")
-        return
+        return false
     end
 
     local flag = animOption?.Flag or animOption?.onFootFlag or 0
@@ -481,12 +481,13 @@ function EmotePlayOnNonPlayerPed(ped, name)
     TaskPlayAnim(ped, emoteData.dict, emoteData.anim, 5.0, 5.0, animOption and animOption.EmoteDuration or -1, flag, 0, false, false, false)
     RemoveAnimDict(emoteData.dict)
 
-    if not animOption or not animOption.Prop then return end
+    if not animOption or not animOption.Prop then return true end
 
     -- A preview needs its prop when the animation begins, not after its duration.
     -- The preview lifecycle deletes these props on every selection and on menu close.
     previewPropVersion = previewPropVersion + 1
     addProps(animOption, nil, ped, nil, true, previewPropVersion)
+    return true
 end
 
 function EmoteMenuStartClone(name, emoteType)
