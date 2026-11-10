@@ -42,3 +42,30 @@ Target: `rpRIGGS/pm-emotes`, branch `development/powermoves-nui`.
 6. Add final logo and secondary color without changing runtime behavior.
 
 **Status:** inventory started, feature parity NOT established. Do not report 100% implementation based only on existing RPEmotes modules or a passing syntax check.
+
+## Quantitative catalog audit — 2026-11-10
+
+The figures below come from direct static parsing of the reference's `[QB]/emotes` catalog files and the target's `client/AnimationList.lua`. They are **not** a runtime or behavioral parity percentage.
+
+| Reference catalog | Reference definitions | PM catalog / raw ID overlap | Gap interpretation |
+|---|---:|---:|---|
+| Regular emotes | 475 entries (471 distinct IDs) | 346 reference IDs found somewhere in PM | At least 129 reference IDs absent by exact name; aliases and animation equivalence still need analysis |
+| Dances | 3,889 entries (29 marked disabled) | 120 PM dance entries parsed, 36 matching animation dictionary + clip pairs | 3,853 reference dance pairs not found in PM's dance section by exact pair |
+| Synced | 30 entries (29 distinct IDs) | 7 IDs found in PM overall | Paired roles and synchronization must be compared; ID overlap is not feature equivalence |
+| Placed | 22 entries | 20 IDs found in PM overall | 2 missing by exact ID; PM's generic placement engine may support equivalent behavior |
+| Chair/seat models | 230 prop entries | No comparable prop-model seating table established | **Distinct capability gap:** model-aware seat offsets and sit targeting require dedicated implementation or verified equivalent |
+| Walk styles | 50 entries | PM has 139 walk definitions | Must compare movement clipset values rather than labels |
+| Expressions | 19 entries | PM has 38 expression definitions | Must compare facial animation values rather than labels |
+| Animals | Species-specific Lua actions | PM has 118 animal-emote entries | Species/action mapping not yet normalized |
+
+### Important qualification
+
+The reference contains repeated IDs and some disabled animations. Exact ID and dictionary/clip comparisons are intentionally conservative and **cannot** be used as proof of functional equivalence. The dance count includes a large set of GTA clip variants; loading all 3,889 into the NUI without filtering, validation and usability work is **not** automatically desirable.
+
+### Confirmed follow-up work
+
+1. Generate a normalized, machine-readable reference-to-PM coverage map for animation dictionaries, clips, IDs and flags.
+2. Implement model-aware chair interaction only after confirming that PM does not already provide equivalent functionality.
+3. Audit paired-emote sender/receiver mapping and missing animal actions.
+4. Decide which reference dance variants are usable and not disabled, then add missing valid entries with stable PM identifiers and preserved licensing notices.
+5. Verify all relevant behaviors in FiveM; a static catalog match cannot prove animations load.
