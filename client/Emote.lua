@@ -411,7 +411,7 @@ function addProps(animOption, textureVariation, ped, playerId, skipWait)
     if animOption.SecondProp
         and not attach(animOption.SecondProp, animOption.SecondPropBone, animOption.SecondPropPlacement, animOption.SecondPropNoCollision)
     then
-        DestroyAllProps()
+        DestroyAllProps(skipWait == true)
     end
 end
 
