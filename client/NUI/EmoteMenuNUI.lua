@@ -199,6 +199,14 @@ RegisterNUICallback('KEYBIND_EMOTE', function(data, cb)
 end)
 
 
+RegisterNUICallback('SIT_NEARBY', function(data, cb)
+    -- Release the preview camera and focus before interacting with the world.
+    PMCloseCharacterPreview()
+    ToggleNUIMenu()
+    PMToggleNearbySeat()
+    cb({["ok"] = true})
+end)
+
 RegisterNUICallback('PREVIEW_EMOTE', function(data, cb)
     local success = PMPreviewCharacterEmote(data.emoteName, data.emoteType)
     cb({["ok"] = true, ["done"] = success})
