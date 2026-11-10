@@ -163,9 +163,12 @@ SEARCH_BAR.addEventListener("input", (e) => {
 
 window.addEventListener('message', (event) => {
     if (event.data.type === 'OPEN_MENU') {
-        (event.data.value ? document.body.style.display = "flex" : document.body.style.display = "none")
-        document.querySelector(".btn-sidebar").focus();
-        event.data.shouldShowEmojiMenu ? document.querySelector(".emoji-sidebar")?.classList.remove("hidden") : document.querySelector(".emoji-sidebar")?.classList.add("hidden")
+        document.body.style.display = event.data.value ? "flex" : "none";
+        if (event.data.value) {
+            const activeButton = document.querySelector(".sidebar-button-active .btn-sidebar") || document.querySelector("#emotes-menu-btn");
+            activeButton?.focus();
+        }
+        event.data.shouldShowEmojiMenu ? document.querySelector(".emoji-sidebar")?.classList.remove("hidden") : document.querySelector(".emoji-sidebar")?.classList.add("hidden");
     }
 
     if (event.data.type === 'TOGGLE_CURSOR_INPUT') {
