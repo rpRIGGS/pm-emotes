@@ -46,3 +46,20 @@
 .pm-brand-subtitle {font-size:10px;font-weight:700;letter-spacing:.25em;color:#9db1ff;margin-top:6px}
 .pm-brand-logo {max-height:52px;max-width:200px;object-fit:contain}
 .btn-emote:focus-visible,.btn-sidebar:focus-visible,.search-input:focus-visible {outline:2px solid #7190ff;outline-offset:2px}
+
+/* Three-zone browsing layout: persistent category rail, results, and preview. */
+.main-container {width:min(1120px,94vw);height:min(730px,85vh);max-height:85vh;overflow:hidden}
+.pm-workspace {display:flex;flex:1;min-height:0;overflow:hidden}
+.menu-container {flex:1;min-width:0;gap:0}
+.side-navigation {position:relative;flex:0 0 180px;max-width:180px;width:180px;box-shadow:none;border-right:1px solid var(--color-border)}
+.side-navigation:hover,.side-navigation:has(button:focus-visible) {max-width:180px;box-shadow:none}
+.side-navigation .btn-sidebar-label {display:block}
+.content-container {margin-left:0;min-width:0;gap:14px;padding:0 12px 14px}
+.search-container {padding:16px 0 0}
+.pm-preview-panel {flex:0 0 30%;min-width:240px;display:flex;flex-direction:column;padding:20px 18px;background:linear-gradient(180deg,#151c2b,#111725);border-left:1px solid var(--color-border)}
+.pm-preview-heading {font:700 11px Arial,sans-serif;letter-spacing:.2em;color:#aab9dc}
+.pm-preview-stage {flex:1;min-height:0;margin:14px 0;position:relative;border:1px solid rgba(90,113,170,.22);border-radius:14px;background:radial-gradient(ellipse at 50% 70%,rgba(4,56,255,.14),transparent 65%),linear-gradient(180deg,#1b2435,#101622)}
+.pm-preview-reticle {position:absolute;inset:18%;border:1px dashed rgba(125,147,203,.18);border-radius:50%}
+.pm-preview-help {font:12px/1.5 Arial,sans-serif;color:var(--color-text-secondary);text-align:center}
+.footer-container {flex-shrink:0;background:#141b2a}
+@media(max-width:850px) {.side-navigation{flex-basis:145px;max-width:145px;width:145px}.side-navigation:hover,.side-navigation:has(button:focus-visible){max-width:145px}.pm-preview-panel{flex-basis:25%;min-width:185px}}
