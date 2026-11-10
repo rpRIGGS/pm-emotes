@@ -258,13 +258,12 @@ window.addEventListener('message', (event) => {
                         <button class="btn btn-emote btn-style-reset" data-emoteid="_reset" data-emotetype="${event.data[key][0].emoteType}" data-locale="normalreset"></button>
                         `)
                 }
-                event.data[key].forEach((el) => {
-                    if (el) {
-                        EMOTES.insertAdjacentHTML("beforeend", `
-                            <button class="btn btn-emote ${el.isFavorite ? "btn-emote-favorite" : ""} ${el.emoteType === "Emojis" ? "noto-color-emoji-regular" : ""}" data-emoteid="${el.emoteName}" data-emotetype="${el.emoteType}" data-label="${el.label}">${el.emoteType !== 'Emojis' ? EMOTE_TYPE_ICONS[el.emoteType]+" " : ""}${el.label}</button>
-                            `)
-                    }
-                })
+                // Render the full catalog in one DOM operation per category.
+                // Thousands of dances previously triggered thousands of HTML reparses.
+                const markup = (event.data[key] || []).filter(Boolean).map((el) => `
+                    <button class="btn btn-emote ${el.isFavorite ? "btn-emote-favorite" : ""} ${el.emoteType === "Emojis" ? "noto-color-emoji-regular" : ""}" data-emoteid="${el.emoteName}" data-emotetype="${el.emoteType}" data-label="${el.label}">${el.emoteType !== 'Emojis' ? (EMOTE_TYPE_ICONS[el.emoteType] || "")+" " : ""}${el.label}</button>
+                `).join("");
+                EMOTES.insertAdjacentHTML("beforeend", markup);
             }
         }
         event.data.favorites?.forEach((emote) => {
