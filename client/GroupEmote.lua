@@ -99,10 +99,17 @@ function OnGroupEmoteRequest(emotename)
 
     local players = {}
     local originCoords = GetEntityCoords(PlayerPedId())
-    for _,src in pairs(GetActivePlayers()) do
-        local crds = GetEntityCoords(GetPlayerPed(src))
-        if #(originCoords - crds) <= emoteRadius then
-            players[#players+1] = GetPlayerServerId(tonumber(src))
+    local localPlayer = PlayerId()
+    for _, src in pairs(GetActivePlayers()) do
+        -- The sender is already participating; never request their own consent.
+        if src ~= localPlayer then
+            local targetPed = GetPlayerPed(src)
+            if DoesEntityExist(targetPed) then
+                local crds = GetEntityCoords(targetPed)
+                if #(originCoords - crds) <= emoteRadius then
+                    players[#players+1] = GetPlayerServerId(src)
+                end
+            end
         end
     end
     if #players == 0 then
