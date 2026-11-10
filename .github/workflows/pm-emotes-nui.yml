@@ -48,6 +48,7 @@ jobs:
           emote = Path("client/Emote.lua").read_text()
           assert "previewGeneration" not in preview, "obsolete preview generation counter"
           assert "PMInvalidatePreviewProps()" in preview, "preview must invalidate async props"
+          assert "ClearFacialIdleAnimOverride(previewPed)" in preview, "preview must clear old facial overrides"
           assert "local previewPropVersion = 0" in emote, "preview prop token missing"
           assert "data.previewVersion ~= previewPropVersion" in emote, "async prop guard missing"
           assert "local newProp = CreateObject(" in emote, "prop handles must be local"
