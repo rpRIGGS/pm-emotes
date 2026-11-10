@@ -200,6 +200,11 @@ window.addEventListener('message', (event) => {
             clearTimeout(previewTimer);
             pendingPreview = null;
             lastPreviewKey = null;
+        } else {
+            // A fresh menu session must not inherit a stale preview from its last opening.
+            previewSession++;
+            pendingPreview = null;
+            lastPreviewKey = null;
         }
         if (event.data.value) {
             const activeButton = document.querySelector(".sidebar-button-active .btn-sidebar") || document.querySelector("#emotes-menu-btn");
