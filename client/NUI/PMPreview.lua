@@ -9,6 +9,7 @@ local function clearPreview()
     end
     previewCamera = nil
     if previewPed and DoesEntityExist(previewPed) then
+        DestroyAllProps(true)
         DeleteEntity(previewPed)
     end
     previewPed = nil
@@ -41,6 +42,7 @@ function PMOpenCharacterPreview()
     FreezeEntityPosition(previewPed, true)
     SetBlockingOfNonTemporaryEvents(previewPed, true)
 
+    -- Aim toward the clone from its front; the preview remains a local-only entity.
     local camPos = vector3(clonePos.x + forward.x * 3.0, clonePos.y + forward.y * 3.0, clonePos.z + 1.45)
     previewCamera = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
     if not previewCamera or not DoesCamExist(previewCamera) then
@@ -48,9 +50,12 @@ function PMOpenCharacterPreview()
         return false
     end
     SetCamCoord(previewCamera, camPos.x, camPos.y, camPos.z)
-    -- Shift the focal point left so the clone appears behind the NUI's right preview pane.
-    local shiftX, shiftY = -forward.y * 1.3, forward.x * 1.3
-    PointCamAtCoord(previewCamera, clonePos.x + shiftX, clonePos.y + shiftY, clonePos.z + 0.85)
+    -- Frame the clone toward the right side of the widescreen image.
+    -- Camera right is perpendicular to the player's forward vector.
+    local rightX, rightY = -forward.y, forward.x
+    local aimX = clonePos.x - rightX * 1.4
+    local aimY = clonePos.y - rightY * 1.4
+    PointCamAtCoord(previewCamera, aimX, aimY, clonePos.z + 0.85)
     SetCamFov(previewCamera, 40.0)
     SetCamActive(previewCamera, true)
     RenderScriptCams(true, true, 250, true, false)
@@ -64,6 +69,8 @@ function PMPreviewCharacterEmote(emoteName, emoteType)
     if not emoteName or emoteName == '' then return true end
     if emoteType == 'Emojis' or emoteType == 'Walks' or emoteType == 'Expressions' then return true end
     -- Reuse upstream's non-player animation engine rather than playing on the actual player.
+    local emote = EmoteData[emoteName] or SharedEmoteData[emoteName]
+    if not emote then return false end
     EmotePlayOnNonPlayerPed(previewPed, emoteName)
     return true
 end
