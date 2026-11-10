@@ -355,30 +355,33 @@ local function addProp(data)
         return false
     end
 
-    attachedProp = CreateObject(GetHashKey(data.prop1), x, y, z + 0.2, data.playerId ~= nil and Config.UseOldPropSpawning, false, false)
-
+    local newProp = CreateObject(GetHashKey(data.prop1), x, y, z + 0.2, data.playerId ~= nil and Config.UseOldPropSpawning, false, false)
+    if not newProp or newProp == 0 or not DoesEntityExist(newProp) then
+        SetModelAsNoLongerNeeded(data.prop1)
+        return false
+    end
     if data.textureVariation ~= nil then
-        SetObjectTextureVariation(attachedProp, data.textureVariation)
+        SetObjectTextureVariation(newProp, data.textureVariation)
     end
 
     if data.noCollision then
-        SetEntityCollision(attachedProp, false, false)
+        SetEntityCollision(newProp, false, false)
     end
 
-    AttachEntityToEntity(attachedProp, target, GetPedBoneIndex(target, data.bone), data.off1, data.off2, data.off3, data.rot1, data.rot2, data.rot3,
+    AttachEntityToEntity(newProp, target, GetPedBoneIndex(target, data.bone), data.off1, data.off2, data.off3, data.rot1, data.rot2, data.rot3,
         true, true, false, true, 1, true)
 
     if not data.playerId then
-        PreviewPedProps[#PreviewPedProps+1] = attachedProp
+        PreviewPedProps[#PreviewPedProps+1] = newProp
 
         local targetAlpha = GetEntityAlpha(target)
 
         if targetAlpha < 255 then
-            SetEntityAlpha(attachedProp, targetAlpha, false)
+            SetEntityAlpha(newProp, targetAlpha, false)
         end
     else
         ServerProps[target] = ServerProps[target] or {}
-        ServerProps[target][#ServerProps[target]+1] = attachedProp
+        ServerProps[target][#ServerProps[target]+1] = newProp
     end
 
     SetModelAsNoLongerNeeded(data.prop1)
