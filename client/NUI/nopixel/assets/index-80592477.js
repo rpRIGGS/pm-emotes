@@ -3,6 +3,27 @@ const pmPreviewId = item => String(item?.value ?? "").replace(/[^a-z0-9_-]/gi, "
 const pmPreviewFailed = new Set();
 let pmActiveHoverToken = 0;
 let pmActiveHoverTimer = null;
+let pmHoveredItem = null;
+const pmTryHoveredPreview = () => {
+  if (!pmHoveredItem) return;
+  if (window.PMAutoShotNoPixel?.show(pmHoveredItem)) {
+    Ge.execute("emotes:clearPreview").catch(() => {});
+  } else {
+    Ge.execute("emotes:preview", {
+      value: pmHoveredItem.value,
+      emoteType: pmHoveredItem.emoteType
+    }).catch(() => {});
+  }
+};
+window.addEventListener("pm-autoshot-manifest-ready", () => {
+  if (pmHoveredItem) pmTryHoveredPreview();
+});
+window.addEventListener("pm-autoshot-preview-failed", event => {
+  if (pmHoveredItem &&
+      event.detail?.key === String(pmHoveredItem.emoteType ?? "") + ":" + String(pmHoveredItem.value ?? "")) {
+    pmTryHoveredPreview();
+  }
+});
 const pmPreviewUrl = item => `./previews/emotes/${pmPreviewId(item)}.webp`;
 const pmSetPreview = (image, url) => {
   // Solid recycles tile elements while searching and changing categories.
@@ -18373,24 +18394,18 @@ const M2 = e => {
     // A recycled virtualized tile must not clear a newer tile's preview.
     // Use one hover owner across the entire catalog.
     m.addEventListener("mouseenter", () => {
+      pmHoveredItem = e.item;
       const token = ++pmActiveHoverToken;
       if (pmActiveHoverTimer !== null) clearTimeout(pmActiveHoverTimer);
       pmActiveHoverTimer = setTimeout(() => {
         pmActiveHoverTimer = null;
         if (token !== pmActiveHoverToken) return;
-        // Prefer captured PM AutoShot animations when deployed. If a
-        // matching asset is absent, retain the live cloned-ped preview.
-        if (window.PMAutoShotNoPixel?.show(e.item)) {
-          Ge.execute("emotes:clearPreview").catch(() => {});
-        } else {
-          Ge.execute("emotes:preview", {
-            value: e.item.value,
-            emoteType: e.item.emoteType
-          }).catch(() => {});
-        }
+        pmHoveredItem = e.item;
+        pmTryHoveredPreview();
       }, 180);
     });
     m.addEventListener("mouseleave", () => {
+      pmHoveredItem = null;
       const token = ++pmActiveHoverToken;
       if (pmActiveHoverTimer !== null) {
         clearTimeout(pmActiveHoverTimer);
