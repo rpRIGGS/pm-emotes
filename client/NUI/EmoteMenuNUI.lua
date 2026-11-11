@@ -325,8 +325,8 @@ end
 
 AddEventHandler("rpemotes:internal:handleNUIOpened", function()
     local _showEmoji = ShouldShowEmojiMenu()
-    -- Preserve the normal gameplay camera: the player must remain visible beside the NUI.
-    -- The old scripted preview camera was hiding the actual character.
+    -- Restore preview clone for emote selection; camera framing is handled in PMPreview.
+    PMOpenCharacterPreview()
     SendNUIMessage({type = "OPEN_MENU", value = true, shouldShowEmojiMenu = _showEmoji})
     SendNUIMessage({type = "TOGGLE_CURSOR_INPUT", value = false})
 
