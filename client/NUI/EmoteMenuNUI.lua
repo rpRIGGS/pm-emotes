@@ -430,6 +430,15 @@ if savedQuick then
     end
 end
 
+-- The compiled NoPixel frontend requests favorites and quick slots independently.
+-- Neither request may invalidate saved entries while the catalog is still building.
+local function waitForNPCatalog()
+    if next(npCatalog) then return true end
+    local deadline = GetGameTimer() + 5000
+    while not next(npCatalog) and GetGameTimer() < deadline do Wait(50) end
+    return next(npCatalog) ~= nil
+end
+
 local function findNPItem(name, emoteType)
     for category, items in pairs(npCatalog) do
         for _, item in ipairs(items) do
@@ -453,10 +462,10 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
     local args = type(data.args) == 'table' and data.args or {}
     if event == 'emotes:getEmotes' then
         -- NativeUI builds the shared catalog asynchronously on initial startup.
-        local deadline = GetGameTimer() + 5000
-        while not next(npCatalog) and GetGameTimer() < deadline do Wait(50) end
+        waitForNPCatalog()
         cb(npCatalog)
     elseif event == 'emotes:getFavorites' then
+        if not waitForNPCatalog() then cb({}) return end
         local favorites = {}
         local stored = GetFavoriteEmotes()
         local seen = {}
@@ -473,12 +482,13 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         npFavorites = favorites
         cb(favorites)
     elseif event == 'emotes:getQuickEmotes' then
+        local catalogReady = waitForNPCatalog()
         -- Catalog order can change when animation packs or categories change.
         -- Resolve saved slots by animation name, not a stale array index.
         local changed = false
         for i = 1, 10 do
             local saved = npQuick[i]
-            if type(saved) == 'table' and saved.value then
+            if catalogReady and type(saved) == 'table' and saved.value then
                 local item = findNPItem(saved.value, saved.emoteType)
                 if item and HasEmotePermission(item.value, item.emoteType) then
                     if saved.category ~= item.category or saved.index ~= item.index or saved.emoteType ~= item.emoteType then
@@ -489,7 +499,7 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
                     npQuick[i] = false
                     changed = true
                 end
-            elseif saved ~= false then
+            elseif catalogReady and saved ~= false then
                 npQuick[i] = false
                 changed = true
             end
