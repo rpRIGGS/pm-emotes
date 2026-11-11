@@ -152,6 +152,8 @@ function requestPreview(target, immediate = false) {
     const name = button?.dataset.emoteid || "";
     const type = button?.dataset.emotetype || "";
     const key = type + ":" + name;
+    document.querySelectorAll(".btn-emote.pm-selected").forEach(el => el.classList.remove("pm-selected"));
+    if (button) button.classList.add("pm-selected");
     selectedPreview = name && type ? {emoteName:name, emoteType:type, emoteLabel:button?.dataset.label || name} : null;
     document.getElementById("pm-preview-name").textContent = button?.dataset.label || name || "Select an animation";
     document.getElementById("pm-preview-category").textContent = type || "Browse the catalog to preview";
@@ -324,7 +326,7 @@ window.addEventListener('message', (event) => {
                 for (const el of (event.data[key] || [])) {
                     if (!el?.emoteName || !el.emoteType) continue;
                     const button = document.createElement("button");
-                    button.className = "btn btn-emote";
+                    button.className = "btn btn-emote pm-emote-card";
                     if (el.isFavorite) button.classList.add("btn-emote-favorite");
                     if (el.emoteType === "Emojis") button.classList.add("noto-color-emoji-regular");
                     button.dataset.emoteid = el.emoteName;
@@ -337,7 +339,13 @@ window.addEventListener('message', (event) => {
                         button.classList.add("btn-emote-unavailable");
                         button.title = "Unavailable";
                     }
-                    button.textContent = (el.emoteType !== "Emojis" ? (EMOTE_TYPE_ICONS[el.emoteType] || "") + " " : "") + (el.label || el.emoteName);
+                    const title = document.createElement("span");
+                    title.className = "pm-card-title";
+                    title.textContent = el.label || el.emoteName;
+                    const command = document.createElement("span");
+                    command.className = "pm-card-command";
+                    command.textContent = el.emoteType === "Emojis" ? "EMOJI" : "/e " + el.emoteName;
+                    button.append(title, command);
                     fragment.appendChild(button);
                 }
                 EMOTES.appendChild(fragment);
