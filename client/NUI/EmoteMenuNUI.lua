@@ -220,13 +220,17 @@ RegisterNUICallback('SIT_NEARBY', function(data, cb)
 end)
 
 RegisterNUICallback('PREVIEW_EMOTE', function(data, cb)
+    if type(data) ~= 'table' or (data.emoteName ~= nil and type(data.emoteName) ~= 'string') then
+        cb({["ok"] = false, ["done"] = false})
+        return
+    end
     local success = PMPreviewCharacterEmote(data.emoteName, data.emoteType)
     cb({["ok"] = true, ["done"] = success})
 end)
 
 RegisterNUICallback('SEARCH_EMOTES', function(data, cb)
     local retval = {}
-    if data.searchTerm ~= nil then
+    if type(data) == 'table' and type(data.searchTerm) == 'string' then
         retval = SearchEmotes(data.searchTerm)
     end
     --
@@ -239,7 +243,9 @@ end)
 
 
 RegisterNUICallback('PLAY_SOUND_FRONTEND', function(data, cb)
-    PlaySoundFrontend(-1, data.soundName, "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+    if type(data) == 'table' and type(data.soundName) == 'string' then
+        PlaySoundFrontend(-1, data.soundName, "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+    end
 
     cb({["ok"] = true})
 end)
