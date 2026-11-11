@@ -5,6 +5,7 @@ local nuiReady = false
 local initialDataLoaded = false
 local localesLoaded = false
 local pendingNuiOpen = false
+local menuSession = 0
 
 
 -- The NUI logic is designed to run *on top* of the existing NativeUI logic, since that menu already does all the data handling that we need.
@@ -363,6 +364,7 @@ function ToggleNUIMenu()
         SetNuiFocusKeepInput(false)
         TriggerEvent("rpemotes:internal:handleNUIOpened")
     else
+        menuSession = menuSession + 1
         PMCloseCharacterPreview()
         SetNuiFocus(false, false)
         SendNUIMessage({event = "emotes:closeUI", args = {}})
@@ -370,6 +372,8 @@ function ToggleNUIMenu()
 end
 
 AddEventHandler("rpemotes:internal:handleNUIOpened", function()
+    menuSession = menuSession + 1
+    local session = menuSession
     local _showEmoji = ShouldShowEmojiMenu()
     -- Restore preview clone for emote selection; camera framing is handled in PMPreview.
     SendNUIMessage({event = "emotes:open", args = {}})
@@ -378,7 +382,7 @@ AddEventHandler("rpemotes:internal:handleNUIOpened", function()
 
     -- NoPixel is mouse-driven: retain cursor focus and prevent gameplay controls
     -- from firing behind the UI. Escape is handled by the frontend.
-    while IsNuiFocused() do
+    while IsNuiFocused() and menuSession == session do
         DisableControlAction(0, 1, true)
         DisableControlAction(0, 2, true)
         DisableControlAction(0, 14, true)
@@ -389,6 +393,8 @@ AddEventHandler("rpemotes:internal:handleNUIOpened", function()
         DisableControlAction(0, 200, true)
         Wait(0)
     end
+    -- An older menu thread must not close a newer F4 session.
+    if menuSession ~= session then return end
     PMCloseCharacterPreview()
     SendNUIMessage({event = "emotes:closeUI", args = {}})
     SendNUIMessage({type = "OPEN_MENU", value = false, shouldShowEmojiMenu = _showEmoji})
