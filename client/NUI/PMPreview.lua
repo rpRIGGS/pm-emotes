@@ -61,9 +61,11 @@ function PMOpenCharacterPreview()
         return false
     end
     previewCamera = cam
-    -- Camera is in front of the clone, and the point of interest is offset
-    -- to the right so the preview remains visible beside the emote menu.
-    local cameraPosition = vector3(stage.x + forward.x * 3.5, stage.y + forward.y * 3.5, stage.z + 1.3)
+    -- The clone faces heading + 180 degrees, i.e. opposite the player's
+    -- forward vector. Put the camera on that facing side (not behind it).
+    -- Offset framing so the emote menu does not obscure the character.
+    local cameraPosition = vector3(stage.x - forward.x * 3.5 - right.x * 0.7,
+        stage.y - forward.y * 3.5 - right.y * 0.7, stage.z + 1.3)
     SetCamCoord(cam, cameraPosition.x, cameraPosition.y, cameraPosition.z)
     PointCamAtCoord(cam, stage.x - right.x * 0.7, stage.y - right.y * 0.7, stage.z + 0.9)
     SetCamFov(cam, 45.0)
