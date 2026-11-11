@@ -204,11 +204,15 @@ let lastSearchInputValue = ""
 SEARCH_BAR.addEventListener("focus", () => ExecuteNUICallback("SEARCH_BAR_FOCUS", { isFocused: true }));
 SEARCH_BAR.addEventListener("blur", () => ExecuteNUICallback("SEARCH_BAR_FOCUS", { isFocused: false }));
 
-SEARCH_BAR.addEventListener("input", (e) => {
-    if (document.querySelector(".search-menu.grid")) return;
-    if (SEARCH_BAR.value !== lastSearchInputValue) HandleEmoteFilter();
-    lastSearchInputValue = SEARCH_BAR.value
-})
+SEARCH_BAR.addEventListener("input", () => {
+    if (SEARCH_BAR.value === lastSearchInputValue) return;
+    lastSearchInputValue = SEARCH_BAR.value;
+    if (document.querySelector(".search-menu.grid")) {
+        HandleEmoteSearch();
+    } else {
+        HandleEmoteFilter();
+    }
+});
 
 
 window.addEventListener('message', (event) => {
