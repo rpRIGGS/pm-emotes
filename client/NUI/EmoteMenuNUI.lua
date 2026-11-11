@@ -72,11 +72,15 @@ local function getEmojiFromCategoryName(str)
 end
 
 local function getHtmlClassFromCategoryName(str)
-    local toLower = str:lower()
-    local result = "custom-" .. toLower:gsub("[%s%p%c%z]", "");
-    local emoji = getEmojiFromCategoryName(result);
-    result = result:gsub(emoji, "");
-    return result
+    -- CSS-safe, deterministic category IDs. Keep different punctuation/emoji
+    -- categories distinct, and avoid invalid selectors in the browser.
+    local normalized = str:lower():gsub("[^%w]", "")
+    if normalized == "" then normalized = "category" end
+    local hash = 0
+    for i = 1, #str do
+        hash = (hash * 31 + str:byte(i)) % 2147483647
+    end
+    return ("custom-%s-%x"):format(normalized, hash)
 end
 
 local NUIEmoteCategories = {
