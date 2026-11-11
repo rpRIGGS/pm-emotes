@@ -104,6 +104,10 @@ check("frontend hover ownership", "pmActiveHoverToken" in js)
 check("preview lifecycle", all(f"function {fn}" in preview for fn in
       ("PMOpenCharacterPreview", "PMPreviewCharacterEmote", "PMCloseCharacterPreview")))
 check("preview ped is not networked", "ClonePed(player, heading + 180.0, false, false)" in preview)
+check("failed preview cleans up clone and camera",
+      "if success then" in preview and
+      "else\\n        -- A failed clip must not leave a clone/camera" in preview and
+      "clearPreview()" in preview)
 check("preview resource-stop cleanup", "onResourceStop" in preview)
 check("preview selection generation guard",
       "requestVersion ~= previewPropVersion" in emote_engine)
