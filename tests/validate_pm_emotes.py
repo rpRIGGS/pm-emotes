@@ -47,7 +47,7 @@ check("AutoShot reads deployed manifest", '../previews/manifest.json' in autosho
 check("AutoShot rejects unsafe preview paths",
       "safeFile(file)" in autoshot and "entries.set(key, file)" in autoshot)
 check("AutoShot preserves live preview fallback",
-      'window.PMAutoShotNoPixel?.show(e.item)' in js and
+      'window.PMAutoShotNoPixel?.show(pmHoveredItem)' in js and
       'Ge.execute("emotes:preview"' in js)
 check("AutoShot clears on menu close", 'emotes:closeUI' in autoshot)
 check("AutoShot announces manifest readiness",
