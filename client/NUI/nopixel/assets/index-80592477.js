@@ -18512,11 +18512,22 @@ function tv() {
     if (m?.id.toString().startsWith("quick:")) {
       const slot = Number(m.id.toString().slice(6));
       if (!Number.isInteger(slot) || slot < 0 || slot > 9) return;
+      // Dragging an assigned slot onto another slot moves the emote;
+      // dragging it outside the bar clears it.
+      const destination = h && Number(h.id);
+      const moveToSlot = h && Number.isInteger(destination) && destination >= 0 && destination <= 9;
+      if (moveToSlot && destination === slot) return;
+      const current = r[String(slot)];
       try {
-        const saved = await Ge.execute("emotes:setQuickEmote", slot, null);
-        if (saved) t(current => ({...current, [slot]: null}));
+        if (moveToSlot && current) {
+          const saved = await Ge.execute("emotes:setQuickEmote", destination, current);
+          if (!saved) return;
+          t(state => ({...state, [destination]: current}));
+        }
+        const cleared = await Ge.execute("emotes:setQuickEmote", slot, null);
+        if (cleared) t(state => ({...state, [slot]: null}));
       } catch (error) {
-        console.error("[PowerMoves RP] Could not clear quick slot", error);
+        console.error("[PowerMoves RP] Could not update quick slots", error);
       }
       return;
     }
