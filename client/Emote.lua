@@ -24,6 +24,7 @@ local PtfxNotif = false
 local PtfxPrompt = false
 local AnimationThreadStatus = false
 local CheckStatus = false
+local checkStatusGeneration = 0
 local InExitEmote = false
 local ExitAndPlay = false
 local EmoteCancelPlaying = false
@@ -159,23 +160,29 @@ local function runAnimationThread()
 end
 
 local function checkStatusThread(dict, anim)
+    -- Each new animation invalidates older watchers. Without this, an old
+    -- watcher can see the replacement animation, decide its own animation
+    -- ended, and immediately cancel the new emote.
+    checkStatusGeneration = checkStatusGeneration + 1
+    local generation = checkStatusGeneration
+    CheckStatus = true
     CreateThread(function()
-        if CheckStatus then
-            CheckStatus = false
+        local deadline = GetGameTimer() + 3000
+        while generation == checkStatusGeneration and IsInAnimation
+            and not IsEntityPlayingAnim(PlayerPedId(), dict, anim, 3)
+            and GetGameTimer() < deadline do
             Wait(10)
         end
-        CheckStatus = true
-        while not IsEntityPlayingAnim(PlayerPedId(), dict, anim, 3) do
-            Wait(5)
-        end
-        while CheckStatus and IsInAnimation do
+        if generation ~= checkStatusGeneration or not IsInAnimation
+            or not IsEntityPlayingAnim(PlayerPedId(), dict, anim, 3) then return end
+        while generation == checkStatusGeneration and CheckStatus and IsInAnimation do
             if not IsEntityPlayingAnim(PlayerPedId(), dict, anim, 3) and not isBumpingPed then
                 DebugPrint("Animation ended")
                 DestroyAllProps()
                 EmoteCancel()
                 break
             end
-            Wait(0)
+            Wait(25)
         end
     end)
 end
@@ -625,6 +632,7 @@ local function playExitAndEnterEmote(name, textureVariation, emoteType)
     -- Stop the status checking thread FIRST to prevent it from 
     -- detecting the animation end and calling EmoteCancel
     CheckStatus = false
+    checkStatusGeneration = checkStatusGeneration + 1
     AnimationThreadStatus = false
 
     exitScenario()
@@ -736,6 +744,7 @@ function OnEmotePlay(name, textureVariation, emoteType)
         -- Don't set lastEmoteTime here - set it when emote actually plays
     end
     CheckStatus = false
+    checkStatusGeneration = checkStatusGeneration + 1
 
     cleanScenarioObjects(PlayerPedId())
     local inVehicle = IsPedInAnyVehicle(PlayerPedId(), true)
