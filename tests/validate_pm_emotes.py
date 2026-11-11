@@ -91,6 +91,13 @@ check("quick slots remain unbound by default",
       "RegisterKeyMapping(command" in bridge and "'keyboard', ''" in bridge)
 check("quick slot persistence", "SetResourceKvp(quickKvp" in bridge)
 check("quick slot restore", "GetResourceKvpString(quickKvp)" in bridge)
+check("catalog not-ready is not misreported as empty",
+      "if not waitForNPCatalog() then" in bridge and
+      'if (catalog === false) throw new Error("Emote catalog did not become ready")' in js)
+check("frontend retries catalog after first join",
+      'for (let attempt = 0; catalog === false && attempt < 4; attempt++)' in js)
+check("favorites and slots reload after catalog",
+      '[favorites, quick] = await Promise.all([' in js)
 check("catalog readiness gate", "npCatalogReady" in bridge)
 check("favorite permission gate", "HasEmotePermission(item.value, item.emoteType)" in bridge)
 check("frontend hover ownership", "pmActiveHoverToken" in js)
