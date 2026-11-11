@@ -335,8 +335,24 @@ AddEventHandler("rpemotes:internal:sendKeybindsDataToNUI", function(binds)
     })
 end)
 
-function ToggleNUIMenu() 
+function ToggleNUIMenu()
     if not IsNuiFocused() then
+        -- The NoPixel page initializes asynchronously. Avoid sending the first
+        -- F4 open before its message listener has registered.
+        if not nuiReady or not initialDataLoaded then
+            CreateThread(function()
+                local deadline = GetGameTimer() + 10000
+                while (not nuiReady or not initialDataLoaded) and GetGameTimer() < deadline do
+                    Wait(50)
+                end
+                if nuiReady and initialDataLoaded and not IsNuiFocused() then
+                    ToggleNUIMenu()
+                else
+                    print('[pm-emotes] NUI did not become ready; F4 menu was not opened')
+                end
+            end)
+            return
+        end
         SetNuiFocus(true, true)
         SetNuiFocusKeepInput(false)
         TriggerEvent("rpemotes:internal:handleNUIOpened")
