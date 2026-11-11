@@ -1,6 +1,14 @@
 // PM AutoShot exports flat preview IDs; legacy category folders remain supported as a fallback.
 const pmPreviewId = item => String(item?.value ?? "").replace(/[^a-z0-9_-]/gi, "_");
 const pmPreviewUrl = item => `./previews/emotes/${pmPreviewId(item)}.webp`;
+const pmSetPreview = (image, url) => {
+  // Solid recycles tile elements while searching and changing categories.
+  // A previous item's failed lookup must not suppress this item's fallback.
+  if (image.getAttribute("src") !== url) {
+    delete image.dataset.pmPreviewFallback;
+    image.setAttribute("src", url);
+  }
+};
 const pmPreviewError = (image, item) => {
   const category = String(item?.category ?? "").replace(/[^a-z0-9_-]/gi, "_");
   const legacy = `./previews/${category}/${pmPreviewId(item)}.webp`;
@@ -18378,7 +18386,7 @@ const M2 = e => {
         ke(y, A._v$4 = R);
       }
       if (B !== A._v$5) {
-        Pr(y, "src", A._v$5 = B);
+        pmSetPreview(y, A._v$5 = B);
       }
       if (z !== A._v$6) {
         ke(g, A._v$6 = z);
@@ -18588,7 +18596,7 @@ function tv() {
                     ke(N, S._v$5 = D);
                   }
                   if (P !== S._v$6) {
-                    Pr(N, "src", S._v$6 = P);
+                    pmSetPreview(N, S._v$6 = P);
                   }
                   return S;
                 }, {
