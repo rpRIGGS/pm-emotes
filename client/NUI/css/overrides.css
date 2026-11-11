@@ -142,3 +142,35 @@ body,body.align-left {justify-content:flex-start !important;align-items:center !
 .footer-container {min-height:20px;background:rgba(12,15,23,.97)}
 @media(max-width:900px){.main-container{width:min(620px,65vw)}}
 @media(max-width:680px){.main-container{width:95vw}.side-navigation{flex-basis:105px !important;width:105px !important;max-width:105px !important}}
+
+/* A transparent framed viewport over the game camera: the animated clone is
+   rendered by FiveM, not by a fake CSS image or a static placeholder. */
+.pm-preview-panel {
+  display:flex !important;
+  position:fixed !important;
+  right:2vw !important;
+  top:12vh !important;
+  width:31vw !important;
+  height:70vh !important;
+  min-width:0 !important;
+  flex:none !important;
+  box-sizing:border-box !important;
+  padding:12px !important;
+  background:transparent !important;
+  border:1px solid rgba(107,111,128,.5) !important;
+  border-top:2px solid var(--pm-blue) !important;
+  border-radius:4px !important;
+  pointer-events:none !important;
+}
+.pm-preview-stage {
+  display:block !important;
+  flex:1 !important;
+  background:transparent !important;
+  border:0 !important;
+  margin:0 !important;
+}
+.pm-preview-reticle {display:none !important}
+.pm-preview-heading {font-size:10px !important;color:#e1e4ee !important;letter-spacing:.16em}
+.pm-preview-help {font-size:10px !important;text-align:left !important;color:#c3c8d5 !important}
+@media(max-width:900px){.pm-preview-panel{right:1vw !important;width:30vw !important}}
+@media(max-width:680px){.pm-preview-panel{display:none !important}}
