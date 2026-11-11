@@ -456,7 +456,7 @@ function EmotePlayOnNonPlayerPed(ped, name)
 
     if emoteData.scenario then
         if requestVersion ~= previewPropVersion or not DoesEntityExist(ped) then return false end
-        checkGender()
+        -- Previewing a clone must not mutate the player's global gender state.
         ClearPedTasks(ped)
         DestroyAllProps(true)
         -- This function only runs on a non-player ped. Do not rely on the
