@@ -584,7 +584,11 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
             return
         end
         local success = PMPreviewCharacterEmote(item.value, item.emoteType) == true
-        if token ~= previewRequestToken or not IsNuiFocused() then
+        if token ~= previewRequestToken then
+            cb(false)
+            return
+        end
+        if not IsNuiFocused() then
             PMCloseCharacterPreview()
             cb(false)
             return
