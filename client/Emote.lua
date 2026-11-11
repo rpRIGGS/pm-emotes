@@ -24,7 +24,6 @@ local PtfxNotif = false
 local PtfxPrompt = false
 local AnimationThreadStatus = false
 local CheckStatus = false
-local checkStatusGeneration = 0
 local InExitEmote = false
 local ExitAndPlay = false
 local EmoteCancelPlaying = false
@@ -160,29 +159,23 @@ local function runAnimationThread()
 end
 
 local function checkStatusThread(dict, anim)
-    -- Each new animation invalidates older watchers. Without this, an old
-    -- watcher can see the replacement animation, decide its own animation
-    -- ended, and immediately cancel the new emote.
-    checkStatusGeneration = checkStatusGeneration + 1
-    local generation = checkStatusGeneration
-    CheckStatus = true
     CreateThread(function()
-        local deadline = GetGameTimer() + 3000
-        while generation == checkStatusGeneration and IsInAnimation
-            and not IsEntityPlayingAnim(PlayerPedId(), dict, anim, 3)
-            and GetGameTimer() < deadline do
+        if CheckStatus then
+            CheckStatus = false
             Wait(10)
         end
-        if generation ~= checkStatusGeneration or not IsInAnimation
-            or not IsEntityPlayingAnim(PlayerPedId(), dict, anim, 3) then return end
-        while generation == checkStatusGeneration and CheckStatus and IsInAnimation do
+        CheckStatus = true
+        while not IsEntityPlayingAnim(PlayerPedId(), dict, anim, 3) do
+            Wait(5)
+        end
+        while CheckStatus and IsInAnimation do
             if not IsEntityPlayingAnim(PlayerPedId(), dict, anim, 3) and not isBumpingPed then
                 DebugPrint("Animation ended")
                 DestroyAllProps()
                 EmoteCancel()
                 break
             end
-            Wait(25)
+            Wait(0)
         end
     end)
 end
@@ -226,26 +219,10 @@ end
 function EmoteCancel(force)
     if (not LocalPlayer.state.canCancel and oneSyncEnabled) and not force then return end
 
-    -- X must be a no-op when idle. In particular, never detach the player,
-    -- exit a scenario, or alter cancellation flags when no emote is active.
-    -- Also do not leave EmoteCancelPlaying stuck true when an exit animation
-    -- is already in progress (the exit timer owns that transition).
-    if InExitEmote then return end
-    if not IsInAnimation and not ExitAndPlay then
-        -- Hands-up is a secondary-task animation, not an RPEmotes IsInAnimation
-        -- state. X must still lower raised hands without touching idle players.
-        local ped = PlayerPedId()
-        if InHandsup or IsEntityPlayingAnim(ped, 'random@mugging3', 'handsup_standing_base', 3) then
-            InHandsup = false
-            ClearPedSecondaryTask(ped)
-            SetCurrentEmoteState(nil)
-        end
-        EmoteCancelPlaying = false
-        return
-    end
-
     SetCurrentEmoteState(nil)
     EmoteCancelPlaying = true
+
+    if InExitEmote then return end
 
     exitScenario()
 
@@ -632,7 +609,6 @@ local function playExitAndEnterEmote(name, textureVariation, emoteType)
     -- Stop the status checking thread FIRST to prevent it from 
     -- detecting the animation end and calling EmoteCancel
     CheckStatus = false
-    checkStatusGeneration = checkStatusGeneration + 1
     AnimationThreadStatus = false
 
     exitScenario()
@@ -744,7 +720,6 @@ function OnEmotePlay(name, textureVariation, emoteType)
         -- Don't set lastEmoteTime here - set it when emote actually plays
     end
     CheckStatus = false
-    checkStatusGeneration = checkStatusGeneration + 1
 
     cleanScenarioObjects(PlayerPedId())
     local inVehicle = IsPedInAnyVehicle(PlayerPedId(), true)
