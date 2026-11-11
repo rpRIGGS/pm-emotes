@@ -464,6 +464,18 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
     elseif event == 'emotes:close' then
         if IsNuiFocused() then ToggleNUIMenu() end
         cb(true)
+    elseif event == 'emotes:preview' then
+        local requested = args[1]
+        if type(requested) ~= 'table' or type(requested.value) ~= 'string' then
+            cb(false)
+            return
+        end
+        local item = findNPItem(requested.value, requested.emoteType)
+        if not item or not HasEmotePermission(item.value, item.emoteType) then
+            cb(false)
+            return
+        end
+        cb(PMPreviewCharacterEmote(item.value, item.emoteType) == true)
     elseif event == 'emotes:play' then
         local requested = args[1] or {}
         if type(requested) ~= 'table' then cb(false) return end
