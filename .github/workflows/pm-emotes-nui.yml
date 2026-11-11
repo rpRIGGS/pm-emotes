@@ -132,7 +132,6 @@ jobs:
   package:
     name: Package complete FiveM resource
     runs-on: ubuntu-latest
-    needs: nui
     steps:
       - uses: actions/checkout@v4
         with:
@@ -149,8 +148,9 @@ jobs:
             cp "$file" "package/pm-emotes/$file"
           done
           test -f package/pm-emotes/fxmanifest.lua
-          test -f package/pm-emotes/client/NUI/index.html
-          test -f package/pm-emotes/client/NUI/js/main.js
+          test -f package/pm-emotes/client/NUI/nopixel/index.html
+          test -f package/pm-emotes/client/NUI/nopixel/assets/index-80592477.js
+          test -f package/pm-emotes/client/NUI/nopixel/assets/index-5495b930.css
           test -f package/pm-emotes/client/NUI/PMPreview.lua
           cd package
           zip -qr ../pm-emotes-fivem.zip pm-emotes
