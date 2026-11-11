@@ -438,7 +438,13 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
             end
         end
         if changed then SetResourceKvp(quickKvp, json.encode(npQuick)) end
-        cb(npQuick)
+        -- NoPixel's drag-and-drop slots are numbered 0..9. Lua arrays are
+        -- 1..10, so returning npQuick directly offsets every displayed slot.
+        local slots = {}
+        for i = 1, 10 do
+            slots[tostring(i - 1)] = npQuick[i] or false
+        end
+        cb(slots)
     elseif event == 'emotes:close' then
         if IsNuiFocused() then ToggleNUIMenu() end
         cb(true)
