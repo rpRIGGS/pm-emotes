@@ -40,12 +40,12 @@ function PMOpenCharacterPreview()
     -- Stage the clone away from the player and aim a private camera at it.
     -- The actual player is never moved or animated.
     local stage = vector3(origin.x + forward.x * 3.0, origin.y + forward.y * 3.0, origin.z)
-    local clone = ClonePed(player, heading + 180.0, false, false)
+    local clone = ClonePed(player, heading, false, false)
     if not clone or clone == 0 or not DoesEntityExist(clone) then return false end
     previewPed = clone
     SetEntityAsMissionEntity(clone, true, true)
     SetEntityCoordsNoOffset(clone, stage.x, stage.y, stage.z, false, false, false)
-    SetEntityHeading(clone, heading + 180.0)
+    SetEntityHeading(clone, heading)
     SetEntityCollision(clone, false, false)
     SetEntityVisible(clone, true, false)
     SetEntityAlpha(clone, 255, false)
@@ -61,11 +61,11 @@ function PMOpenCharacterPreview()
         return false
     end
     previewCamera = cam
-    -- The clone faces heading + 180 degrees, i.e. opposite the player's
-    -- forward vector. Put the camera on that facing side (not behind it).
-    -- Offset framing so the emote menu does not obscure the character.
-    local cameraPosition = vector3(stage.x - forward.x * 3.5 - right.x * 0.7,
-        stage.y - forward.y * 3.5 - right.y * 0.7, stage.z + 1.3)
+    -- Keep the clone facing the player's heading and put the camera ahead
+    -- of it. This avoids filming its back or positioning the camera through
+    -- the actual player, who is three meters behind the clone.
+    local cameraPosition = vector3(stage.x + forward.x * 3.5 - right.x * 0.7,
+        stage.y + forward.y * 3.5 - right.y * 0.7, stage.z + 1.3)
     SetCamCoord(cam, cameraPosition.x, cameraPosition.y, cameraPosition.z)
     PointCamAtCoord(cam, stage.x - right.x * 0.7, stage.y - right.y * 0.7, stage.z + 0.9)
     SetCamFov(cam, 45.0)
