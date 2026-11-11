@@ -219,10 +219,18 @@ end
 function EmoteCancel(force)
     if (not LocalPlayer.state.canCancel and oneSyncEnabled) and not force then return end
 
+    -- X must be a no-op when idle. In particular, never detach the player,
+    -- exit a scenario, or alter cancellation flags when no emote is active.
+    -- Also do not leave EmoteCancelPlaying stuck true when an exit animation
+    -- is already in progress (the exit timer owns that transition).
+    if InExitEmote then return end
+    if not IsInAnimation and not ExitAndPlay then
+        EmoteCancelPlaying = false
+        return
+    end
+
     SetCurrentEmoteState(nil)
     EmoteCancelPlaying = true
-
-    if InExitEmote then return end
 
     exitScenario()
 
