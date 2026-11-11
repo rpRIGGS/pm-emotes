@@ -422,8 +422,14 @@ end
 
 -- Adapter for the original NoPixel 4.0 compiled UI; all animation execution stays in RPEmotes.
 RegisterNUICallback('PM_NP_RPC', function(data, cb)
+    -- NUI messages are external input; malformed payloads must not break the
+    -- callback dispatcher or leave the browser waiting indefinitely.
+    if type(data) ~= 'table' or type(data.event) ~= 'string' then
+        cb(false)
+        return
+    end
     local event = data.event
-    local args = data.args or {}
+    local args = type(data.args) == 'table' and data.args or {}
     if event == 'emotes:getEmotes' then
         -- NativeUI builds the shared catalog asynchronously on initial startup.
         local deadline = GetGameTimer() + 5000
@@ -432,9 +438,11 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
     elseif event == 'emotes:getFavorites' then
         local favorites = {}
         local stored = GetFavoriteEmotes()
-        for _, id in ipairs(GetFavoriteEmotesMap()) do
+        local seen = {}
+        for _, id in pairs(GetFavoriteEmotesMap()) do
             local fav = stored[id]
-            if fav then
+            if fav and not seen[id] then
+                seen[id] = true
                 local item = findNPItem(fav.name, fav.emoteType)
                 if item then
                     favorites[#favorites + 1] = {id = id, category = item.category, index = item.index, value = item.value, emoteType = item.emoteType}
