@@ -19017,12 +19017,21 @@ function yv() {
     const sequence = ++openSequence;
     r(true);
     try {
-      const [catalog, favorites, quick] = await Promise.all([
+      let [catalog, favorites, quick] = await Promise.all([
         Ge.execute("emotes:getEmotes"),
         Ge.execute("emotes:getFavorites"),
         Ge.execute("emotes:getQuickEmotes")
       ]);
+      // On first join the NativeUI catalog can still be rebuilding. A false
+      // response means "not ready", not "there are zero emotes".
+      for (let attempt = 0; catalog === false && attempt < 4; attempt++) {
+        if (sequence !== openSequence || !e()) return;
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        if (sequence !== openSequence || !e()) return;
+        catalog = await Ge.execute("emotes:getEmotes");
+      }
       if (sequence !== openSequence || !e()) return;
+      if (catalog === false) throw new Error("Emote catalog did not become ready");
       const items = Object.values(catalog || {}).flatMap(group =>
         (Array.isArray(group) ? group : []).map((item, index) => ({
           ...item,
