@@ -18602,9 +18602,13 @@ function tv() {
       value: v.value,
       emoteType: v.emoteType
     };
+    const targetId = String(h.id ?? "");
+    const slot = /^quick:[0-9]$/.test(targetId) ? Number(targetId.slice(6)) :
+      /^[0-9]$/.test(targetId) ? Number(targetId) : -1;
+    if (slot < 0 || slot > 9) return;
     try {
-      const saved = await Ge.execute("emotes:setQuickEmote", h.id, _);
-      if (saved) t(y => ({...y, [h.id]: _}));
+      const saved = await Ge.execute("emotes:setQuickEmote", slot, _);
+      if (saved) t(y => ({...y, [slot]: _}));
     } catch (error) {
       console.error("[PowerMoves RP] Could not assign quick slot", error);
     }
