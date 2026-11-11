@@ -55,3 +55,13 @@ body,body.align-left {display:flex;justify-content:flex-start!important;align-it
 .pm-preview-reticle {display:none!important}
 @media(max-width:1050px){.main-container{width:57vw!important}.pm-preview-panel{width:34vw!important;right:1vw!important}}
 @media(max-width:680px){.main-container{width:94vw!important}.pm-preview-panel{display:none!important}.pm-workspace .side-navigation{flex-basis:112px!important;width:112px!important;max-width:112px!important}}
+
+/* Catalog cards: the live GTA preview remains in the transparent game viewport.
+   Do not fake a 3D animation thumbnail with a static image. */
+.pm-workspace .content-container .menu.doublecolumn,
+.pm-workspace .content-container .menu.grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;align-content:start!important}
+.pm-emote-card {display:flex!important;flex-direction:column!important;justify-content:flex-end!important;align-items:flex-start!important;gap:6px!important;min-height:92px!important;padding:11px!important;text-align:left!important;background:linear-gradient(160deg,#252d3c,#171d29)!important;border:1px solid #3b4559!important;border-top:2px solid #505d75!important;transition:background .12s,border-color .12s}
+.pm-emote-card:hover,.pm-emote-card:focus-visible,.pm-emote-card.pm-selected {background:linear-gradient(160deg,#303e59,#1a2541)!important;border-color:#0438ff!important;border-top-color:#0438ff!important}
+.pm-card-title {display:block;max-width:100%;font:700 13px/1.25 Arial,sans-serif;color:#fff;overflow-wrap:anywhere}
+.pm-card-command {display:block;font:10px Arial,sans-serif;color:#a5b5d7;letter-spacing:.045em}
+.pm-emote-card:disabled {opacity:.4}
