@@ -18306,6 +18306,16 @@ const M2 = e => {
         }
       }
     }), false, true);
+    // Hover previews use the RPEmotes clone; they never animate the player.
+    // Delay avoids rebuilding the clone while the pointer crosses tiles.
+    let previewTimer;
+    m.addEventListener("mouseenter", () => {
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(() => {
+        Ge.execute("emotes:preview", e.item).catch(console.error);
+      }, 220);
+    });
+    m.addEventListener("mouseleave", () => clearTimeout(previewTimer));
     v.$$mouseup = () => {
       setTimeout(() => {
         i(false);
