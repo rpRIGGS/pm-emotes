@@ -17789,12 +17789,24 @@ const D2 = e => {
     }
     return 0;
   };
-  const l = new ResizeObserver(h => {
-    nt(() => {
-      h.forEach(v => d(v));
-      s({
-        isMeasured: true,
-        mainAxisScrollValue: c()
+  // Measurements can update the virtualized layout. Defer reactive writes
+  // until the next animation frame so ResizeObserver does not trigger a
+  // second resize during the same browser layout delivery cycle.
+  let pendingMeasurements = new Map();
+  let measurementFrame = 0;
+  const l = new ResizeObserver(entries => {
+    for (const entry of entries) pendingMeasurements.set(entry.target, entry);
+    if (measurementFrame) return;
+    measurementFrame = requestAnimationFrame(() => {
+      measurementFrame = 0;
+      const measurements = Array.from(pendingMeasurements.values());
+      pendingMeasurements.clear();
+      nt(() => {
+        measurements.forEach(entry => d(entry));
+        s({
+          isMeasured: true,
+          mainAxisScrollValue: c()
+        });
       });
     });
   });
@@ -17828,6 +17840,9 @@ const D2 = e => {
         h.removeEventListener("scroll", m);
         l.unobserve(h);
         l.unobserve(v);
+        if (measurementFrame) cancelAnimationFrame(measurementFrame);
+        measurementFrame = 0;
+        pendingMeasurements.clear();
       });
     }
   });
