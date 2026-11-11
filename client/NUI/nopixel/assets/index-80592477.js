@@ -18354,7 +18354,7 @@ const M2 = e => {
       };
       const T = Ut.center;
       const R = Ut.icon;
-      const B = `https://assets.nopixel.net/dev/images/animations/${e.item.category}/${e.item.index}.webp`;
+      const B = wl;
       const z = Ut.bar;
       if (I !== A._v$) {
         ke(h, A._v$ = I);
@@ -18444,7 +18444,7 @@ const Nt = {
 };
 const Y2 = tt("<div><div class=\"w-full flex flex-row justify-between items-center\"><div>Quick Animations</div><div><div></div></div></div><div class=\"w-full flex flex-row justify-between items-center\">");
 const J2 = tt("<img>");
-const Q2 = tt("<div>SHIFT + ");
+const Q2 = tt("<div>NUMPAD ");
 const ev = tt("<div><div>");
 function tv() {
   const {
@@ -18574,7 +18574,7 @@ function tv() {
                 });
                 Oe(S => {
                   const D = Nt.icon;
-                  const P = `https://assets.nopixel.net/dev/images/animations/${g.category}/${g.index}.webp`;
+                  const P = wl;
                   if (D !== S._v$5) {
                     ke(N, S._v$5 = D);
                   }
@@ -18889,21 +18889,8 @@ function yv() {
       Ge.execute("emotes:close");
       return;
     }
-    // The original NoPixel quick bar advertises SHIFT + 1..0. Make the
-    // advertised shortcut work while the F4 menu is open, without stealing
-    // keystrokes from the search field.
-    if (d.shiftKey && !d.ctrlKey && !d.altKey &&
-        !["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName) &&
-        /^Digit[0-9]$/.test(d.code)) {
-      const slot = (Number(d.code.slice(-1)) + 9) % 10;
-      const quick = quickSlots[String(slot)];
-      const item = quick && t.find(v =>
-        v.category === quick.category && v.index === quick.index);
-      if (item) {
-        d.preventDefault();
-        Ge.execute("emotes:play", item);
-      }
-    }
+    // Gameplay quick slots are handled by FiveM key mappings, not the NUI.
+    // This avoids qb-inventory hotbar conflicts and works with F4 closed.
   };
   Kn(async () => {
     document.addEventListener("keydown", s);
