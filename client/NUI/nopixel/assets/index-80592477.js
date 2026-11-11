@@ -19032,6 +19032,13 @@ function yv() {
       }
       if (sequence !== openSequence || !e()) return;
       if (catalog === false) throw new Error("Emote catalog did not become ready");
+      // Favorites and slots may have timed out before the catalog existed.
+      // Refresh them after the successful catalog response.
+      [favorites, quick] = await Promise.all([
+        Ge.execute("emotes:getFavorites"),
+        Ge.execute("emotes:getQuickEmotes")
+      ]);
+      if (sequence !== openSequence || !e()) return;
       const items = Object.values(catalog || {}).flatMap(group =>
         (Array.isArray(group) ? group : []).map((item, index) => ({
           ...item,
