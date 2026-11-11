@@ -21,6 +21,7 @@ css = read("client/NUI/nopixel/assets/index-5495b930.css")
 bridge = read("client/NUI/EmoteMenuNUI.lua")
 preview = read("client/NUI/PMPreview.lua")
 seating = read("client/PMSeating.lua")
+emote_engine = read("client/Emote.lua")
 
 checks = []
 def check(label, condition):
@@ -65,6 +66,15 @@ check("preview lifecycle", all(f"function {fn}" in preview for fn in
       ("PMOpenCharacterPreview", "PMPreviewCharacterEmote", "PMCloseCharacterPreview")))
 check("preview ped is not networked", "ClonePed(player, heading + 180.0, false, false)" in preview)
 check("preview resource-stop cleanup", "onResourceStop" in preview)
+check("preview selection generation guard",
+      "requestVersion ~= previewPropVersion" in emote_engine)
+check("preview props attach to the correct generation",
+      "addProps(animOption, nil, ped, nil, true, requestVersion)" in emote_engine)
+check("NUI invalidates obsolete preview requests",
+      "previewRequestToken" in bridge and "token ~= previewRequestToken" in bridge)
+check("favorites retain animation type",
+      "emoteType: e.item.emoteType" in js)
+
 check("seating has its own lifecycle", "onResourceStop" in seating)
 check("NUI focus release on stop",
       "SetNuiFocus(false, false)" in bridge and "onResourceStop" in bridge)
