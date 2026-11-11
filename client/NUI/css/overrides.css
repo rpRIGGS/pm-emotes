@@ -103,3 +103,13 @@ body,body.align-left {align-items:center !important;justify-content:center;paddi
 .pm-workspace .search-container {flex-shrink:0}
 .pm-workspace .pm-preview-panel {min-height:0;box-sizing:border-box}
 .pm-workspace .pm-preview-stage {pointer-events:none}
+
+/* Gameplay-first layout: keep the real player visible to the right of the menu.
+   The previous centered, opaque three-column shell hid the game and made the
+   scripted preview camera appear as an empty panel. */
+body, body.align-left {justify-content:flex-start !important;align-items:center !important;padding:0 0 0 2vw !important;background:transparent !important}
+.main-container {width:min(760px,56vw);height:min(730px,85vh);max-height:85vh}
+.pm-preview-panel {display:none !important}
+.pm-workspace .menu-container {width:100%;flex:1 1 100%}
+@media(max-width:850px){.main-container{width:min(650px,75vw)}}
+@media(max-width:680px){.main-container{width:96vw}}
