@@ -17,6 +17,8 @@ jobs:
           for file in client/NUI/js/*.js; do
             node --input-type=module --check < "$file"
           done
+      - name: Verify PowerMoves UI to RPEmotes integration
+        run: python3 development/verify-ui-contract.py
       - name: Validate supplemental Lua catalog syntax
         run: |
           sudo apt-get update -qq
