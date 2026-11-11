@@ -8,6 +8,7 @@ local localesLoaded = false
 local pendingNuiOpen = false
 local menuSession = 0
 local pendingOpenToken = 0
+local previewRequestToken = 0
 
 
 -- The NUI logic is designed to run *on top* of the existing NativeUI logic, since that menu already does all the data handling that we need.
@@ -127,6 +128,7 @@ end)
 RegisterNUICallback('CLOSE_MENU', function(data, cb)
     pendingOpenToken = pendingOpenToken + 1
     pendingNuiOpen = false
+    previewRequestToken = previewRequestToken + 1
     if IsNuiFocused() then ToggleNUIMenu() end
     PlaySoundFrontend(-1, "QUIT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
     cb({["ok"] = true})
@@ -434,6 +436,7 @@ function ToggleNUIMenu()
         pendingOpenToken = pendingOpenToken + 1
         pendingNuiOpen = false
         menuSession = menuSession + 1
+        previewRequestToken = previewRequestToken + 1
         PMCloseCharacterPreview()
         SetNuiFocus(false, false)
         SendNUIMessage({event = "emotes:closeUI", args = {}})
@@ -567,6 +570,8 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         end
         cb(slots)
     elseif event == 'emotes:preview' then
+        previewRequestToken = previewRequestToken + 1
+        local token = previewRequestToken
         local requested = args[1]
         if not IsNuiFocused() or type(requested) ~= 'table'
             or type(requested.value) ~= 'string' then
@@ -578,13 +583,21 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
             cb(false)
             return
         end
-        cb(PMPreviewCharacterEmote(item.value, item.emoteType) == true)
+        local success = PMPreviewCharacterEmote(item.value, item.emoteType) == true
+        if token ~= previewRequestToken or not IsNuiFocused() then
+            PMCloseCharacterPreview()
+            cb(false)
+            return
+        end
+        cb(success)
     elseif event == 'emotes:clearPreview' then
+        previewRequestToken = previewRequestToken + 1
         PMCloseCharacterPreview()
         cb(true)
     elseif event == 'emotes:close' then
         pendingOpenToken = pendingOpenToken + 1
         pendingNuiOpen = false
+        previewRequestToken = previewRequestToken + 1
         if IsNuiFocused() then ToggleNUIMenu() end
         cb(true)
     elseif event == 'emotes:play' then
@@ -712,6 +725,7 @@ end
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= GetCurrentResourceName() then return end
     menuSession = menuSession + 1
+    previewRequestToken = previewRequestToken + 1
     pendingOpenToken = pendingOpenToken + 1
     pendingNuiOpen = false
     PMCloseCharacterPreview()
