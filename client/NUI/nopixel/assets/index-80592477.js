@@ -18901,27 +18901,36 @@ function yv() {
   Kt(() => {
     document.removeEventListener("keydown", s);
   });
+  let openSequence = 0;
   Ge.register("emotes:open", async () => {
-    // Open immediately on F4, even while the initial catalog is loading.
-    // Refresh the RPEmotes catalog and favorites on each opening so changes
-    // to animation packs, permissions and favorites are reflected in the UI.
+    // Do not let an earlier, slow fetch overwrite the current menu state.
+    const sequence = ++openSequence;
     r(true);
     try {
-      const d = await Ge.execute("emotes:getEmotes");
-      const c = Object.values(d || {}).flatMap(m => (Array.isArray(m) ? m : []).map((v, _) => ({
-        ...v,
-        index: v.index ?? _ + 1,
-        label: v.label ?? v.value ?? `Emote ${_ + 1}`,
-        value: v.value ?? v.id
-      })));
-      n(c);
-      const l = await Ge.execute("emotes:getFavorites");
-      i(Array.isArray(l) ? l : []);
+      const [catalog, favorites, quick] = await Promise.all([
+        Ge.execute("emotes:getEmotes"),
+        Ge.execute("emotes:getFavorites"),
+        Ge.execute("emotes:getQuickEmotes")
+      ]);
+      if (sequence !== openSequence || !e()) return;
+      const items = Object.values(catalog || {}).flatMap(group =>
+        (Array.isArray(group) ? group : []).map((item, index) => ({
+          ...item,
+          index: item.index ?? index + 1,
+          label: item.label ?? item.value ?? `Emote ${index + 1}`,
+          value: item.value ?? item.id
+        })));
+      n(items);
+      i(Array.isArray(favorites) ? favorites : []);
+      en().setQuickEmotes(Object.fromEntries(
+        Array.from({length: 10}, (_, index) =>
+          [String(index), quick?.[String(index)] || null])));
     } catch (error) {
       console.error("[PowerMoves RP] Failed to refresh emote menu", error);
     }
   });
   Ge.register("emotes:closeUI", () => {
+    ++openSequence;
     r(false);
   });
   Ge.register("emotes:hud", async d => {
