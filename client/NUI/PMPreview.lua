@@ -106,6 +106,10 @@ function PMPreviewCharacterEmote(emoteName, emoteType)
     end
     if success then
         previewName, previewType = emoteName, emoteType
+    else
+        -- A failed clip must not leave a clone/camera (or its props) active
+        -- while the player browses the rest of the catalog.
+        clearPreview()
     end
     return success
 end
