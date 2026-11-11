@@ -1,3 +1,6 @@
+local npCatalog = {}
+local npFavorites = {}
+local npQuick = {false, false, false, false, false}
 local nuiReady = false
 local initialDataLoaded = false
 local localesLoaded = false
@@ -259,6 +262,7 @@ AddEventHandler("rpemotes:internal:loadEmoteDataToNUI", function(EmoteData, Cate
 end)
 
 function ResetNUIQueue()
+    npCatalog = {}
     for key, val in pairs(dataForMenu) do
         if type(val) == "table" then
             dataForMenu[key] = {}
@@ -272,6 +276,9 @@ function AddEmoteToNUIQueue(data)
         table.insert(dataForMenu["favorites"], data)
         return
     end
+    local cat = ({[EmoteType.DANCES] = 'dances', [EmoteType.EXPRESSIONS] = 'expressions', [EmoteType.WALKS] = 'walks', [EmoteType.SHARED] = 'synced', [EmoteType.ANIMAL_EMOTES] = 'animals', [EmoteType.PROP_EMOTES] = 'placed'})[data.emoteType] or 'emotes'
+    npCatalog[cat] = npCatalog[cat] or {}
+    npCatalog[cat][#npCatalog[cat] + 1] = {category = cat, value = data.emoteName, label = data.label or data.emoteName, emoteType = data.emoteType}
     local tbl = dataForMenu[NUIEmoteCategories[data.categoryName] and NUIEmoteCategories[data.categoryName].id] or dataForMenu[NUIEmoteType[data.emoteType]]
     if tbl ~= nil then
         table.insert(tbl, data)
@@ -326,7 +333,7 @@ end
 AddEventHandler("rpemotes:internal:handleNUIOpened", function()
     local _showEmoji = ShouldShowEmojiMenu()
     -- Restore preview clone for emote selection; camera framing is handled in PMPreview.
-    PMOpenCharacterPreview()
+    SendNUIMessage({event = "emotes:open", args = {}})
     SendNUIMessage({type = "OPEN_MENU", value = true, shouldShowEmojiMenu = _showEmoji})
     SendNUIMessage({type = "TOGGLE_CURSOR_INPUT", value = false})
 
@@ -369,4 +376,49 @@ AddEventHandler("rpemotes:internal:handleNUIOpened", function()
     PMCloseCharacterPreview()
     SetScaleformMovieAsNoLongerNeeded(scaleform_instructions)
     SendNUIMessage({type = "OPEN_MENU", value = false, shouldShowEmojiMenu = _showEmoji})
+end)
+-- Adapter for the original NoPixel 4.0 compiled UI; all animation execution stays in RPEmotes.
+RegisterNUICallback('PM_NP_RPC', function(data, cb)
+    local event = data.event
+    local args = data.args or {}
+    if event == 'emotes:getEmotes' then
+        cb(npCatalog)
+    elseif event == 'emotes:getFavorites' then
+        cb(npFavorites)
+    elseif event == 'emotes:getQuickEmotes' then
+        cb(npQuick)
+    elseif event == 'emotes:close' then
+        ToggleNUIMenu()
+        cb(true)
+    elseif event == 'emotes:play' then
+        local item = args[1] or {}
+        if item.value then
+            RouteEmoteToFunction(item.value, item.emoteType or EmoteType.EMOTES, 1)
+        end
+        cb(true)
+    elseif event == 'emotes:setFavorite' then
+        local item = args[1] or {}
+        if item.value then
+            local id = (item.category or 'emotes') .. '_' .. item.value
+            local emote = {id = id, name = item.value, emoteType = item.emoteType or EmoteType.EMOTES, label = item.value, textureVariation = 1}
+            ToggleFavoriteEmote(id, emote)
+            local found = false
+            for i = #npFavorites, 1, -1 do
+                if npFavorites[i].value == item.value then table.remove(npFavorites, i) found = true end
+            end
+            if not found then
+                item.id = id
+                npFavorites[#npFavorites + 1] = item
+            end
+            cb(found and false or id)
+        else cb(false) end
+    elseif event == 'emotes:setQuickEmote' then
+        local slot = tonumber(args[1])
+        if slot and slot >= 0 and slot <= 9 then
+            npQuick[slot + 1] = args[2] or false
+        end
+        cb(true)
+    else
+        cb(false)
+    end
 end)
