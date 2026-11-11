@@ -24,6 +24,7 @@ files {
     'client/NUI/nopixel/index.html',
     'client/NUI/nopixel/*.svg',
     'client/NUI/nopixel/assets/*',
+    'client/NUI/nopixel/previews/**/*.webp',
     'client/NUI/assets/*.png',
 }
 
