@@ -14,7 +14,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "dist" / "pm-emotes-server-test.zip"
 EXCLUDED_DIRS = {".git", ".github", "dist", "tests", "development", "development-reference",
-                 "node_modules", ".vscode", ".idea", "__pycache__"}
+                 "node_modules", ".vscode", ".idea", "__pycache__", "tools"}
 EXCLUDED_SUFFIXES = {".pyc", ".log"}
 EXCLUDED_FILES = {".DS_Store", "Thumbs.db"}
 EXCLUDED_PREFIXES = (".",)
