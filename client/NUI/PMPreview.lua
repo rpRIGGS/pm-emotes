@@ -44,7 +44,10 @@ function PMOpenCharacterPreview()
     SetEntityVisible(previewPed, true, false)
     SetEntityAlpha(previewPed, 255, false)
     SetEntityInvincible(previewPed, true)
-    FreezeEntityPosition(previewPed, false)
+    -- The non-colliding clone must remain in its preview stage rather than
+    -- falling through the world when the player is on an elevated interior.
+    SetEntityHasGravity(previewPed, false)
+    FreezeEntityPosition(previewPed, true)
     SetPedCanRagdoll(previewPed, false)
     SetBlockingOfNonTemporaryEvents(previewPed, true)
 
