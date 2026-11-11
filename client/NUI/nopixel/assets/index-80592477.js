@@ -18305,14 +18305,16 @@ const M2 = e => {
         value: e.item.value ?? "",
         type: "favorite"
       };
-      const I = await Ge.execute("emotes:setFavorite", A);
-      if (!l() && I) {
-        t(b => [...b, {
-          ...A,
-          id: I
-        }]);
-      } else {
-        t(b => b.filter(T => T.category !== A.category || T.index !== A.index));
+      try {
+        const I = await Ge.execute("emotes:setFavorite", A);
+        if (I === false && !l()) return;
+        if (!l() && I) {
+          t(b => [...b, {...A, id: I}]);
+        } else {
+          t(b => b.filter(T => T.category !== A.category || T.index !== A.index));
+        }
+      } catch (error) {
+        console.error("[PowerMoves RP] Failed to update favorite", error);
       }
     };
     Fe(h, Ae(Lr, {
