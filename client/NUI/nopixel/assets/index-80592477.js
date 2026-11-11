@@ -18367,6 +18367,26 @@ const M2 = e => {
         return A;
       }
     }), null);
+    // Each animation tile can request a real, local ped preview on hover.
+    // Debounce hover transitions while the user scrolls the catalog.
+    let pmHoverTimer = null;
+    m.addEventListener("mouseenter", () => {
+      if (pmHoverTimer !== null) clearTimeout(pmHoverTimer);
+      pmHoverTimer = setTimeout(() => {
+        pmHoverTimer = null;
+        Ge.execute("emotes:preview", {
+          value: e.item.value,
+          emoteType: e.item.emoteType
+        }).catch(() => {});
+      }, 180);
+    });
+    m.addEventListener("mouseleave", () => {
+      if (pmHoverTimer !== null) {
+        clearTimeout(pmHoverTimer);
+        pmHoverTimer = null;
+      }
+      Ge.execute("emotes:clearPreview").catch(() => {});
+    });
     y.addEventListener("error", A => pmPreviewError(A.currentTarget, e.item));
     Fe(_, () => e.item.label ?? e.item.index ?? 1, null);
     Oe(A => {
