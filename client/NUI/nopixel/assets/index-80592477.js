@@ -18498,18 +18498,7 @@ function tv() {
       console.error("[PowerMoves RP] Could not assign quick slot", error);
     }
   });
-  Kn(async () => {
-    try {
-      const l = await Ge.execute("emotes:getQuickEmotes");
-      // Always render all ten slots, even for a fresh player with no KVP.
-      t(Object.fromEntries(Array.from({length: 10}, (_, index) =>
-        [String(index), l?.[String(index)] || null])));
-    } catch (error) {
-      console.error("[PowerMoves RP] Quick animations failed to load", error);
-      t(Object.fromEntries(Array.from({length: 10}, (_, index) =>
-        [String(index), null])));
-    }
-  });
+  // Quick slots are refreshed together with the catalog when F4 opens.
   const c = (l, m) => e.find(h => h.category === l && h.index === m);
   return (() => {
     const l = Y2();
@@ -18872,6 +18861,8 @@ function yv() {
     emotes: t,
     setEmotes: n,
     setFavorites: i,
+    quickEmotes: quickSlots,
+    setQuickEmotes: updateQuickSlots,
     hudVisible: a,
     setHudVisible: o
   } = en();
@@ -18890,7 +18881,7 @@ function yv() {
         !["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName) &&
         /^Digit[0-9]$/.test(d.code)) {
       const slot = (Number(d.code.slice(-1)) + 9) % 10;
-      const quick = en().quickEmotes[String(slot)];
+      const quick = quickSlots[String(slot)];
       const item = quick && t.find(v =>
         v.category === quick.category && v.index === quick.index);
       if (item) {
@@ -18926,7 +18917,7 @@ function yv() {
         })));
       n(items);
       i(Array.isArray(favorites) ? favorites : []);
-      en().setQuickEmotes(Object.fromEntries(
+      updateQuickSlots(Object.fromEntries(
         Array.from({length: 10}, (_, index) =>
           [String(index), quick?.[String(index)] || null])));
     } catch (error) {
