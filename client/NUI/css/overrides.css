@@ -1,7 +1,7 @@
-/* PowerMoves RP interface theme. Temporary gray and text logo are replaceable tokens. */
+/* PowerMoves RP interface theme. Official PM RP blue and gray; logo asset supplied separately. */
 :root {
   --pm-blue: #0438ff;
-  --pm-gray: #252c39;
+  --pm-gray: #6b6f80;
   --pm-surface: rgba(18, 23, 34, .96);
   --color-bg-primary: var(--pm-surface);
   --color-bg-sidebar: rgba(26, 32, 46, .98);
