@@ -328,6 +328,7 @@ function ToggleNUIMenu()
     else
         PMCloseCharacterPreview()
         SetNuiFocus(false, false)
+        SendNUIMessage({event = "emotes:closeUI", args = {}})
     end
 end
 
