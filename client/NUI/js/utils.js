@@ -75,36 +75,28 @@ export function HandleEmoteFilter(_search, menu = ".grid") {
     })
 }
 
-let searchRequestGeneration = 0;
+// Search the exact catalog already delivered by RPEmotes to the UI.
+// Unlike the legacy engine search, this includes walks, expressions, props,
+// custom categories and future additions without maintaining another catalog.
 export async function HandleEmoteSearch(_search) {
     const container = document.querySelector(".search-menu");
-    const searchValue = typeof _search !== "undefined" ? _search?.toLowerCase() : document.querySelector(".search-input").value.toLowerCase();
-    const requestId = ++searchRequestGeneration;
-    let emotes = [];
-    try {
-        const response = await ExecuteNUICallback("SEARCH_EMOTES", { searchTerm: searchValue });
-        if (!response?.ok) return;
-        const result = await response.json();
-        emotes = typeof result.emotes === "string" ? JSON.parse(result.emotes) : result.emotes;
-        if (!Array.isArray(emotes)) emotes = [];
-    } catch (error) {
-        console.warn("[PM Emotes] Search request failed", error);
-        return;
+    if (!container) return;
+    const term = String(typeof _search !== "undefined" ? _search : document.querySelector(".search-input").value).trim().toLocaleLowerCase();
+    const matches = document.createDocumentFragment();
+    const seen = new Set();
+    for (const source of document.querySelectorAll(".content-container .menu:not(.search-menu) [data-emoteid]")) {
+        const id = source.dataset.emoteid;
+        const type = source.dataset.emotetype;
+        if (!id || !type || id === "_reset") continue;
+        const key = type + ":" + id;
+        if (seen.has(key)) continue;
+        if (!(id + " " + (source.dataset.label || source.textContent)).toLocaleLowerCase().includes(term)) continue;
+        seen.add(key);
+        const button = source.cloneNode(true);
+        button.classList.remove("hidden");
+        matches.appendChild(button);
     }
-    // A slower previous response must never replace the latest search.
-    if (requestId !== searchRequestGeneration) return;
-    const buttons = document.createDocumentFragment();
-    for (const emote of emotes) {
-        if (!emote?.data || !emote.name) continue;
-        const button = document.createElement("button");
-        button.className = "btn btn-emote";
-        button.dataset.emoteid = emote.name;
-        button.dataset.emotetype = emote.data.emoteType;
-        button.dataset.label = emote.data.label || emote.name;
-        button.textContent = (emote.data.emoteType !== "Emojis" ? (EMOTE_TYPE_ICONS[emote.data.emoteType] || "") + " " : "") + (emote.data.label || emote.name);
-        buttons.appendChild(button);
-    }
-    container.replaceChildren(buttons);
+    container.replaceChildren(matches);
 }
 
 export function querySelectorVisible(parent, query = ".btn") {
