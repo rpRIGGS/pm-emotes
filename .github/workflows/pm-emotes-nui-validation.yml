@@ -12,8 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate compiled NoPixel JavaScript
-        run: node --check client/NUI/nopixel/assets/index-80592477.js
+      - name: Validate NoPixel and AutoShot JavaScript
+        run: |
+          node --check client/NUI/nopixel/assets/index-80592477.js
+          node --check client/NUI/nopixel/assets/pm-autoshot-bridge.js
       - name: Validate PowerMoves NUI integration contracts
         run: python3 tests/validate_pm_emotes.py
       - name: Install Lua syntax checker
@@ -24,11 +26,7 @@ jobs:
           luac5.4 -p client/NUI/PMPreview.lua
           luac5.4 -p client/PMSeating.lua
       - name: Package complete FiveM resource
-        run: |
-          mkdir -p dist
-          zip -q -r dist/pm-emotes-server-test.zip . \
-            -x '.git/*' '.github/*' 'dist/*' 'tests/*'
-          unzip -tqq dist/pm-emotes-server-test.zip
+        run: python3 tools/package_pm_emotes.py
       - uses: actions/upload-artifact@v4
         with:
           name: pm-emotes-server-test
