@@ -693,13 +693,17 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
             cb(false)
             return
         end
-        if destination ~= nil and destination ~= source then
+        if destination == source then
+            cb(true)
+            return
+        end
+        if destination ~= nil then
             npQuick[destination + 1] = {
                 category = item.category, index = item.index,
                 value = item.value, emoteType = item.emoteType
             }
         end
-        if destination ~= source then npQuick[from] = false end
+        npQuick[from] = false
         SetResourceKvp(quickKvp, json.encode(npQuick))
         cb(true)
     elseif event == 'emotes:setQuickEmote' then
