@@ -455,6 +455,7 @@ function EmotePlayOnNonPlayerPed(ped, name)
     end
 
     if emoteData.scenario then
+        if requestVersion ~= previewPropVersion or not DoesEntityExist(ped) then return false end
         checkGender()
         ClearPedTasks(ped)
         DestroyAllProps(true)
@@ -476,7 +477,8 @@ function EmotePlayOnNonPlayerPed(ped, name)
     end
 
     if not LoadAnim(emoteData.dict) then
-        EmoteChatMessage("'" .. name .. "' " .. Translate('notvalidemote') .. "")
+        -- Missing preview clips must not interrupt the real player's emote
+        -- or display gameplay chat errors from a passive hover.
         return false
     end
 
