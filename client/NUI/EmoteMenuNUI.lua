@@ -274,7 +274,7 @@ function AddEmoteToNUIQueue(data)
     -- data = {emoteName, emoteType, label, categoryName, hasPermission, isFavorite}
     if data.isFavorite then
         table.insert(dataForMenu["favorites"], data)
-        return
+        -- Favorites are also catalog entries; do not hide them from search or All.
     end
     local cat = ({[EmoteType.DANCES] = 'dances', [EmoteType.EXPRESSIONS] = 'expressions', [EmoteType.WALKS] = 'walks', [EmoteType.SHARED] = 'synced', [EmoteType.ANIMAL_EMOTES] = 'animals', [EmoteType.PROP_EMOTES] = 'placed'})[data.emoteType] or 'emotes'
     npCatalog[cat] = npCatalog[cat] or {}
@@ -422,7 +422,7 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
     elseif event == 'emotes:getQuickEmotes' then
         cb(npQuick)
     elseif event == 'emotes:close' then
-        ToggleNUIMenu()
+        if IsNuiFocused() then ToggleNUIMenu() end
         cb(true)
     elseif event == 'emotes:play' then
         local item = args[1] or {}
@@ -430,7 +430,15 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
             item = npCatalog[item.category][tonumber(item.index)] or item
         end
         if item.value then
-            RouteEmoteToFunction(item.value, item.emoteType or EmoteType.EMOTES, 1)
+            if item.emoteType == EmoteType.SHARED then
+                if IsNuiFocused() then ToggleNUIMenu() end
+                OnGroupEmoteRequest(item.value)
+            elseif item.emoteType == EmoteType.PROP_EMOTES and Config.PlacementEnabled and item.category == 'placed' then
+                if IsNuiFocused() then ToggleNUIMenu() end
+                StartNewPlacement(item.value)
+            else
+                RouteEmoteToFunction(item.value, item.emoteType or EmoteType.EMOTES, 1)
+            end
         end
         cb(true)
     elseif event == 'emotes:setFavorite' then
