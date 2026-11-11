@@ -176,3 +176,17 @@ body,body.align-left {justify-content:flex-start !important;align-items:center !
 @media(max-width:680px){.pm-preview-panel{display:none !important}}
 
 .pm-brand-word{color:#fff !important}.pm-brand-rp{color:#0438ff !important}
+
+/* Live preview controls: usable selection state, no pretend thumbnail art. */
+.pm-preview-panel {gap:10px !important}
+.pm-preview-heading {display:flex;align-items:center;justify-content:space-between}
+.pm-live-indicator {font-size:11px;color:#0438ff;text-shadow:0 0 7px rgba(4,56,255,.65)}
+.pm-preview-meta {display:flex;flex-direction:column;gap:5px;padding:10px 0;border-top:1px solid rgba(180,190,210,.24);background:rgba(9,12,19,.5)}
+.pm-preview-meta strong {color:#fff;font:700 15px/1.25 Arial,sans-serif}
+.pm-preview-meta span {color:#aeb8ce;font:11px Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em}
+.pm-preview-actions {display:flex;gap:7px;pointer-events:auto}
+.pm-preview-actions button {flex:1;padding:10px 7px;background:rgba(16,21,33,.9);border:1px solid #526078;border-radius:3px;color:#fff;font:700 10px Arial,sans-serif;letter-spacing:.08em;cursor:pointer}
+.pm-preview-actions button:first-child {background:#0438ff;border-color:#0438ff}
+.pm-preview-actions button:disabled {opacity:.35;cursor:not-allowed}
+.pm-preview-actions button:not(:disabled):hover {filter:brightness(1.2)}
+.pm-preview-help {margin:0 !important}
