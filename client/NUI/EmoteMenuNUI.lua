@@ -549,3 +549,30 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         cb(false)
     end
 end)
+
+
+-- NoPixel quick slots are independent of RPEmotes' existing keybinds and
+-- the inventory hotbar. They work even when the NUI is closed.
+-- Players can assign their preferred keys in FiveM Settings > Key Bindings.
+local function playNPQuickSlot(slot)
+    local saved = npQuick[slot + 1]
+    if type(saved) ~= 'table' or type(saved.value) ~= 'string' then return end
+    local item = findNPItem(saved.value)
+    if not item or not HasEmotePermission(item.value, item.emoteType) then return end
+
+    if item.emoteType == EmoteType.SHARED then
+        SendSharedEmoteRequest(item.value)
+    else
+        RouteEmoteToFunction(item.value, item.emoteType, 1)
+    end
+end
+
+for slot = 0, 9 do
+    local currentSlot = slot
+    local command = ('pmemotequick%s'):format(currentSlot)
+    RegisterCommand(command, function()
+        playNPQuickSlot(currentSlot)
+    end, false)
+    -- Intentionally unbound: do not override qb-inventory's 1-0 hotbar.
+    RegisterKeyMapping(command, ('PowerMoves Emotes quick slot %s'):format(currentSlot), 'keyboard', '')
+end
