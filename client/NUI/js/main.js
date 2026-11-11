@@ -263,12 +263,22 @@ window.addEventListener('message', (event) => {
                         <button class="btn btn-emote btn-style-reset" data-emoteid="_reset" data-emotetype="${event.data[key][0].emoteType}" data-locale="normalreset"></button>
                         `)
                 }
-                // Render the full catalog in one DOM operation per category.
-                // Thousands of dances previously triggered thousands of HTML reparses.
-                const markup = (event.data[key] || []).filter(Boolean).map((el) => `
-                    <button class="btn btn-emote ${el.isFavorite ? "btn-emote-favorite" : ""} ${el.emoteType === "Emojis" ? "noto-color-emoji-regular" : ""}" data-emoteid="${el.emoteName}" data-emotetype="${el.emoteType}" data-label="${el.label}">${el.emoteType !== 'Emojis' ? (EMOTE_TYPE_ICONS[el.emoteType] || "")+" " : ""}${el.label}</button>
-                `).join("");
-                EMOTES.insertAdjacentHTML("beforeend", markup);
+                // Build elements without HTML interpolation; catalog labels can contain
+                // quotes and special characters supplied by third-party animation packs.
+                const fragment = document.createDocumentFragment();
+                for (const el of (event.data[key] || [])) {
+                    if (!el?.emoteName || !el.emoteType) continue;
+                    const button = document.createElement("button");
+                    button.className = "btn btn-emote";
+                    if (el.isFavorite) button.classList.add("btn-emote-favorite");
+                    if (el.emoteType === "Emojis") button.classList.add("noto-color-emoji-regular");
+                    button.dataset.emoteid = el.emoteName;
+                    button.dataset.emotetype = el.emoteType;
+                    button.dataset.label = el.label || el.emoteName;
+                    button.textContent = (el.emoteType !== "Emojis" ? (EMOTE_TYPE_ICONS[el.emoteType] || "") + " " : "") + (el.label || el.emoteName);
+                    fragment.appendChild(button);
+                }
+                EMOTES.appendChild(fragment);
             }
         }
         event.data.favorites?.forEach((emote) => {
