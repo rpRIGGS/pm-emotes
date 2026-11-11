@@ -664,6 +664,44 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
             }
         end
         cb(alreadyFavorite and false or id)
+    elseif event == 'emotes:moveQuickEmote' then
+        -- Moving a slot must be atomic: two separate set/clear RPCs can lose
+        -- an emote if the menu closes or the second request fails.
+        local source = tonumber(args[1])
+        local destination = args[2]
+        if source == nil or source % 1 ~= 0 or source < 0 or source > 9 then
+            cb(false)
+            return
+        end
+        if destination ~= nil and destination ~= false then
+            destination = tonumber(destination)
+            if not destination or destination % 1 ~= 0 or destination < 0 or destination > 9 then
+                cb(false)
+                return
+            end
+        else
+            destination = nil
+        end
+        local from = source + 1
+        local saved = npQuick[from]
+        if type(saved) ~= 'table' or type(saved.value) ~= 'string' then
+            cb(false)
+            return
+        end
+        local item = findNPItem(saved.value, saved.emoteType)
+        if not item or not HasEmotePermission(item.value, item.emoteType) then
+            cb(false)
+            return
+        end
+        if destination ~= nil and destination ~= source then
+            npQuick[destination + 1] = {
+                category = item.category, index = item.index,
+                value = item.value, emoteType = item.emoteType
+            }
+        end
+        if destination ~= source then npQuick[from] = false end
+        SetResourceKvp(quickKvp, json.encode(npQuick))
+        cb(true)
     elseif event == 'emotes:setQuickEmote' then
         local slot = tonumber(args[1])
         if not slot or slot % 1 ~= 0 or slot < 0 or slot > 9 then
