@@ -463,10 +463,26 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         cb(alreadyFavorite and false or id)
     elseif event == 'emotes:setQuickEmote' then
         local slot = tonumber(args[1])
-        if slot and slot >= 0 and slot <= 9 then
-            npQuick[slot + 1] = args[2] or false
-            SetResourceKvp(quickKvp, json.encode(npQuick))
+        if not slot or slot % 1 ~= 0 or slot < 0 or slot > 9 then
+            cb(false)
+            return
         end
+        local requested = args[2]
+        local stored = false
+        if requested and requested ~= false then
+            local item
+            if type(requested) == 'table' and requested.category and requested.index
+                and npCatalog[requested.category] then
+                item = npCatalog[requested.category][tonumber(requested.index)]
+            end
+            if not item or not HasEmotePermission(item.value, item.emoteType) then
+                cb(false)
+                return
+            end
+            stored = {category = item.category, index = item.index, value = item.value}
+        end
+        npQuick[slot + 1] = stored
+        SetResourceKvp(quickKvp, json.encode(npQuick))
         cb(true)
     else
         cb(false)
