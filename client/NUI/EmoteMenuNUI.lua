@@ -466,6 +466,7 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         cb(true)
     elseif event == 'emotes:play' then
         local requested = args[1] or {}
+        if type(requested) ~= 'table' then cb(false) return end
         -- Never trust a browser-provided animation name/type. Resolve against the
         -- catalog built by RPEmotes and enforce the existing permission gate.
         local item
@@ -488,6 +489,7 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         cb(true)
     elseif event == 'emotes:setFavorite' then
         local requested = args[1] or {}
+        if type(requested) ~= 'table' then cb(false) return end
         local item
         if requested.category and requested.index and npCatalog[requested.category] then
             item = npCatalog[requested.category][tonumber(requested.index)]
