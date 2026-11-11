@@ -401,6 +401,28 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         npFavorites = favorites
         cb(favorites)
     elseif event == 'emotes:getQuickEmotes' then
+        -- Catalog order can change when animation packs or categories change.
+        -- Resolve saved slots by animation name, not a stale array index.
+        local changed = false
+        for i = 1, 10 do
+            local saved = npQuick[i]
+            if type(saved) == 'table' and saved.value then
+                local item = findNPItem(saved.value)
+                if item and HasEmotePermission(item.value, item.emoteType) then
+                    if saved.category ~= item.category or saved.index ~= item.index then
+                        npQuick[i] = {category = item.category, index = item.index, value = item.value}
+                        changed = true
+                    end
+                else
+                    npQuick[i] = false
+                    changed = true
+                end
+            elseif saved ~= false then
+                npQuick[i] = false
+                changed = true
+            end
+        end
+        if changed then SetResourceKvp(quickKvp, json.encode(npQuick)) end
         cb(npQuick)
     elseif event == 'emotes:close' then
         if IsNuiFocused() then ToggleNUIMenu() end
