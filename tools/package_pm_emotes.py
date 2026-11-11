@@ -46,10 +46,10 @@ files = sorted(
 # Validate literal runtime file declarations before creating a distributable ZIP.
 # Wildcard declarations are checked against the runtime files in the archive.
 manifest = (ROOT / "fxmanifest.lua").read_text(encoding="utf-8")
-file_block = re.search(r"\\bfiles\\s*\\{(.*?)\\}", manifest, flags=re.S)
+file_block = re.search(r"\bfiles\s*\{(.*?)\}", manifest, flags=re.S)
 if not file_block:
     sys.exit("fxmanifest.lua does not declare a files block")
-declarations = re.findall(r"['\\\"]([^'\\\"]+)['\\\"]", file_block.group(1))
+declarations = re.findall(r"['\"]([^'\"]+)['\"]", file_block.group(1))
 for declaration in declarations:
     if "*" not in declaration and not (ROOT / declaration).is_file():
         sys.exit(f"Missing fxmanifest runtime asset: {declaration}")
