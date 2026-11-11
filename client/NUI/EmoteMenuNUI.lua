@@ -416,6 +416,30 @@ local function findNPItem(name, emoteType)
     return nil
 end
 
+
+-- Global emote quick slots: work during gameplay, not only inside the F4 browser.
+-- Dedicated numpad mappings avoid collisions with qb-inventory's 1-5 hotbar.
+local function playPMQuickSlot(slot)
+    if IsNuiFocused() or IsPauseMenuActive() then return end
+    local saved = npQuick[slot]
+    if type(saved) ~= 'table' or not saved.value then return end
+    local item = findNPItem(saved.value, saved.emoteType)
+    if not item or not HasEmotePermission(item.value, item.emoteType) then return end
+    if item.emoteType == EmoteType.SHARED then
+        SendSharedEmoteRequest(item.value)
+    else
+        RouteEmoteToFunction(item.value, item.emoteType, 1)
+    end
+end
+
+for slot = 1, 10 do
+    local slotNumber = slot
+    local command = 'pmemotequick' .. slotNumber
+    RegisterCommand('+' .. command, function() playPMQuickSlot(slotNumber) end, false)
+    RegisterCommand('-' .. command, function() end, false)
+    RegisterKeyMapping('+' .. command, 'PowerMoves RP Emote Quick Slot ' .. slotNumber, 'keyboard', slotNumber == 10 and 'NUMPAD0' or ('NUMPAD' .. slotNumber))
+end
+
 -- Adapter for the original NoPixel 4.0 compiled UI; all animation execution stays in RPEmotes.
 RegisterNUICallback('PM_NP_RPC', function(data, cb)
     local event = data.event
