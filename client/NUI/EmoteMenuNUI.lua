@@ -124,6 +124,8 @@ RegisterNUICallback('LOCALES_LOADED', function(data, cb)
 end)
 
 RegisterNUICallback('CLOSE_MENU', function(data, cb)
+    pendingOpenToken = pendingOpenToken + 1
+    pendingNuiOpen = false
     if IsNuiFocused() then ToggleNUIMenu() end
     PlaySoundFrontend(-1, "QUIT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
     cb({["ok"] = true})
@@ -526,6 +528,8 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         end
         cb(slots)
     elseif event == 'emotes:close' then
+        pendingOpenToken = pendingOpenToken + 1
+        pendingNuiOpen = false
         if IsNuiFocused() then ToggleNUIMenu() end
         cb(true)
     elseif event == 'emotes:play' then
