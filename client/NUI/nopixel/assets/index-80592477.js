@@ -1,3 +1,8 @@
+const pmPreviewUrl = item => {
+  const category = String(item.category ?? "").replace(/[^a-z0-9_-]/gi, "_");
+  const name = String(item.value ?? "").replace(/[^a-z0-9_-]/gi, "_");
+  return `./previews/${category}/${name}.webp`;
+};
 (function () {
   const r = document.createElement("link").relList;
   if (r && r.supports && r.supports("modulepreload")) {
@@ -18354,7 +18359,7 @@ const M2 = e => {
       };
       const T = Ut.center;
       const R = Ut.icon;
-      const B = `https://assets.nopixel.net/dev/images/animations/${e.item.category}/${e.item.index}.webp`;
+      const B = pmPreviewUrl(e.item);
       const z = Ut.bar;
       if (I !== A._v$) {
         ke(h, A._v$ = I);
@@ -18574,7 +18579,7 @@ function tv() {
                 });
                 Oe(S => {
                   const D = Nt.icon;
-                  const P = `https://assets.nopixel.net/dev/images/animations/${g.category}/${g.index}.webp`;
+                  const P = pmPreviewUrl(g);
                   if (D !== S._v$5) {
                     ke(N, S._v$5 = D);
                   }
