@@ -483,8 +483,8 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         -- catalog built by RPEmotes and enforce the existing permission gate.
         local item
         if requested.category and requested.index and npCatalog[requested.category] then
-            item = npCatalog[requested.category][tonumber(requested.index)]
-            if item and requested.value and item.value ~= requested.value then item = nil end
+            item = npCatalog[requested.category][tonumber(requested.index) or -1]
+            if item and (requested.value ~= item.value or (requested.emoteType and requested.emoteType ~= item.emoteType)) then item = nil end
         end
         if not item and requested.value then
             item = findNPItem(requested.value, requested.emoteType)
@@ -505,11 +505,11 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         if type(requested) ~= 'table' then cb(false) return end
         local item
         if requested.category and requested.index and npCatalog[requested.category] then
-            item = npCatalog[requested.category][tonumber(requested.index)]
-            if item and requested.value and item.value ~= requested.value then item = nil end
+            item = npCatalog[requested.category][tonumber(requested.index) or -1]
+            if item and (requested.value ~= item.value or (requested.emoteType and requested.emoteType ~= item.emoteType)) then item = nil end
         end
         if not item and requested.value then
-            item = findNPItem(requested.value)
+            item = findNPItem(requested.value, requested.emoteType)
         end
         if not item or not HasEmotePermission(item.value, item.emoteType) then
             cb(false)
@@ -548,8 +548,8 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
             local item
             if type(requested) == 'table' and requested.category and requested.index
                 and npCatalog[requested.category] then
-                item = npCatalog[requested.category][tonumber(requested.index)]
-                if item and requested.value and item.value ~= requested.value then item = nil end
+                item = npCatalog[requested.category][tonumber(requested.index) or -1]
+                if item and (requested.value ~= item.value or (requested.emoteType and requested.emoteType ~= item.emoteType)) then item = nil end
             end
             if not item or not HasEmotePermission(item.value, item.emoteType) then
                 cb(false)
