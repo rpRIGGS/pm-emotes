@@ -1,6 +1,8 @@
 // PM AutoShot exports flat preview IDs; legacy category folders remain supported as a fallback.
 const pmPreviewId = item => String(item?.value ?? "").replace(/[^a-z0-9_-]/gi, "_");
 const pmPreviewFailed = new Set();
+let pmActiveHoverToken = 0;
+let pmActiveHoverTimer = null;
 const pmPreviewUrl = item => `./previews/emotes/${pmPreviewId(item)}.webp`;
 const pmSetPreview = (image, url) => {
   // Solid recycles tile elements while searching and changing categories.
@@ -18367,13 +18369,14 @@ const M2 = e => {
         return A;
       }
     }), null);
-    // Each animation tile can request a real, local ped preview on hover.
-    // Debounce hover transitions while the user scrolls the catalog.
-    let pmHoverTimer = null;
+    // A recycled virtualized tile must not clear a newer tile's preview.
+    // Use one hover owner across the entire catalog.
     m.addEventListener("mouseenter", () => {
-      if (pmHoverTimer !== null) clearTimeout(pmHoverTimer);
-      pmHoverTimer = setTimeout(() => {
-        pmHoverTimer = null;
+      const token = ++pmActiveHoverToken;
+      if (pmActiveHoverTimer !== null) clearTimeout(pmActiveHoverTimer);
+      pmActiveHoverTimer = setTimeout(() => {
+        pmActiveHoverTimer = null;
+        if (token !== pmActiveHoverToken) return;
         Ge.execute("emotes:preview", {
           value: e.item.value,
           emoteType: e.item.emoteType
@@ -18381,11 +18384,18 @@ const M2 = e => {
       }, 180);
     });
     m.addEventListener("mouseleave", () => {
-      if (pmHoverTimer !== null) {
-        clearTimeout(pmHoverTimer);
-        pmHoverTimer = null;
+      const token = ++pmActiveHoverToken;
+      if (pmActiveHoverTimer !== null) {
+        clearTimeout(pmActiveHoverTimer);
+        pmActiveHoverTimer = null;
       }
-      Ge.execute("emotes:clearPreview").catch(() => {});
+      // Delay clearing so moving directly to the next tile does not
+      // repeatedly destroy and recreate the preview camera.
+      setTimeout(() => {
+        if (token === pmActiveHoverToken) {
+          Ge.execute("emotes:clearPreview").catch(() => {});
+        }
+      }, 120);
     });
     y.addEventListener("error", A => pmPreviewError(A.currentTarget, e.item));
     Fe(_, () => e.item.label ?? e.item.index ?? 1, null);
