@@ -6,6 +6,7 @@ local initialDataLoaded = false
 local localesLoaded = false
 local pendingNuiOpen = false
 local menuSession = 0
+local pendingOpenToken = 0
 
 
 -- The NUI logic is designed to run *on top* of the existing NativeUI logic, since that menu already does all the data handling that we need.
@@ -367,11 +368,14 @@ function ToggleNUIMenu()
             -- multiple wait threads that reopen the menu after it closes.
             if pendingNuiOpen then return end
             pendingNuiOpen = true
+            pendingOpenToken = pendingOpenToken + 1
+            local token = pendingOpenToken
             CreateThread(function()
                 local deadline = GetGameTimer() + 10000
                 while (not nuiReady or not initialDataLoaded) and GetGameTimer() < deadline do
                     Wait(50)
                 end
+                if token ~= pendingOpenToken then return end
                 pendingNuiOpen = false
                 if nuiReady and initialDataLoaded and not IsNuiFocused() then
                     ToggleNUIMenu()
@@ -385,6 +389,8 @@ function ToggleNUIMenu()
         SetNuiFocusKeepInput(false)
         TriggerEvent("rpemotes:internal:handleNUIOpened")
     else
+        pendingOpenToken = pendingOpenToken + 1
+        pendingNuiOpen = false
         menuSession = menuSession + 1
         PMCloseCharacterPreview()
         SetNuiFocus(false, false)
@@ -646,6 +652,7 @@ end
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= GetCurrentResourceName() then return end
     menuSession = menuSession + 1
+    pendingOpenToken = pendingOpenToken + 1
     pendingNuiOpen = false
     PMCloseCharacterPreview()
     SetNuiFocusKeepInput(false)
