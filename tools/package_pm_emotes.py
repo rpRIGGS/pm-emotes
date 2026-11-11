@@ -48,10 +48,10 @@ files = sorted(
 manifest = (ROOT / "fxmanifest.lua").read_text(encoding="utf-8")
 declarations = []
 for block in ("files", "client_scripts", "server_scripts", "shared_scripts"):
-    matches = re.findall(r"\\b" + block + r"\\s*\\{(.*?)\\}", manifest, flags=re.S)
+    matches = re.findall(r"\b" + block + r"\s*\{(.*?)\}", manifest, flags=re.S)
     for match in matches:
-        declarations.extend(re.findall(r"['\\\"]([^'\\\"]+)['\\\"]", match))
-for name in re.findall(r"\\bdata_file\\s+['\\\"][^'\\\"]+['\\\"]\\s+['\\\"]([^'\\\"]+)['\\\"]", manifest):
+        declarations.extend(re.findall(r"['\"]([^'\"]+)['\"]", match))
+for name in re.findall(r"\bdata_file\s+['\"][^'\"]+['\"]\s+['\"]([^'\"]+)['\"]", manifest):
     declarations.append(name)
 for declaration in declarations:
     if declaration.startswith("/") or declaration.startswith("@"):
