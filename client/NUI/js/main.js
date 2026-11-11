@@ -51,22 +51,33 @@ document.addEventListener('popoverAction', (e) => {
             ExecuteNUICallback("KEYBIND_EMOTE", {type: "clear", id: button.dataset.slotid, emoteName: button.dataset.emoteid, emoteType: button.dataset.emotetype})
             break;
         case 'favorite':
-            ExecuteNUICallback("FAVORITE_EMOTE", {emoteName: button.dataset.emoteid, emoteType: button.dataset.emotetype, emoteLabel: button.dataset.label}).then( async (res) => {
+            ExecuteNUICallback("FAVORITE_EMOTE", {
+                emoteName: button.dataset.emoteid,
+                emoteType: button.dataset.emotetype,
+                emoteLabel: button.dataset.label
+            }).then(async (res) => {
                 const result = await res.json();
-                if (!result.favorites) return;
-                const ELEMENTS = Array.from(document.querySelectorAll(`.btn-emote-favorite`));
-                const MENU = document.querySelector(".favorites-menu")
-                ClearHTMLContainer(".favorites-menu");
-                ELEMENTS.forEach((el) => el?.classList.remove("btn-emote-favorite"));
-                result.favorites?.forEach((emote) => {
-                    const ELEMENTS = Array.from(document.querySelectorAll(`[data-emoteid="${emote.name}"]`));
-                    ELEMENTS.forEach((el) => el?.classList.add("btn-emote-favorite"));
-                    MENU.insertAdjacentHTML("beforeend", `
-                            <button class="btn btn-emote btn-emote-favorite" data-emoteid="${emote.name}" data-emoteType="${emote.emoteType}" data-label="${emote.label}">${emote.emoteType !== 'Emojis' ? EMOTE_TYPE_ICONS[emote.emoteType]+" " : ""}${emote.label}</button>
-                            `)
-                })
-                if (!document.activeElement || document.activeElement.nodeName !== "BUTTON") querySelectorVisible(document.querySelector(".grid"))?.focus();
-            })
+                if (!Array.isArray(result.favorites)) return;
+                const favoritesMenu = document.querySelector(".favorites-menu");
+                if (!favoritesMenu) return;
+                const favorites = result.favorites.filter((item) => item?.name && item?.emoteType);
+                const favoriteIds = new Set(favorites.map((item) => item.emoteType + ":" + item.name));
+                document.querySelectorAll(".btn-emote[data-emoteid]").forEach((el) => {
+                    el.classList.toggle("btn-emote-favorite", favoriteIds.has(el.dataset.emotetype + ":" + el.dataset.emoteid));
+                });
+                const fragment = document.createDocumentFragment();
+                for (const item of favorites) {
+                    const entry = document.createElement("button");
+                    entry.className = "btn btn-emote btn-emote-favorite";
+                    entry.dataset.emoteid = item.name;
+                    entry.dataset.emotetype = item.emoteType;
+                    entry.dataset.label = item.label || item.name;
+                    entry.textContent = (item.emoteType !== "Emojis" ? (EMOTE_TYPE_ICONS[item.emoteType] || "") + " " : "") + (item.label || item.name);
+                    fragment.appendChild(entry);
+                }
+                favoritesMenu.replaceChildren(fragment);
+                querySelectorVisible(document.querySelector(".grid"))?.focus();
+            }).catch((error) => console.warn("[PM Emotes] Favorite update failed", error));
             break;
     }
 });
