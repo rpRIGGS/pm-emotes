@@ -18378,10 +18378,16 @@ const M2 = e => {
       pmActiveHoverTimer = setTimeout(() => {
         pmActiveHoverTimer = null;
         if (token !== pmActiveHoverToken) return;
-        Ge.execute("emotes:preview", {
-          value: e.item.value,
-          emoteType: e.item.emoteType
-        }).catch(() => {});
+        // Prefer captured PM AutoShot animations when deployed. If a
+        // matching asset is absent, retain the live cloned-ped preview.
+        if (window.PMAutoShotNoPixel?.show(e.item)) {
+          Ge.execute("emotes:clearPreview").catch(() => {});
+        } else {
+          Ge.execute("emotes:preview", {
+            value: e.item.value,
+            emoteType: e.item.emoteType
+          }).catch(() => {});
+        }
       }, 180);
     });
     m.addEventListener("mouseleave", () => {
@@ -18394,6 +18400,7 @@ const M2 = e => {
       // repeatedly destroy and recreate the preview camera.
       setTimeout(() => {
         if (token === pmActiveHoverToken) {
+          window.PMAutoShotNoPixel?.hide();
           Ge.execute("emotes:clearPreview").catch(() => {});
         }
       }, 120);
