@@ -1,4 +1,4 @@
-name: PM Emotes NUI validation
+name: PM Emotes release validation
 
 on:
   push:
@@ -8,40 +8,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  nui-validation:
+  release-validation:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verify compiled NoPixel frontend syntax
+      - name: Validate compiled NoPixel JavaScript
         run: node --check client/NUI/nopixel/assets/index-80592477.js
-      - name: Verify NUI manifest and integration contracts
+      - name: Validate PowerMoves NUI integration contracts
+        run: python3 tests/validate_pm_emotes.py
+      - name: Install Lua syntax checker
+        run: sudo apt-get update -qq && sudo apt-get install -y lua5.4
+      - name: Validate Lua NUI and preview syntax
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          manifest = Path('fxmanifest.lua').read_text()
-          html = Path('client/NUI/nopixel/index.html').read_text()
-          lua = Path('client/NUI/EmoteMenuNUI.lua').read_text()
-          js = Path('client/NUI/nopixel/assets/index-80592477.js').read_text()
-          preview = Path('client/NUI/PMPreview.lua').read_text()
-          required_manifest = [
-              "ui_page 'client/NUI/nopixel/index.html'",
-              "'client/NUI/PMPreview.lua'",
-              "'client/PMSeating.lua'",
-          ]
-          for item in required_manifest:
-              assert item in manifest, f'Missing manifest integration: {item}'
-          for filename in ('index-80592477.js', 'index-5495b930.css'):
-              assert filename in html, f'HTML does not load {filename}'
-              assert (Path('client/NUI/nopixel/assets') / filename).is_file(), f'Missing {filename}'
-          for event in ('emotes:getEmotes', 'emotes:getFavorites', 'emotes:getQuickEmotes',
-                        'emotes:play', 'emotes:setFavorite', 'emotes:setQuickEmote',
-                        'emotes:preview', 'emotes:clearPreview'):
-              assert f"event == '{event}'" in lua, f'Missing Lua RPC {event}'
-              assert f'"{event}"' in js, f'Missing frontend RPC {event}'
-          for name in ('PMOpenCharacterPreview', 'PMPreviewCharacterEmote',
-                       'PMCloseCharacterPreview'):
-              assert f'function {name}' in preview, f'Missing preview lifecycle function {name}'
-          assert 'pmActiveHoverToken' in js
-          assert 'npCatalogReady' in lua
-          print('NUI integration contracts passed')
-          PY
+          luac5.4 -p client/NUI/EmoteMenuNUI.lua
+          luac5.4 -p client/NUI/PMPreview.lua
+          luac5.4 -p client/PMSeating.lua
+      - name: Package complete FiveM resource
+        run: |
+          mkdir -p dist
+          zip -q -r dist/pm-emotes-server-test.zip . \
+            -x '.git/*' '.github/*' 'dist/*' 'tests/*'
+          unzip -tqq dist/pm-emotes-server-test.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pm-emotes-server-test
+          path: dist/pm-emotes-server-test.zip
+          if-no-files-found: error
