@@ -459,21 +459,24 @@ function EmotePlayOnNonPlayerPed(ped, name)
         checkGender()
         ClearPedTasks(ped)
         DestroyAllProps(true)
-        -- For the preview ped (ClonedPed), skip the enter animation so the ped
-        -- continues to follow the menu position during scenario playback
-        local isPreviewPed = ClonedPed and ped == ClonedPed
-        local playEnterAnim = not isPreviewPed
+        -- This function only runs on a non-player ped. Do not rely on the
+        -- legacy NativeUI ClonedPed global: the NoPixel clone is independent.
+        local playEnterAnim = false
         if emoteData.scenarioType == ScenarioType.MALE then
-            if PlayerGender == "male" then
+            if IsPedMale(ped) then
                 TaskStartScenarioInPlace(ped, emoteData.scenario, 0, playEnterAnim)
+                return true
             end
+            return false
         elseif emoteData.scenarioType == ScenarioType.OBJECT then
-            local BehindPlayer = GetOffsetFromEntityInWorldCoords(ped, 0.0, -0.5, -0.5)
-            TaskStartScenarioAtPosition(ped, emoteData.scenario, BehindPlayer.x, BehindPlayer.y, BehindPlayer.z, GetEntityHeading(ped), 0, playEnterAnim, false)
+            local behind = GetOffsetFromEntityInWorldCoords(ped, 0.0, -0.5, -0.5)
+            TaskStartScenarioAtPosition(ped, emoteData.scenario, behind.x, behind.y, behind.z, GetEntityHeading(ped), 0, playEnterAnim, false)
+            return true
         elseif emoteData.scenarioType == ScenarioType.SCENARIO then
             TaskStartScenarioInPlace(ped, emoteData.scenario, 0, playEnterAnim)
+            return true
         end
-        return true
+        return false
     end
 
     if not LoadAnim(emoteData.dict) then
