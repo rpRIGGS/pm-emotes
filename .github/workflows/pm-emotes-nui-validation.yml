@@ -35,3 +35,4 @@ jobs:
           name: pm-emotes-server-test
           path: dist/pm-emotes-server-test.zip
           if-no-files-found: error
+          retention-days: 30
