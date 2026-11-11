@@ -26,7 +26,6 @@ files {
     'client/NUI/nopixel/assets/*',
     'client/NUI/nopixel/previews/**/*.webp',
     'client/NUI/previews/*',
-    'client/NUI/assets/*.png',
 }
 
 -- Unlocks idle Animations from GTA:O when using motorcycles, dirt bikes, etc
