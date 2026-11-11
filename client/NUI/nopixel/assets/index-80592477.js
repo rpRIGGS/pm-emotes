@@ -18494,8 +18494,16 @@ function tv() {
     await Ge.execute("emotes:setQuickEmote", h.id, _);
   });
   Kn(async () => {
-    const l = await Ge.execute("emotes:getQuickEmotes");
-    t(l);
+    try {
+      const l = await Ge.execute("emotes:getQuickEmotes");
+      // Always render all ten slots, even for a fresh player with no KVP.
+      t(Object.fromEntries(Array.from({length: 10}, (_, index) =>
+        [String(index), l?.[String(index)] || null])));
+    } catch (error) {
+      console.error("[PowerMoves RP] Quick animations failed to load", error);
+      t(Object.fromEntries(Array.from({length: 10}, (_, index) =>
+        [String(index), null])));
+    }
   });
   const c = (l, m) => e.find(h => h.category === l && h.index === m);
   return (() => {
