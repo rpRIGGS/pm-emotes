@@ -15830,7 +15830,31 @@ tl = async function (e) {
     }
   }
 };
-var Ge = new I1();
+var Ge = (() => {
+  const listeners = new Map();
+  window.addEventListener("message", ({data}) => {
+    if (data && data.event && listeners.has(data.event)) {
+      for (const handler of listeners.get(data.event)) {
+        Promise.resolve().then(() => handler(...(Array.isArray(data.args) ? data.args : []))).catch(console.error);
+      }
+    }
+  });
+  const post = (name, payload) => fetch("https://" + GetParentResourceName() + "/" + name, {
+    method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)
+  }).then(r => r.json());
+  window.addEventListener("load", async () => {
+    await post("NUI_READY", {});
+    await post("LOCALES_LOADED", {});
+    await post("INITIAL_DATA_LOADED", {});
+  });
+  return {
+    register(event, callback) {
+      if (!listeners.has(event)) listeners.set(event, []);
+      listeners.get(event).push(callback);
+    },
+    execute(event, ...args) { return post("PM_NP_RPC", {event, args}); }
+  };
+})();
 var Ue;
 var tr;
 var pi;
