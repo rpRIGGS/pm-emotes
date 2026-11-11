@@ -290,7 +290,7 @@ window.addEventListener('message', (event) => {
             }
         }
         event.data.favorites?.forEach((emote) => {
-            const ELEMENTS = Array.from(document.querySelectorAll(`[data-emoteid="${emote.emoteName}"]`));
+            const ELEMENTS = Array.from(document.querySelectorAll("[data-emoteid]")).filter((el) => el.dataset.emoteid === emote.emoteName);
             ELEMENTS.forEach((el) => el?.classList.add("btn-emote-favorite"));
         })
         Locale.setLocaleStrings();
