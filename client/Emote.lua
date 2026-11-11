@@ -225,6 +225,14 @@ function EmoteCancel(force)
     -- is already in progress (the exit timer owns that transition).
     if InExitEmote then return end
     if not IsInAnimation and not ExitAndPlay then
+        -- Hands-up is a secondary-task animation, not an RPEmotes IsInAnimation
+        -- state. X must still lower raised hands without touching idle players.
+        local ped = PlayerPedId()
+        if InHandsup or IsEntityPlayingAnim(ped, 'random@mugging3', 'handsup_standing_base', 3) then
+            InHandsup = false
+            ClearPedSecondaryTask(ped)
+            SetCurrentEmoteState(nil)
+        end
         EmoteCancelPlaying = false
         return
     end
