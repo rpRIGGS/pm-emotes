@@ -393,7 +393,13 @@ local savedQuick = GetResourceKvpString(quickKvp)
 if savedQuick then
     local ok, decoded = pcall(json.decode, savedQuick)
     if ok and type(decoded) == 'table' then
-        for i = 1, 10 do npQuick[i] = decoded[tostring(i)] or decoded[i] or false end
+        -- KVP stores Lua slots 1..10; the browser protocol uses 0..9.
+        -- Preserve the persisted 1-based layout instead of shifting slot 1.
+        for i = 1, 10 do
+            local saved = decoded[tostring(i)]
+            if saved == nil then saved = decoded[i] end
+            npQuick[i] = type(saved) == 'table' and saved or false
+        end
     end
 end
 
