@@ -428,25 +428,39 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         end
         cb(true)
     elseif event == 'emotes:setFavorite' then
-        local item = args[1] or {}
-        if item.category and item.index and npCatalog[item.category] then
-            local original = npCatalog[item.category][tonumber(item.index)]
-            if original then item.emoteType = original.emoteType item.label = original.label end
+        local requested = args[1] or {}
+        local item
+        if requested.category and requested.index and npCatalog[requested.category] then
+            item = npCatalog[requested.category][tonumber(requested.index)]
         end
-        if item.value then
-            local id = (item.category or 'emotes') .. '_' .. item.value
-            local emote = {id = id, name = item.value, emoteType = item.emoteType or EmoteType.EMOTES, label = item.label or item.value, textureVariation = 1}
-            ToggleFavoriteEmote(id, emote)
-            local found = false
+        if not item and requested.value then
+            item = findNPItem(requested.value)
+        end
+        if not item or not HasEmotePermission(item.value, item.emoteType) then
+            cb(false)
+            return
+        end
+
+        -- Use the same ID shape as the native favorites menu so the two UIs
+        -- share one persistent favorite rather than creating duplicates.
+        local id = item.emoteType .. '_' .. item.value
+        local favorites = GetFavoriteEmotes()
+        local alreadyFavorite = favorites[id] ~= nil
+        ToggleFavoriteEmote(id, {
+            id = id, name = item.value, emoteType = item.emoteType,
+            label = item.label or item.value, textureVariation = 1
+        })
+        if alreadyFavorite then
             for i = #npFavorites, 1, -1 do
-                if npFavorites[i].value == item.value then table.remove(npFavorites, i) found = true end
+                if npFavorites[i].id == id then table.remove(npFavorites, i) end
             end
-            if not found then
-                item.id = id
-                npFavorites[#npFavorites + 1] = item
-            end
-            cb(found and false or id)
-        else cb(false) end
+        else
+            npFavorites[#npFavorites + 1] = {
+                id = id, category = item.category, index = item.index,
+                value = item.value, emoteType = item.emoteType
+            }
+        end
+        cb(alreadyFavorite and false or id)
     elseif event == 'emotes:setQuickEmote' then
         local slot = tonumber(args[1])
         if slot and slot >= 0 and slot <= 9 then
