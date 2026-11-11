@@ -518,8 +518,12 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
     local event = data.event
     local args = type(data.args) == 'table' and data.args or {}
     if event == 'emotes:getEmotes' then
-        -- NativeUI builds the shared catalog asynchronously on initial startup.
-        waitForNPCatalog()
+        -- Never report an empty catalog as a successful load when the
+        -- NativeUI builder is still starting. The browser can retry.
+        if not waitForNPCatalog() then
+            cb(false)
+            return
+        end
         cb(npCatalog)
     elseif event == 'emotes:getFavorites' then
         if not waitForNPCatalog() then cb({}) return end
