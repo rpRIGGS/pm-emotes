@@ -18394,7 +18394,9 @@ const M2 = e => {
     // A recycled virtualized tile must not clear a newer tile's preview.
     // Use one hover owner across the entire catalog.
     m.addEventListener("mouseenter", () => {
-      pmHoveredItem = e.item;
+      // Only a settled hover owns the preview; asynchronous manifest loading
+      // must not bypass the same debounce interval.
+      pmHoveredItem = null;
       const token = ++pmActiveHoverToken;
       if (pmActiveHoverTimer !== null) clearTimeout(pmActiveHoverTimer);
       pmActiveHoverTimer = setTimeout(() => {
