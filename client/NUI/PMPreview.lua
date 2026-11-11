@@ -1,9 +1,14 @@
--- PM Emotes: local, non-networked preview. Never move or animate the player.
+-- PM Emotes: local, non-networked character preview.
+-- Preview entities and cameras are always private to this client.
 local previewPed, previewCamera
 local previewActive = false
+local previewGeneration = 0
+local previewName, previewType
 
 local function clearPreview()
+    previewGeneration = previewGeneration + 1
     previewActive = false
+    previewName, previewType = nil, nil
     PMInvalidatePreviewProps()
     if previewCamera and DoesCamExist(previewCamera) then
         RenderScriptCams(false, false, 0, true, false)
@@ -26,71 +31,83 @@ function PMOpenCharacterPreview()
     if previewActive and previewPed and DoesEntityExist(previewPed) then return true end
     clearPreview()
     local player = PlayerPedId()
-    if not DoesEntityExist(player) then return false end
+    if not DoesEntityExist(player) or IsEntityDead(player) then return false end
 
     local origin = GetEntityCoords(player)
     local heading = GetEntityHeading(player)
     local forward = GetEntityForwardVector(player)
-    local clonePos = vector3(origin.x + forward.x * 3.0, origin.y + forward.y * 3.0, origin.z)
-    previewPed = ClonePed(player, heading + 180.0, false, false)
-    if not previewPed or previewPed == 0 or not DoesEntityExist(previewPed) then
-        previewPed = nil
-        return false
-    end
-    SetEntityAsMissionEntity(previewPed, true, true)
-    SetEntityCoordsNoOffset(previewPed, clonePos.x, clonePos.y, clonePos.z, false, false, false)
-    SetEntityHeading(previewPed, heading + 180.0)
-    SetEntityCollision(previewPed, false, false)
-    SetEntityVisible(previewPed, true, false)
-    SetEntityAlpha(previewPed, 255, false)
-    SetEntityInvincible(previewPed, true)
-    -- The non-colliding clone must remain in its preview stage rather than
-    -- falling through the world when the player is on an elevated interior.
-    SetEntityHasGravity(previewPed, false)
-    FreezeEntityPosition(previewPed, true)
-    SetPedCanRagdoll(previewPed, false)
-    SetBlockingOfNonTemporaryEvents(previewPed, true)
+    local right = vector3(-forward.y, forward.x, 0.0)
+    -- Stage the clone away from the player and aim a private camera at it.
+    -- The actual player is never moved or animated.
+    local stage = vector3(origin.x + forward.x * 3.0, origin.y + forward.y * 3.0, origin.z)
+    local clone = ClonePed(player, heading + 180.0, false, false)
+    if not clone or clone == 0 or not DoesEntityExist(clone) then return false end
+    previewPed = clone
+    SetEntityAsMissionEntity(clone, true, true)
+    SetEntityCoordsNoOffset(clone, stage.x, stage.y, stage.z, false, false, false)
+    SetEntityHeading(clone, heading + 180.0)
+    SetEntityCollision(clone, false, false)
+    SetEntityVisible(clone, true, false)
+    SetEntityAlpha(clone, 255, false)
+    SetEntityInvincible(clone, true)
+    SetEntityHasGravity(clone, false)
+    FreezeEntityPosition(clone, true)
+    SetPedCanRagdoll(clone, false)
+    SetBlockingOfNonTemporaryEvents(clone, true)
 
-    -- Keep the clone in the uncovered right side of the game view.
-    -- Point the camera to the LEFT of the clone to place it to the right on screen.
-    local rightX, rightY = forward.y, -forward.x
-    local camPos = vector3(clonePos.x + forward.x * 3.6, clonePos.y + forward.y * 3.6, clonePos.z + 1.35)
-    previewCamera = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
-    if not previewCamera or not DoesCamExist(previewCamera) then
+    local cam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
+    if not cam or not DoesCamExist(cam) then
         clearPreview()
         return false
     end
-    SetCamCoord(previewCamera, camPos.x, camPos.y, camPos.z)
-    -- The target is left of the clone, putting the clone right-of-center in the camera image.
-    PointCamAtCoord(previewCamera, clonePos.x - rightX * 1.0, clonePos.y - rightY * 1.0, clonePos.z + 0.9)
-    SetCamFov(previewCamera, 45.0)
-    SetCamActive(previewCamera, true)
+    previewCamera = cam
+    -- Camera is in front of the clone, and the point of interest is offset
+    -- to the right so the preview remains visible beside the emote menu.
+    local cameraPosition = vector3(stage.x + forward.x * 3.5, stage.y + forward.y * 3.5, stage.z + 1.3)
+    SetCamCoord(cam, cameraPosition.x, cameraPosition.y, cameraPosition.z)
+    PointCamAtCoord(cam, stage.x - right.x * 0.7, stage.y - right.y * 0.7, stage.z + 0.9)
+    SetCamFov(cam, 45.0)
+    SetCamActive(cam, true)
     RenderScriptCams(true, false, 0, true, false)
     previewActive = true
     return true
 end
 
 function PMPreviewCharacterEmote(emoteName, emoteType)
-    if not previewActive or not previewPed or not DoesEntityExist(previewPed) then
-        if not PMOpenCharacterPreview() then return false end
+    if type(emoteName) ~= 'string' or emoteName == '' then return false end
+    if previewActive and previewName == emoteName and previewType == emoteType
+        and previewPed and DoesEntityExist(previewPed) then
+        return true
     end
-
-    ClearPedTasksImmediately(previewPed)
+    if not PMOpenCharacterPreview() then return false end
+    previewGeneration = previewGeneration + 1
+    local generation = previewGeneration
+    local ped = previewPed
+    ClearPedTasksImmediately(ped)
     PMInvalidatePreviewProps()
-    ClearFacialIdleAnimOverride(previewPed)
-    if not emoteName or emoteName == '' then return true end
-    if emoteType == 'Emojis' or emoteType == 'Walks' then return true end
+    ClearFacialIdleAnimOverride(ped)
+
+    local success = false
     if emoteType == 'Expressions' then
         local expression = ExpressionData and ExpressionData[emoteName]
         if expression then
-            SetFacialIdleAnimOverride(previewPed, expression.anim, 0)
-            return true
+            SetFacialIdleAnimOverride(ped, expression.anim, 0)
+            success = true
         end
+    elseif emoteType == 'Walks' or emoteType == 'Emojis' then
+        -- Walk styles and emoji states do not have a standalone preview clip.
+        success = true
+    else
+        local emote = (EmoteData and EmoteData[emoteName]) or (SharedEmoteData and SharedEmoteData[emoteName])
+        if emote then success = EmotePlayOnNonPlayerPed(ped, emoteName) ~= false end
+    end
+    if generation ~= previewGeneration or ped ~= previewPed or not DoesEntityExist(ped) then
         return false
     end
-    local emote = EmoteData[emoteName] or SharedEmoteData[emoteName]
-    if not emote then return false end
-    return EmotePlayOnNonPlayerPed(previewPed, emoteName) ~= false
+    if success then
+        previewName, previewType = emoteName, emoteType
+    end
+    return success
 end
 
 AddEventHandler('onResourceStop', function(resource)
