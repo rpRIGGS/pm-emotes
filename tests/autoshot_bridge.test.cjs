@@ -52,5 +52,11 @@ setImmediate(() => {
   assert.equal(bridge.hasPreview({emoteType:"Emotes",value:"wave"}), false);
   assert.equal(element.style.display, "none");
   assert.equal(bridge.show({emoteType:"Emotes",value:"missing"}), false);
-  console.log("PASS: PM AutoShot bridge manifest, path security, hover, error fallback");
+  // Menu close must clear the visible preview even without a mouseleave.
+  assert.equal(bridge.show({emoteType:"Emotes",value:"unsafe"}), false);
+  assert.equal(element.style.display, "none");
+  events.message?.({data:{event:"emotes:closeUI"}});
+  assert.equal(element.style.display, "none");
+  assert.equal(element.getAttribute("src"), null);
+  console.log("PASS: PM AutoShot bridge manifest, path security, hover, error fallback, close cleanup");
 });
