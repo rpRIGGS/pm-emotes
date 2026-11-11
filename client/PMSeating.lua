@@ -251,7 +251,12 @@ function PMToggleNearbySeat()
         SimpleNotify('No supported chair within reach')
         return
     end
-    local pos = GetOffsetFromEntityInWorldCoords(chair, config.x, config.y, config.z)
+    -- GTA scenario coordinates are world positions, not an offset below the
+    -- chair's origin. The imported negative Z offsets buried the player.
+    -- Use the chair's model bounds to estimate its seating surface instead.
+    local boundsMin, boundsMax = GetModelDimensions(GetEntityModel(chair))
+    local seatHeight = math.max(0.0, boundsMax.z - 0.45)
+    local pos = GetOffsetFromEntityInWorldCoords(chair, config.x, config.y, seatHeight)
     -- Do not place the local player on top of another nearby seated player.
     for _, player in ipairs(GetActivePlayers()) do
         if player ~= PlayerId() then
