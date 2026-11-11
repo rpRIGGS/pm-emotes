@@ -259,7 +259,12 @@ AddEventHandler("rpemotes:internal:loadEmoteDataToNUI", function(EmoteData, Cate
         dataForMenu[htmlClass] = {}
     end
 
-    while not nuiReady or not localesLoaded do Citizen.Wait(10) end
+    local deadline = GetGameTimer() + 15000
+    while (not nuiReady or not localesLoaded) and GetGameTimer() < deadline do Wait(50) end
+    if not nuiReady or not localesLoaded then
+        print('[pm-emotes] NUI catalog sync timed out waiting for browser/locales')
+        return
+    end
     SendNUIMessage({type = "LOAD_EMOTE_DATA", emoteData = EmoteData, categoryToEmotes = CategoryToEmotes, emoteCategories = NUIEmoteCategories, emoteTypeIcons = EmoteTypeEmoji})
 end)
 
@@ -304,7 +309,12 @@ function AddEmoteToNUIQueue(data)
 end
 
 AddEventHandler("rpemotes:internal:sendMenuDataToNUI", function()
-    while not nuiReady or not initialDataLoaded do Citizen.Wait(10) end
+    local deadline = GetGameTimer() + 15000
+    while (not nuiReady or not initialDataLoaded) and GetGameTimer() < deadline do Wait(50) end
+    if not nuiReady or not initialDataLoaded then
+        print('[pm-emotes] NUI menu build timed out waiting for browser')
+        return
+    end
 
     -- Multiple builds can queue sends while waiting above (e.g. InitMenu plus a
     -- RebuildEmoteMenu during startup). The first send empties the queue, so a
@@ -329,7 +339,12 @@ AddEventHandler("rpemotes:internal:sendMenuDataToNUI", function()
 end)
 
 AddEventHandler("rpemotes:internal:sendKeybindsDataToNUI", function(binds)
-    while not nuiReady or not initialDataLoaded do Citizen.Wait(10) end
+    local deadline = GetGameTimer() + 15000
+    while (not nuiReady or not initialDataLoaded) and GetGameTimer() < deadline do Wait(50) end
+    if not nuiReady or not initialDataLoaded then
+        print('[pm-emotes] NUI keybind sync timed out waiting for browser')
+        return
+    end
     DebugPrint("[ NUI KEYBINDS BUILT ]")
     SendNUIMessage({
         type = "BUILD_KEYBINDS_MENU",
@@ -610,3 +625,13 @@ for slot = 0, 9 do
     -- Intentionally unbound: do not override qb-inventory's 1-0 hotbar.
     RegisterKeyMapping(command, ('PowerMoves Emotes quick slot %s'):format(currentSlot), 'keyboard', '')
 end
+
+-- Resource restarts must never strand player input in a dead browser overlay.
+AddEventHandler('onResourceStop', function(resource)
+    if resource ~= GetCurrentResourceName() then return end
+    menuSession = menuSession + 1
+    pendingNuiOpen = false
+    PMCloseCharacterPreview()
+    SetNuiFocusKeepInput(false)
+    SetNuiFocus(false, false)
+end)
