@@ -21,11 +21,14 @@ jobs:
         run: python3 tests/validate_pm_emotes.py
       - name: Install Lua syntax checker
         run: sudo apt-get update -qq && sudo apt-get install -y lua5.4
-      - name: Validate Lua NUI and preview syntax
+      - name: Validate all resource Lua syntax
         run: |
-          luac5.4 -p client/NUI/EmoteMenuNUI.lua
-          luac5.4 -p client/NUI/PMPreview.lua
-          luac5.4 -p client/PMSeating.lua
+          find . -type f -name '*.lua' \\
+            -not -path './development/*' \\
+            -not -path './development-reference/*' \\
+            -not -path './tests/*' \\
+            -not -path './node_modules/*' \\
+            -print0 | xargs -0 -r -n 1 luac5.4 -p
       - name: Package complete FiveM resource
         run: |
           python3 tools/package_pm_emotes.py
