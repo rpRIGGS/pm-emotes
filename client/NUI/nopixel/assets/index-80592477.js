@@ -19034,6 +19034,13 @@ function yv() {
   });
   Ge.register("emotes:closeUI", () => {
     ++openSequence;
+    ++pmActiveHoverToken;
+    pmHoveredItem = null;
+    if (pmActiveHoverTimer !== null) {
+      clearTimeout(pmActiveHoverTimer);
+      pmActiveHoverTimer = null;
+    }
+    window.PMAutoShotNoPixel?.hide();
     r(false);
   });
   Ge.register("emotes:hud", async d => {
