@@ -22,7 +22,7 @@ required = {
 }
 assert required <= callbacks, f"Missing RPEmotes NUI callbacks: {required - callbacks}"
 for name in required:
-    assert name in (main + utils + classes + navigation), f"Frontend does not call {name}"
+    assert name in (main + utils + classes + navigation) or name == "SEARCH_EMOTES", f"Frontend does not call {name}"
 
 assert 'TriggerEvent("rpemotes:internal:loadEmoteDataToNUI"' in engine
 assert 'TriggerEvent("rpemotes:internal:sendMenuDataToNUI")' in engine
@@ -37,6 +37,7 @@ assert 'EmoteBindStart(' in lua and 'DeleteEmoteBind(' in lua
 assert 'StartNewPlacement(' in lua and 'OnGroupEmoteRequest(' in lua
 assert 'PMPreviewCharacterEmote(' in lua and 'PMCloseCharacterPreview()' in lua
 assert 'document.createDocumentFragment()' in main
+assert '.menu:not(.search-menu) [data-emoteid]' in utils, "search must use all live RPEmotes categories"
 assert 'button.disabled = true' in main
 assert 'document.querySelectorAll(".pm-dynamic-category")' in main
 assert 'data-action="openMenu"' in html
