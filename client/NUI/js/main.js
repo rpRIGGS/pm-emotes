@@ -321,6 +321,10 @@ window.addEventListener('message', (event) => {
             ELEMENTS.forEach((el) => el?.classList.add("btn-emote-favorite"));
         })
         Locale.setLocaleStrings();
+        // A catalog rebuild can add/remove animations while the UI remains
+        // open. Refresh the visible search instead of keeping stale results.
+        if (document.querySelector(".search-menu.grid")) HandleEmoteSearch();
+        else if (SEARCH_BAR.value) HandleEmoteFilter();
     }
 
     if (event.data.type === "BUILD_KEYBINDS_MENU") {
