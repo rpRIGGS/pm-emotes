@@ -18344,6 +18344,7 @@ const M2 = e => {
         category: e.item.category ?? "",
         index: e.item.index ?? 0,
         value: e.item.value ?? "",
+        emoteType: e.item.emoteType,
         type: "favorite"
       };
       try {
