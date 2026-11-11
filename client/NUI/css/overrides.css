@@ -119,3 +119,26 @@ body, body.align-left {justify-content:flex-start !important;align-items:center 
 .pm-brand {gap:12px;letter-spacing:0}
 .pm-brand-logo {display:block;max-height:54px;max-width:190px;width:auto;height:auto;object-fit:contain}
 .pm-brand-name {font:700 15px/1.2 Arial,sans-serif;letter-spacing:.06em}
+
+/* PowerMoves RP / NoPixel-inspired compact utility treatment.
+   No oversized emoji buttons, rounded toy tiles or faux 3D preview panel. */
+:root {--border-radius-menu:4px;--border-radius-btn-sidebar:3px;--border-radius-btn-emote:3px}
+body,body.align-left {justify-content:flex-start !important;align-items:center !important;padding:0 0 0 2vw !important;background:transparent !important}
+.main-container {width:min(650px,48vw);height:min(760px,84vh);border-radius:5px;background:rgba(10,13,19,.92);box-shadow:0 14px 38px rgba(0,0,0,.4)}
+.header-container {min-height:62px;padding:8px 16px;background:rgba(12,15,23,.97);border-bottom:2px solid var(--pm-blue)}
+.pm-brand-logo {max-height:46px}
+.pm-brand-name {font-size:13px;letter-spacing:.12em}
+.side-navigation {flex-basis:140px !important;width:140px !important;max-width:140px !important;background:rgba(12,16,24,.95)}
+.side-navigation:hover {max-width:140px !important}
+.side-navigation .sidebar-button-container {min-height:41px !important;gap:4px}
+.side-navigation .btn-sidebar {font-size:0 !important;width:7px !important;flex:0 0 7px !important;height:27px !important;margin:6px 4px 6px 10px !important;border:0 !important;border-radius:0 !important;background:rgba(117,132,159,.4) !important}
+.side-navigation .sidebar-button-active .btn-sidebar {background:var(--pm-blue) !important}
+.side-navigation .btn-sidebar-label {font-size:11px !important;font-weight:700 !important;letter-spacing:.045em;text-transform:uppercase}
+.pm-workspace .content-container {padding:0 12px 12px}
+.search-container {padding-top:10px}
+.search-input {border-radius:3px !important}
+.btn-emote {border-radius:3px !important;font-size:12px}
+.pm-preview-panel {display:none !important}
+.footer-container {min-height:20px;background:rgba(12,15,23,.97)}
+@media(max-width:900px){.main-container{width:min(620px,65vw)}}
+@media(max-width:680px){.main-container{width:95vw}.side-navigation{flex-basis:105px !important;width:105px !important;max-width:105px !important}}
