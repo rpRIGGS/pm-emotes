@@ -8,6 +8,7 @@ lua = (root / "client/NUI/EmoteMenuNUI.lua").read_text()
 main = (root / "client/NUI/js/main.js").read_text()
 utils = (root / "client/NUI/js/utils.js").read_text()
 classes = (root / "client/NUI/js/classes.js").read_text()
+navigation = (root / "client/NUI/js/navigation.js").read_text()
 html = (root / "client/NUI/index.html").read_text()
 engine = (root / "client/EmoteMenu.lua").read_text()
 manifest = (root / "fxmanifest.lua").read_text()
@@ -21,7 +22,7 @@ required = {
 }
 assert required <= callbacks, f"Missing RPEmotes NUI callbacks: {required - callbacks}"
 for name in required:
-    assert name in (main + utils + classes) or name in {"SEARCH_BAR_FOCUS"}, f"Frontend does not call {name}"
+    assert name in (main + utils + classes + navigation), f"Frontend does not call {name}"
 
 assert 'TriggerEvent("rpemotes:internal:loadEmoteDataToNUI"' in engine
 assert 'TriggerEvent("rpemotes:internal:sendMenuDataToNUI")' in engine
