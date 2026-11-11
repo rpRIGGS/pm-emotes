@@ -16,6 +16,7 @@ jobs:
         run: |
           node --check client/NUI/nopixel/assets/index-80592477.js
           node --check client/NUI/nopixel/assets/pm-autoshot-bridge.js
+          node tests/autoshot_bridge.test.cjs
       - name: Validate PowerMoves NUI integration contracts
         run: python3 tests/validate_pm_emotes.py
       - name: Install Lua syntax checker
