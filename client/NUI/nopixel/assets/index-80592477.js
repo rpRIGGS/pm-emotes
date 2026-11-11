@@ -18870,9 +18870,27 @@ function yv() {
     setHudVisible: o
   } = en();
   const s = d => {
-    if (d.key === "Escape" && e()) {
+    if (!e()) return;
+    if (d.key === "Escape") {
+      d.preventDefault();
       r(false);
       Ge.execute("emotes:close");
+      return;
+    }
+    // The original NoPixel quick bar advertises SHIFT + 1..0. Make the
+    // advertised shortcut work while the F4 menu is open, without stealing
+    // keystrokes from the search field.
+    if (d.shiftKey && !d.ctrlKey && !d.altKey &&
+        !["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName) &&
+        /^Digit[0-9]$/.test(d.code)) {
+      const slot = (Number(d.code.slice(-1)) + 9) % 10;
+      const quick = en().quickEmotes[String(slot)];
+      const item = quick && t.find(v =>
+        v.category === quick.category && v.index === quick.index);
+      if (item) {
+        d.preventDefault();
+        Ge.execute("emotes:play", item);
+      }
     }
   };
   Kn(async () => {
