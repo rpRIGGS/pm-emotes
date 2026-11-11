@@ -378,6 +378,27 @@ AddEventHandler("rpemotes:internal:handleNUIOpened", function()
     SetScaleformMovieAsNoLongerNeeded(scaleform_instructions)
     SendNUIMessage({type = "OPEN_MENU", value = false, shouldShowEmojiMenu = _showEmoji})
 end)
+-- The quick bar is local per-player and survives resource restarts.
+local quickKvp = 'pm_emotes_nopixel_quick'
+local savedQuick = GetResourceKvpString(quickKvp)
+if savedQuick then
+    local ok, decoded = pcall(json.decode, savedQuick)
+    if ok and type(decoded) == 'table' then
+        for i = 1, 10 do npQuick[i] = decoded[tostring(i)] or decoded[i] or false end
+    end
+end
+
+local function findNPItem(name, emoteType)
+    for category, items in pairs(npCatalog) do
+        for _, item in ipairs(items) do
+            if item.value == name and (not emoteType or item.emoteType == emoteType) then
+                return item
+            end
+        end
+    end
+    return nil
+end
+
 -- Adapter for the original NoPixel 4.0 compiled UI; all animation execution stays in RPEmotes.
 RegisterNUICallback('PM_NP_RPC', function(data, cb)
     local event = data.event
@@ -385,7 +406,19 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
     if event == 'emotes:getEmotes' then
         cb(npCatalog)
     elseif event == 'emotes:getFavorites' then
-        cb(npFavorites)
+        local favorites = {}
+        local stored = GetFavoriteEmotes()
+        for _, id in ipairs(GetFavoriteEmotesMap()) do
+            local fav = stored[id]
+            if fav then
+                local item = findNPItem(fav.name, fav.emoteType)
+                if item then
+                    favorites[#favorites + 1] = {id = id, category = item.category, index = item.index, value = item.value, emoteType = item.emoteType}
+                end
+            end
+        end
+        npFavorites = favorites
+        cb(favorites)
     elseif event == 'emotes:getQuickEmotes' then
         cb(npQuick)
     elseif event == 'emotes:close' then
@@ -424,6 +457,7 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         local slot = tonumber(args[1])
         if slot and slot >= 0 and slot <= 9 then
             npQuick[slot + 1] = args[2] or false
+            SetResourceKvp(quickKvp, json.encode(npQuick))
         end
         cb(true)
     else
