@@ -228,23 +228,31 @@ window.addEventListener('message', (event) => {
         // Reloads must not duplicate sidebar buttons or rebind event listeners.
         document.querySelectorAll(".pm-dynamic-category").forEach((node) => node.remove());
         Object.keys(emoteCategories).forEach((key) => {
-            const SIDEBAR_ANCHOR = document.querySelector(".sidebar-button-anchor");
-            const MENU_ANCHOR = document.querySelector(".menu-anchor");
-
-            SIDEBAR_ANCHOR.insertAdjacentHTML("afterend",
-                `
-                    <li class="sidebar-button-container pm-dynamic-category">
-                        <button id="${emoteCategories[key].id}-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="${emoteCategories[key].id}-menu">${emoteCategories[key].icon}</button>
-                        <label for="${emoteCategories[key].id}-menu-btn" class="btn-sidebar-label" data-locale="${key}">${key}</label>
-                    </li>
-                `);
-
-            MENU_ANCHOR.insertAdjacentHTML("afterend",
-                `
-                <article class="menu pm-dynamic-category ${emoteCategories[key].id}-menu doublecolumn btn-list">
-                </article>
-                `)
-        })
+            const category = emoteCategories[key];
+            if (!category?.id || !/^[a-zA-Z0-9_-]+$/.test(category.id)) return;
+            const sidebarAnchor = document.querySelector(".sidebar-button-anchor");
+            const menuAnchor = document.querySelector(".menu-anchor");
+            if (!sidebarAnchor || !menuAnchor) return;
+            const item = document.createElement("li");
+            item.className = "sidebar-button-container pm-dynamic-category";
+            const button = document.createElement("button");
+            button.id = category.id + "-menu-btn";
+            button.className = "btn btn-sidebar";
+            button.dataset.action = "openMenu";
+            button.dataset.menu = category.id + "-menu";
+            button.textContent = category.icon || "🎬";
+            const label = document.createElement("label");
+            label.htmlFor = button.id;
+            label.className = "btn-sidebar-label";
+            label.dataset.locale = key;
+            label.textContent = key;
+            item.append(button, label);
+            sidebarAnchor.after(item);
+            const menu = document.createElement("article");
+            menu.className = "menu pm-dynamic-category doublecolumn btn-list";
+            menu.classList.add(category.id + "-menu");
+            menuAnchor.after(menu);
+        });
         MENUS = CONTENT_CONTAINER.querySelectorAll(".menu");
         _setupMenuEventListeners(CONTENT_CONTAINER.querySelectorAll(".pm-dynamic-category.menu"));
         ExecuteNUICallback("INITIAL_DATA_LOADED", {})
