@@ -70,6 +70,22 @@ for declaration in declarations:
     if not (ROOT / declaration).is_file():
         sys.exit(f"Missing fxmanifest runtime asset: {declaration}")
 
+# A declaration can point to a real file that our exclusion filters accidentally
+# remove. Verify the actual ZIP input list, not just the source tree.
+included = {path.relative_to(ROOT).as_posix() for path in files}
+for declaration in declarations:
+    if declaration.startswith("/") or declaration.startswith("@"):
+        continue
+    if "*" in declaration:
+        if declaration in optional_globs:
+            continue
+        matches = [path.relative_to(ROOT).as_posix()
+                   for path in ROOT.glob(declaration) if path.is_file()]
+        if not any(name in included for name in matches):
+            sys.exit(f"Manifest asset glob omitted from ZIP: {declaration}")
+    elif declaration not in included:
+        sys.exit(f"Manifest runtime asset omitted from ZIP: {declaration}")
+
 with ZipFile(OUTPUT, "w", compression=ZIP_DEFLATED, compresslevel=6) as archive:
     for path in files:
         archive.write(path, arcname="pm-emotes/" + path.relative_to(ROOT).as_posix())
