@@ -433,10 +433,7 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
             if item.emoteType == EmoteType.SHARED then
                 if IsNuiFocused() then ToggleNUIMenu() end
                 OnGroupEmoteRequest(item.value)
-            elseif item.emoteType == EmoteType.PROP_EMOTES and Config.PlacementEnabled and item.category == 'placed' then
-                if IsNuiFocused() then ToggleNUIMenu() end
-                StartNewPlacement(item.value)
-            else
+             else
                 RouteEmoteToFunction(item.value, item.emoteType or EmoteType.EMOTES, 1)
             end
         end
