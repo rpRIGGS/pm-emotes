@@ -174,3 +174,5 @@ body,body.align-left {justify-content:flex-start !important;align-items:center !
 .pm-preview-help {font-size:10px !important;text-align:left !important;color:#c3c8d5 !important}
 @media(max-width:900px){.pm-preview-panel{right:1vw !important;width:30vw !important}}
 @media(max-width:680px){.pm-preview-panel{display:none !important}}
+
+.pm-brand-word{color:#fff !important}.pm-brand-rp{color:#0438ff !important}
