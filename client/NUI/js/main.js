@@ -305,18 +305,30 @@ window.addEventListener('message', (event) => {
         const BIND_ITEMS = Array.from(document.querySelectorAll(".keybinds-list-item"));
         BIND_ITEMS?.forEach((el) => el.remove());
 
-        Object.keys(kbinds).sort().forEach((key) => {
-            const data = kbinds[key]
-            KEYBINDS_LIST_CONTAINER?.insertAdjacentHTML("beforeend",
-                `
-                <li class="keybinds-list-item">
-                    <span class="keybind-item-text">Slot ${data.id} [ <span class="keybind-bind-text keybind-${data.id}-bind">${data.keyLabel}</span> ]</span>
-                    <button class="btn btn-emote btn-keybind" data-emoteid="${data.emoteName}" data-emoteType="${data.emoteType}" data-slotid="${data.id}">${data.emoteType && data.emoteType !== 'Emojis' ? EMOTE_TYPE_ICONS[data.emoteType]+" " : ""}${data.emoteLabel || data.emoteName || Locale.translate("empty_slot")}</button>
-                </li>
-                `
-
-            )
-        })
+        const keybindFragment = document.createDocumentFragment();
+        Object.keys(kbinds || {}).sort().forEach((key) => {
+            const data = kbinds[key];
+            if (!data) return;
+            const item = document.createElement("li");
+            item.className = "keybinds-list-item";
+            const description = document.createElement("span");
+            description.className = "keybind-item-text";
+            description.append(document.createTextNode("Slot " + data.id + " [ "));
+            const label = document.createElement("span");
+            label.className = "keybind-bind-text";
+            label.classList.add("keybind-" + String(data.id).replace(/[^a-zA-Z0-9_-]/g, "") + "-bind");
+            label.textContent = data.keyLabel || "";
+            description.append(label, document.createTextNode(" ]"));
+            const button = document.createElement("button");
+            button.className = "btn btn-emote btn-keybind";
+            button.dataset.emoteid = data.emoteName || "";
+            button.dataset.emotetype = data.emoteType || "";
+            button.dataset.slotid = data.id;
+            button.textContent = (data.emoteType && data.emoteType !== "Emojis" ? (EMOTE_TYPE_ICONS[data.emoteType] || "") + " " : "") + (data.emoteLabel || data.emoteName || Locale.translate("empty_slot"));
+            item.append(description, button);
+            keybindFragment.appendChild(item);
+        });
+        KEYBINDS_LIST_CONTAINER?.appendChild(keybindFragment);
         if (document.querySelector(".keybinds-menu.grid")) {
             querySelectorVisible(document.querySelector(".keybinds-list"))?.focus();
         }
