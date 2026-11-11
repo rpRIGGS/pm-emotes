@@ -16,7 +16,7 @@ with ZipFile(archive_path) as archive:
     if not names or any(not name.startswith("pm-emotes/") for name in names):
         sys.exit("ZIP must extract into a single pm-emotes/ resource directory")
     forbidden = (".git/", ".github/", "tests/", "development-reference/",
-                 "development/", "dist/", "node_modules/")
+                 "development/", "dist/", "node_modules/", "tools/")
     for name in names:
         relative = name.removeprefix("pm-emotes/")
         if any(relative.startswith(prefix) for prefix in forbidden):
