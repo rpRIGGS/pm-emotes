@@ -93,6 +93,11 @@ check("preview ped is not networked", "ClonePed(player, heading + 180.0, false, 
 check("preview resource-stop cleanup", "onResourceStop" in preview)
 check("preview selection generation guard",
       "requestVersion ~= previewPropVersion" in emote_engine)
+check("NoPixel preview scenario is independent of legacy clone",
+      "local playEnterAnim = false" in emote_engine and
+      "IsPedMale(ped)" in emote_engine)
+check("Preview scenario does not mutate player gender",
+      "checkGender()\\n        ClearPedTasks(ped)\\n        DestroyAllProps(true)" not in emote_engine)
 check("preview props attach to the correct generation",
       "addProps(animOption, nil, ped, nil, true, requestVersion)" in emote_engine)
 check("NUI invalidates obsolete preview requests",
