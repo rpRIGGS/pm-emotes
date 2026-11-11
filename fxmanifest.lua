@@ -25,6 +25,7 @@ files {
     'client/NUI/nopixel/*.svg',
     'client/NUI/nopixel/assets/*',
     'client/NUI/nopixel/previews/**/*.webp',
+    'client/NUI/previews/*',
     'client/NUI/assets/*.png',
 }
 
