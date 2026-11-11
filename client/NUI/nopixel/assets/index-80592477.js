@@ -18467,13 +18467,15 @@ function tv() {
   o(async l => {
     const m = l.draggable;
     const h = l.droppable;
-    if (m?.id.toString().includes("quick:")) {
-      const y = parseInt(l.draggable.id.toString().replace("quick:", ""));
-      t(g => ({
-        ...g,
-        [y]: null
-      }));
-      await Ge.execute("emotes:setQuickEmote", y, null);
+    if (m?.id.toString().startsWith("quick:")) {
+      const slot = Number(m.id.toString().slice(6));
+      if (!Number.isInteger(slot) || slot < 0 || slot > 9) return;
+      try {
+        const saved = await Ge.execute("emotes:setQuickEmote", slot, null);
+        if (saved) t(current => ({...current, [slot]: null}));
+      } catch (error) {
+        console.error("[PowerMoves RP] Could not clear quick slot", error);
+      }
       return;
     }
     d("draggables", m.id, "custom");
@@ -18489,9 +18491,11 @@ function tv() {
       index: v.index,
       value: v.value
     };
-    const saved = await Ge.execute("emotes:setQuickEmote", h.id, _);
-    if (saved) {
-      t(y => ({...y, [h.id]: _}));
+    try {
+      const saved = await Ge.execute("emotes:setQuickEmote", h.id, _);
+      if (saved) t(y => ({...y, [h.id]: _}));
+    } catch (error) {
+      console.error("[PowerMoves RP] Could not assign quick slot", error);
     }
   });
   Kn(async () => {
