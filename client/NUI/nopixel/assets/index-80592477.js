@@ -18886,6 +18886,9 @@ function yv() {
     }
     r(true);
   });
+  Ge.register("emotes:closeUI", () => {
+    r(false);
+  });
   Ge.register("emotes:hud", async d => {
     o(d);
   });
