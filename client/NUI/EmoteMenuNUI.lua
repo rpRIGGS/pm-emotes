@@ -1,6 +1,6 @@
 local npCatalog = {}
 local npFavorites = {}
-local npQuick = {false, false, false, false, false}
+local npQuick = {false, false, false, false, false, false, false, false, false, false}
 local nuiReady = false
 local initialDataLoaded = false
 local localesLoaded = false
@@ -278,7 +278,8 @@ function AddEmoteToNUIQueue(data)
     end
     local cat = ({[EmoteType.DANCES] = 'dances', [EmoteType.EXPRESSIONS] = 'expressions', [EmoteType.WALKS] = 'walks', [EmoteType.SHARED] = 'synced', [EmoteType.ANIMAL_EMOTES] = 'animals', [EmoteType.PROP_EMOTES] = 'placed'})[data.emoteType] or 'emotes'
     npCatalog[cat] = npCatalog[cat] or {}
-    npCatalog[cat][#npCatalog[cat] + 1] = {category = cat, value = data.emoteName, label = data.label or data.emoteName, emoteType = data.emoteType}
+    local index = #npCatalog[cat] + 1
+    npCatalog[cat][index] = {category = cat, index = index, value = data.emoteName, label = data.label or data.emoteName, emoteType = data.emoteType}
     local tbl = dataForMenu[NUIEmoteCategories[data.categoryName] and NUIEmoteCategories[data.categoryName].id] or dataForMenu[NUIEmoteType[data.emoteType]]
     if tbl ~= nil then
         table.insert(tbl, data)
@@ -392,15 +393,22 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         cb(true)
     elseif event == 'emotes:play' then
         local item = args[1] or {}
+        if item.category and item.index and npCatalog[item.category] then
+            item = npCatalog[item.category][tonumber(item.index)] or item
+        end
         if item.value then
             RouteEmoteToFunction(item.value, item.emoteType or EmoteType.EMOTES, 1)
         end
         cb(true)
     elseif event == 'emotes:setFavorite' then
         local item = args[1] or {}
+        if item.category and item.index and npCatalog[item.category] then
+            local original = npCatalog[item.category][tonumber(item.index)]
+            if original then item.emoteType = original.emoteType item.label = original.label end
+        end
         if item.value then
             local id = (item.category or 'emotes') .. '_' .. item.value
-            local emote = {id = id, name = item.value, emoteType = item.emoteType or EmoteType.EMOTES, label = item.value, textureVariation = 1}
+            local emote = {id = id, name = item.value, emoteType = item.emoteType or EmoteType.EMOTES, label = item.label or item.value, textureVariation = 1}
             ToggleFavoriteEmote(id, emote)
             local found = false
             for i = #npFavorites, 1, -1 do
