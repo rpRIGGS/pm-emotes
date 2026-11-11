@@ -17,6 +17,7 @@ document.body.appendChild(overlay);
 
 let activeKey = null;
 let manifestReady = false;
+let failedKey = null;
 const keyFor = item => String(item?.emoteType ?? "") + ":" + String(item?.value ?? "");
 const safeFile = file => typeof file === "string" &&
   /^previews\/[A-Za-z0-9_-]+\.webp$/.test(file);
@@ -34,6 +35,7 @@ window.PMAutoShotNoPixel = {
       this.hide();
       return false;
     }
+    failedKey = null;
     if (activeKey !== key || overlay.getAttribute("src") !== url) {
       overlay.src = url;
       activeKey = key;
@@ -50,8 +52,11 @@ window.PMAutoShotNoPixel = {
 };
 
 overlay.addEventListener("error", () => {
-  if (activeKey) entries.delete(activeKey);
+  const key = activeKey;
+  if (key) entries.delete(key);
+  failedKey = key;
   window.PMAutoShotNoPixel.hide();
+  window.dispatchEvent(new CustomEvent("pm-autoshot-preview-failed", {detail: {key}}));
 });
 
 fetch("../previews/manifest.json", {cache: "no-store"})
@@ -64,7 +69,10 @@ fetch("../previews/manifest.json", {cache: "no-store"})
     }
   })
   .catch(() => {})
-  .finally(() => { manifestReady = true; });
+  .finally(() => {
+    manifestReady = true;
+    window.dispatchEvent(new Event("pm-autoshot-manifest-ready"));
+  });
 
 window.addEventListener("message", event => {
   if (event.data?.event === "emotes:closeUI" ||
