@@ -12,7 +12,7 @@ dependencies {
     '/onesync'
 }
 
-ui_page 'client/NUI/index.html'
+ui_page 'client/NUI/nopixel/index.html'
 
 files {
     'conditionalanims.meta',
@@ -21,6 +21,9 @@ files {
     'client/NUI/js/*.js',
     'client/NUI/css/*.css',
     'client/NUI/index.html',
+    'client/NUI/nopixel/index.html',
+    'client/NUI/nopixel/*.svg',
+    'client/NUI/nopixel/assets/*',
     'client/NUI/assets/*.png',
 }
 
