@@ -380,6 +380,14 @@ AddEventHandler("rpemotes:internal:handleNUIOpened", function()
         DisableControlAction(0, 24, true)
         DisableControlAction(0, 25, true)
         DisableControlAction(0, 37, true)
+        -- Reserve the NoPixel-style Shift+1..0 emote shortcuts while F4 is open.
+        -- GTA weapon slots use 157..165; allowing those through also triggers
+        -- qb-inventory hotbar actions instead of (or alongside) the emote.
+        for control = 157, 165 do
+            DisableControlAction(0, control, true)
+            DisableControlAction(1, control, true)
+            DisableControlAction(2, control, true)
+        end
         DisableControlAction(0, 200, true)
         Wait(0)
     end
