@@ -59,4 +59,34 @@ setImmediate(() => {
   assert.equal(element.style.display, "none");
   assert.equal(element.getAttribute("src"), null);
   console.log("PASS: PM AutoShot bridge manifest, path security, hover, error fallback, close cleanup");
+  // The integration must remain optional when AutoShot has not been installed.
+  const missingOverlay = {
+    style: {}, attributes: {},
+    setAttribute(k,v) {this.attributes[k]=v;},
+    getAttribute(k) {return this.attributes[k] ?? null;},
+    removeAttribute(k) {delete this.attributes[k];},
+    addEventListener() {},
+    set src(v) {this.attributes.src=v;},
+    get src() {return this.attributes.src;}
+  };
+  const missingWindow = {addEventListener() {}, dispatchEvent() {}};
+  const missingContext = {
+    document: {
+      createElement: () => missingOverlay,
+      body: {appendChild() {}},
+      addEventListener() {}
+    },
+    window: missingWindow, Object, Map, String,
+    Event: class {constructor(type) {this.type=type;}},
+    CustomEvent: class {constructor(type, args) {this.type=type; this.detail=args.detail;}},
+    fetch: async () => ({ok:false})
+  };
+  vm.createContext(missingContext);
+  vm.runInContext(source, missingContext);
+  setImmediate(() => {
+    assert.equal(missingWindow.PMAutoShotNoPixel.ready, true);
+    assert.equal(missingWindow.PMAutoShotNoPixel.show({emoteType:"Emotes",value:"wave"}), false);
+    assert.equal(missingOverlay.style.display, "none");
+    console.log("PASS: Missing AutoShot manifest leaves normal preview fallback available");
+  });
 });
