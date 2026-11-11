@@ -245,6 +245,9 @@ end)
 
 
 AddEventHandler("rpemotes:internal:loadEmoteDataToNUI", function(EmoteData, CategoryToEmotes)
+    -- Rebuild the category index from the engine on every catalog conversion.
+    -- A removed/renamed category must not remain in the PowerMoves sidebar.
+    NUIEmoteCategories = {}
     for name, emotes in pairs(CategoryToEmotes) do
         local htmlClass = getHtmlClassFromCategoryName(name)
         NUIEmoteCategories[name] = {id=htmlClass, icon = getEmojiFromCategoryName(name)}
