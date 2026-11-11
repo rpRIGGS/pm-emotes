@@ -69,6 +69,7 @@ check("NUI manifest declares preview images",
 
 rpc = ("emotes:getEmotes", "emotes:getFavorites", "emotes:getQuickEmotes",
        "emotes:play", "emotes:setFavorite", "emotes:setQuickEmote",
+       "emotes:moveQuickEmote",
        "emotes:preview", "emotes:clearPreview", "emotes:close")
 for event in rpc:
     check(f"Lua RPC: {event}", f"event == '{event}'" in bridge)
@@ -82,6 +83,9 @@ check("Lua close event", 'event = "emotes:closeUI"' in bridge)
 check("NoPixel drag-to-slot uses numeric RPC slot IDs",
       'const slot = /^quick:[0-9]$/.test(targetId)' in js and
       'Ge.execute("emotes:setQuickEmote", slot, _)' in js)
+check("quick slot moves are atomic and persisted once",
+      'Ge.execute("emotes:moveQuickEmote", slot, moveToSlot ? destination : null)' in js and
+      "elseif event == 'emotes:moveQuickEmote' then" in bridge)
 check("quick slots use all ten slots", "for slot = 0, 9 do" in bridge)
 check("quick slots remain unbound by default",
       "RegisterKeyMapping(command" in bridge and "'keyboard', ''" in bridge)
