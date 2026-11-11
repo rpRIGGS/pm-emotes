@@ -79,6 +79,9 @@ check("browser open event", 'Ge.register("emotes:open"' in js)
 check("Lua open event", 'event = "emotes:open"' in bridge)
 check("browser close event", 'Ge.register("emotes:closeUI"' in js)
 check("Lua close event", 'event = "emotes:closeUI"' in bridge)
+check("NoPixel drag-to-slot uses numeric RPC slot IDs",
+      'const slot = /^quick:[0-9]$/.test(targetId)' in js and
+      'Ge.execute("emotes:setQuickEmote", slot, _)' in js)
 check("quick slots use all ten slots", "for slot = 0, 9 do" in bridge)
 check("quick slots remain unbound by default",
       "RegisterKeyMapping(command" in bridge and "'keyboard', ''" in bridge)
