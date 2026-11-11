@@ -15,14 +15,18 @@ export class Popover {
 
     init() {
         document.addEventListener('contextmenu', (e) => {
-            let event = JSON.parse(JSON.stringify(e));
-            event.target = document.activeElement;
-            const rect = event.target.getBoundingClientRect();
-            event.clientX = rect.left + rect.width/2;
-            event.clientY = rect.top + rect.height/2;
-            if (event.target.closest(this.triggerSelector)) {
+            // Mouse context menus target the actual clicked emote. Keyboard
+            // context-menu keys use the currently focused emote instead.
+            const target = e.target.closest?.(this.triggerSelector) ||
+                (e.detail === 0 ? document.activeElement?.closest?.(this.triggerSelector) : null);
+            if (target) {
                 e.preventDefault();
-                this.currentButton = event.target.closest(this.triggerSelector);
+                const rect = target.getBoundingClientRect();
+                const event = {
+                    clientX: e.detail === 0 ? rect.left + rect.width / 2 : e.clientX,
+                    clientY: e.detail === 0 ? rect.top + rect.height / 2 : e.clientY
+                };
+                this.currentButton = target;
                 if (this.currentButton.classList.contains("btn-style-reset")) {
                     this.currentButton = null;
                     return;
