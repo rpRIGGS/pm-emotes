@@ -18872,19 +18872,24 @@ function yv() {
     document.removeEventListener("keydown", s);
   });
   Ge.register("emotes:open", async () => {
-    if (t.length === 0) {
+    // Open immediately on F4, even while the initial catalog is loading.
+    // Refresh the RPEmotes catalog and favorites on each opening so changes
+    // to animation packs, permissions and favorites are reflected in the UI.
+    r(true);
+    try {
       const d = await Ge.execute("emotes:getEmotes");
-      const c = Object.values(d).flatMap((m, h) => m.map((v, _) => ({
+      const c = Object.values(d || {}).flatMap(m => (Array.isArray(m) ? m : []).map((v, _) => ({
         ...v,
-        index: _ + 1,
-        label: v.label ?? `Dance ${_ + 1}`,
-        value: v.id ?? v.value
+        index: v.index ?? _ + 1,
+        label: v.label ?? v.value ?? `Emote ${_ + 1}`,
+        value: v.value ?? v.id
       })));
       n(c);
       const l = await Ge.execute("emotes:getFavorites");
-      i(l);
+      i(Array.isArray(l) ? l : []);
+    } catch (error) {
+      console.error("[PowerMoves RP] Failed to refresh emote menu", error);
     }
-    r(true);
   });
   Ge.register("emotes:closeUI", () => {
     r(false);
