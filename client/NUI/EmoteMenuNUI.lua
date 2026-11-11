@@ -124,13 +124,14 @@ RegisterNUICallback('LOCALES_LOADED', function(data, cb)
 end)
 
 RegisterNUICallback('CLOSE_MENU', function(data, cb)
-    ToggleNUIMenu()
+    if IsNuiFocused() then ToggleNUIMenu() end
     PlaySoundFrontend(-1, "QUIT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
     cb({["ok"] = true})
 end)
 
 RegisterNUICallback('SEARCH_BAR_FOCUS', function(data, cb)
-    if data.isFocused then
+    if not IsNuiFocused() then cb({["ok"] = true}) return end
+    if type(data) == 'table' and data.isFocused then
         SetNuiFocusKeepInput(false)
     else
         SetNuiFocusKeepInput(true)
@@ -160,13 +161,13 @@ RegisterNUICallback('ROUTE_EMOTE', function(data, cb)
         end
     elseif data.type == "groupemote" then
         PMCloseCharacterPreview()
-        ToggleNUIMenu() -- Important to close first. Group emote request blocks the thread until you actually start the request.
+        if IsNuiFocused() then ToggleNUIMenu() end -- Important to close first. Group emote request blocks the thread until you actually start the request.
         OnGroupEmoteRequest(data.emoteName)
     elseif data.type == "placement" then
         if Config.PlacementEnabled then
             PMCloseCharacterPreview()
             StartNewPlacement(data.emoteName)
-            ToggleNUIMenu() -- Important to close *after* the placement request. Closing it before the request will block the preview ped on the screen.
+            if IsNuiFocused() then ToggleNUIMenu() end -- Important to close *after* the placement request. Closing it before the request will block the preview ped on the screen.
         end
     end
 
@@ -215,7 +216,7 @@ end)
 RegisterNUICallback('SIT_NEARBY', function(data, cb)
     -- Release the preview camera and focus before interacting with the world.
     PMCloseCharacterPreview()
-    ToggleNUIMenu()
+    if IsNuiFocused() then ToggleNUIMenu() end
     PMToggleNearbySeat()
     cb({["ok"] = true})
 end)
