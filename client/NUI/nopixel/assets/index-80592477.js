@@ -18514,8 +18514,9 @@ function tv() {
       if (!Number.isInteger(slot) || slot < 0 || slot > 9) return;
       // Dragging an assigned slot onto another slot moves the emote;
       // dragging it outside the bar clears it.
-      const destination = h && Number(h.id);
-      const moveToSlot = h && Number.isInteger(destination) && destination >= 0 && destination <= 9;
+      const targetId = h?.id?.toString() ?? "";
+      const destination = /^quick:[0-9]$/.test(targetId) ? Number(targetId.slice(6)) : Number(targetId);
+      const moveToSlot = h && targetId !== "" && Number.isInteger(destination) && destination >= 0 && destination <= 9;
       if (moveToSlot && destination === slot) return;
       const current = r[String(slot)];
       try {
