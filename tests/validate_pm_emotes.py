@@ -50,6 +50,19 @@ check("AutoShot preserves live preview fallback",
       'window.PMAutoShotNoPixel?.show(e.item)' in js and
       'Ge.execute("emotes:preview"' in js)
 check("AutoShot clears on menu close", 'emotes:closeUI' in autoshot)
+check("AutoShot announces manifest readiness",
+      "pm-autoshot-manifest-ready" in autoshot and
+      "pm-autoshot-manifest-ready" in js)
+check("AutoShot reports missing or corrupt WebP",
+      "pm-autoshot-preview-failed" in autoshot and
+      "pm-autoshot-preview-failed" in js)
+check("AutoShot missing capture falls back to live ped",
+      "pmTryHoveredPreview" in js and
+      'Ge.execute("emotes:preview"' in js)
+check("NoPixel cancels stale hover on close",
+      "pmHoveredItem = null" in js and
+      "++pmActiveHoverToken" in js)
+
 
 check("NUI manifest declares preview images",
       "'client/NUI/nopixel/previews/**/*.webp'" in manifest)
