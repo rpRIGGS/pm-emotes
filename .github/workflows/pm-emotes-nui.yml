@@ -78,6 +78,8 @@ jobs:
           assert 'pm-dynamic-category' in main, "dynamic menu cleanup missing"
           assert 'document.createElement("li")' in main and 'document.createElement("article")' in main, "custom categories must use safe DOM creation"
           assert 'el.dataset.emoteid === emote.emoteName' in main, "favorites must support special-character IDs"
+          assert 'KEYBINDS_LIST_CONTAINER?.appendChild(keybindFragment)' in main, "keybinds must batch DOM updates"
+          assert 'const target = e.target.closest?.(this.triggerSelector)' in Path("client/NUI/js/classes.js").read_text(), "mouse context menu must target clicked emote"
           print("Sync and catalog UI contracts verified")
           PY
       - name: Validate PM preview lifecycle contracts
