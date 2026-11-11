@@ -321,8 +321,8 @@ end)
 
 function ToggleNUIMenu() 
     if not IsNuiFocused() then
-        SetNuiFocus(true, false)
-        SetNuiFocusKeepInput(true)
+        SetNuiFocus(true, true)
+        SetNuiFocusKeepInput(false)
         TriggerEvent("rpemotes:internal:handleNUIOpened")
     else
         PMCloseCharacterPreview()
@@ -335,10 +335,10 @@ AddEventHandler("rpemotes:internal:handleNUIOpened", function()
     -- Restore preview clone for emote selection; camera framing is handled in PMPreview.
     SendNUIMessage({event = "emotes:open", args = {}})
     SendNUIMessage({type = "OPEN_MENU", value = true, shouldShowEmojiMenu = _showEmoji})
-    SendNUIMessage({type = "TOGGLE_CURSOR_INPUT", value = false})
+    SendNUIMessage({type = "TOGGLE_CURSOR_INPUT", value = true})
 
     local scaleform_instructions = SetupButtons(keyListKeyboard)
-    local cursorActive = false
+    local cursorActive = true
 
     local function setCursorActive(state)
         if cursorActive == state then return end
@@ -350,7 +350,7 @@ AddEventHandler("rpemotes:internal:handleNUIOpened", function()
     end
 
     while IsNuiFocused() do
-        DrawScaleformMovieFullscreen(scaleform_instructions, 255, 255, 255, 255)
+        -- The original NoPixel UI uses a mouse-first interaction model.
         DisableControlAction(0,37,true)
         DisableControlAction(0,200,true)
         if IsControlJustPressed(0,19) then
