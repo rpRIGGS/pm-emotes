@@ -31,7 +31,7 @@ function PMOpenCharacterPreview()
     local origin = GetEntityCoords(player)
     local heading = GetEntityHeading(player)
     local forward = GetEntityForwardVector(player)
-    local clonePos = vector3(origin.x + forward.x * 2.5, origin.y + forward.y * 2.5, origin.z)
+    local clonePos = vector3(origin.x + forward.x * 3.0, origin.y + forward.y * 3.0, origin.z)
     previewPed = ClonePed(player, heading + 180.0, false, false)
     if not previewPed or previewPed == 0 or not DoesEntityExist(previewPed) then
         previewPed = nil
@@ -42,13 +42,13 @@ function PMOpenCharacterPreview()
     SetEntityHeading(previewPed, heading + 180.0)
     SetEntityCollision(previewPed, false, false)
     SetEntityInvincible(previewPed, true)
-    FreezeEntityPosition(previewPed, true)
+    FreezeEntityPosition(previewPed, false)
     SetBlockingOfNonTemporaryEvents(previewPed, true)
 
-    -- Aim at a point left of the clone in camera space so the clone occupies the right pane.
-    -- Camera is in front of the clone, facing back toward the player.
+    -- Keep the clone in the uncovered right side of the game view.
+    -- Point the camera to the LEFT of the clone to place it to the right on screen.
     local rightX, rightY = forward.y, -forward.x
-    local camPos = vector3(clonePos.x + forward.x * 3.0, clonePos.y + forward.y * 3.0, clonePos.z + 1.45)
+    local camPos = vector3(clonePos.x + forward.x * 3.6, clonePos.y + forward.y * 3.6, clonePos.z + 1.35)
     previewCamera = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
     if not previewCamera or not DoesCamExist(previewCamera) then
         clearPreview()
@@ -56,8 +56,8 @@ function PMOpenCharacterPreview()
     end
     SetCamCoord(previewCamera, camPos.x, camPos.y, camPos.z)
     -- The target is left of the clone, putting the clone right-of-center in the camera image.
-    PointCamAtCoord(previewCamera, clonePos.x - rightX * 1.2, clonePos.y - rightY * 1.2, clonePos.z + 0.9)
-    SetCamFov(previewCamera, 40.0)
+    PointCamAtCoord(previewCamera, clonePos.x - rightX * 1.0, clonePos.y - rightY * 1.0, clonePos.z + 0.9)
+    SetCamFov(previewCamera, 45.0)
     SetCamActive(previewCamera, true)
     RenderScriptCams(true, false, 0, true, false)
     previewActive = true
