@@ -21,6 +21,7 @@ css = read("client/NUI/nopixel/assets/index-5495b930.css")
 bridge = read("client/NUI/EmoteMenuNUI.lua")
 preview = read("client/NUI/PMPreview.lua")
 seating = read("client/PMSeating.lua")
+autoshot = read("client/NUI/nopixel/assets/pm-autoshot-bridge.js")
 emote_engine = read("client/Emote.lua")
 
 checks = []
@@ -39,6 +40,17 @@ check("frontend contains substantive bundled JS", len(js) > 100000)
 check("frontend contains substantive bundled CSS", len(css) > 10000)
 check("frontend PowerMoves branding", "POWERMOVES" in js and "#0438ff" in js)
 check("NUI transparent root", "background: transparent" in html)
+check("NoPixel loads AutoShot integration", "pm-autoshot-bridge.js" in html)
+check("FiveM registers AutoShot manifest and WebP assets",
+      "'client/NUI/previews/*'" in manifest)
+check("AutoShot reads deployed manifest", '../previews/manifest.json' in autoshot)
+check("AutoShot rejects unsafe preview paths",
+      "safeFile(file)" in autoshot and "entries.set(key, file)" in autoshot)
+check("AutoShot preserves live preview fallback",
+      'window.PMAutoShotNoPixel?.show(e.item)' in js and
+      'Ge.execute("emotes:preview"' in js)
+check("AutoShot clears on menu close", 'emotes:closeUI' in autoshot)
+
 check("NUI manifest declares preview images",
       "'client/NUI/nopixel/previews/**/*.webp'" in manifest)
 
