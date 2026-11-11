@@ -41,8 +41,11 @@ function PMOpenCharacterPreview()
     SetEntityCoordsNoOffset(previewPed, clonePos.x, clonePos.y, clonePos.z, false, false, false)
     SetEntityHeading(previewPed, heading + 180.0)
     SetEntityCollision(previewPed, false, false)
+    SetEntityVisible(previewPed, true, false)
+    SetEntityAlpha(previewPed, 255, false)
     SetEntityInvincible(previewPed, true)
     FreezeEntityPosition(previewPed, false)
+    SetPedCanRagdoll(previewPed, false)
     SetBlockingOfNonTemporaryEvents(previewPed, true)
 
     -- Keep the clone in the uncovered right side of the game view.
@@ -65,7 +68,9 @@ function PMOpenCharacterPreview()
 end
 
 function PMPreviewCharacterEmote(emoteName, emoteType)
-    if not previewActive or not previewPed or not DoesEntityExist(previewPed) then return false end
+    if not previewActive or not previewPed or not DoesEntityExist(previewPed) then
+        if not PMOpenCharacterPreview() then return false end
+    end
 
     ClearPedTasksImmediately(previewPed)
     PMInvalidatePreviewProps()
