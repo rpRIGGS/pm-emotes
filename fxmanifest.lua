@@ -21,6 +21,7 @@ files {
     'client/NUI/js/*.js',
     'client/NUI/css/*.css',
     'client/NUI/index.html',
+    'client/NUI/assets/*.png',
 }
 
 -- Unlocks idle Animations from GTA:O when using motorcycles, dirt bikes, etc
