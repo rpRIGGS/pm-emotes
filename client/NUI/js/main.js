@@ -294,6 +294,13 @@ window.addEventListener('message', (event) => {
                     button.dataset.emoteid = el.emoteName;
                     button.dataset.emotetype = el.emoteType;
                     button.dataset.label = el.label || el.emoteName;
+                    // Mirror the engine's permission state instead of presenting
+                    // unavailable animations as playable actions.
+                    if (el.hasPermission === false) {
+                        button.disabled = true;
+                        button.classList.add("btn-emote-unavailable");
+                        button.title = "Unavailable";
+                    }
                     button.textContent = (el.emoteType !== "Emojis" ? (EMOTE_TYPE_ICONS[el.emoteType] || "") + " " : "") + (el.label || el.emoteName);
                     fragment.appendChild(button);
                 }
