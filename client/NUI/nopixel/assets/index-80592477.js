@@ -18547,8 +18547,11 @@ function tv() {
             get style() {
               return {
                 transform: `translate(${I.transform.x}px, ${I.transform.y}px)`,
-                "pointer-events": g ? "all" : "none"
+                "pointer-events": "all"
               };
+            },
+            onDblClick: () => {
+              if (b) Ge.execute("emotes:play", b);
             }
           }), false, true);
           Fe(R, Ae(Lr, {
