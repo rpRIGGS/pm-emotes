@@ -1,7 +1,15 @@
-const pmPreviewUrl = item => {
-  const category = String(item.category ?? "").replace(/[^a-z0-9_-]/gi, "_");
-  const name = String(item.value ?? "").replace(/[^a-z0-9_-]/gi, "_");
-  return `./previews/${category}/${name}.webp`;
+// PM AutoShot exports flat preview IDs; legacy category folders remain supported as a fallback.
+const pmPreviewId = item => String(item?.value ?? "").replace(/[^a-z0-9_-]/gi, "_");
+const pmPreviewUrl = item => `./previews/emotes/${pmPreviewId(item)}.webp`;
+const pmPreviewError = (image, item) => {
+  const category = String(item?.category ?? "").replace(/[^a-z0-9_-]/gi, "_");
+  const legacy = `./previews/${category}/${pmPreviewId(item)}.webp`;
+  if (!image.dataset.pmPreviewFallback) {
+    image.dataset.pmPreviewFallback = "1";
+    image.src = legacy;
+  } else if (image.src !== wl) {
+    image.src = wl;
+  }
 };
 (function () {
   const r = document.createElement("link").relList;
@@ -18348,9 +18356,7 @@ const M2 = e => {
         return A;
       }
     }), null);
-    y.addEventListener("error", A => {
-      if (A.currentTarget.src !== wl) A.currentTarget.src = wl;
-    });
+    y.addEventListener("error", A => pmPreviewError(A.currentTarget, e.item));
     Fe(_, () => e.item.label ?? e.item.index ?? 1, null);
     Oe(A => {
       const I = Ut.header;
@@ -18574,9 +18580,7 @@ function tv() {
             get children() {
               return [(() => {
                 const N = J2();
-                N.addEventListener("error", S => {
-                  if (S.currentTarget.src !== wl) S.currentTarget.src = wl;
-                });
+                N.addEventListener("error", S => pmPreviewError(S.currentTarget, g));
                 Oe(S => {
                   const D = Nt.icon;
                   const P = pmPreviewUrl(g);
