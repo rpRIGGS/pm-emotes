@@ -76,6 +76,8 @@ jobs:
           assert 'const fragment = document.createDocumentFragment()' in main and 'EMOTES.appendChild(fragment)' in main, "large catalog must batch safe DOM writes"
           assert '_setupMenuEventListeners(MENUS);' in main, "static menu listeners missing"
           assert 'pm-dynamic-category' in main, "dynamic menu cleanup missing"
+          assert 'document.createElement("li")' in main and 'document.createElement("article")' in main, "custom categories must use safe DOM creation"
+          assert 'el.dataset.emoteid === emote.emoteName' in main, "favorites must support special-character IDs"
           print("Sync and catalog UI contracts verified")
           PY
       - name: Validate PM preview lifecycle contracts
