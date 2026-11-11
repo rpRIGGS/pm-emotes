@@ -199,6 +199,11 @@ SEARCH_CONTAINER.addEventListener("reset", (e) => {
 
 
 let lastSearchInputValue = ""
+// Keep game controls disabled while typing; restore keyboard navigation
+// as soon as the search field loses focus.
+SEARCH_BAR.addEventListener("focus", () => ExecuteNUICallback("SEARCH_BAR_FOCUS", { isFocused: true }));
+SEARCH_BAR.addEventListener("blur", () => ExecuteNUICallback("SEARCH_BAR_FOCUS", { isFocused: false }));
+
 SEARCH_BAR.addEventListener("input", (e) => {
     if (document.querySelector(".search-menu.grid")) return;
     if (SEARCH_BAR.value !== lastSearchInputValue) HandleEmoteFilter();
