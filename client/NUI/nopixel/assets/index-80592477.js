@@ -18300,6 +18300,9 @@ const M2 = e => {
           transform: s.isActiveDraggable ? `translate(${s.transform.x}px, ${s.transform.y - a()}px)` : `translate(${d.x}px, ${d.y}px)`
         };
       },
+      onMouseEnter: () => {
+        Ge.execute("emotes:preview", e.item).catch(() => {});
+      },
       onMouseUp: () => {
         if (!n()) {
           Ge.execute("emotes:play", e.item);
