@@ -2,6 +2,15 @@
 
 Install the **development/powermoves-nui** branch as a complete resource, not only the modified files. Keep the upstream resource name and all original streamed assets. Do not run this fork alongside a second copy of RPEmotes.
 
+## Install the complete resource
+
+1. Open **Actions → PM Emotes NUI static checks** in this repository, select the latest successful development run, and download the **pm-emotes-fivem** artifact.
+2. Extract the artifact, then extract its `pm-emotes-fivem.zip` file. Copy the contained **pm-emotes** directory into your development server's resources folder.
+3. Stop/remove any other running copy of RPEmotes. In `server.cfg`, use `ensure pm-emotes` after QBCore and other required dependencies. Keep all bundled `stream/` assets and the entire resource together.
+4. Restart the development server and open the menu using the existing RPEmotes menu command/keybind. Use F8 for the first client error, if one occurs.
+
+The artifact is a **complete resource build**, not a patch or collection of commits. GitHub static checks cannot replace a live FiveM test.
+
 ## In-game sequence
 1. Open the emote menu. Confirm the category rail, emote list, and transparent character-preview panel appear.
 2. Select a standard looping emote, then a prop emote. Check clone animation and attached props; ensure your actual player remains unchanged.
