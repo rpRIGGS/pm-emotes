@@ -128,11 +128,35 @@ async function drainPreviewQueue() {
     }
 }
 
+// Preview details and actions use the same engine callbacks as catalog buttons.
+let selectedPreview = null;
+const previewPlay = document.getElementById("pm-preview-play");
+const previewFavorite = document.getElementById("pm-preview-favorite");
+previewPlay?.addEventListener("click", () => {
+    if (!selectedPreview) return;
+    ExecuteNUICallback("ROUTE_EMOTE", {type:"emote", emoteName:selectedPreview.emoteName, emoteType:selectedPreview.emoteType});
+});
+previewFavorite?.addEventListener("click", async () => {
+    if (!selectedPreview) return;
+    const response = await ExecuteNUICallback("FAVORITE_EMOTE", {...selectedPreview});
+    const result = await response.json();
+    if (!Array.isArray(result.favorites)) return;
+    const names = new Set(result.favorites.map(f => f.name || f.emoteName));
+    document.querySelectorAll("[data-emoteid]").forEach(el => {
+        el.classList.toggle("btn-emote-favorite", names.has(el.dataset.emoteid));
+    });
+});
+
 function requestPreview(target, immediate = false) {
     const button = target?.closest?.("[data-emoteid]");
     const name = button?.dataset.emoteid || "";
     const type = button?.dataset.emotetype || "";
     const key = type + ":" + name;
+    selectedPreview = name && type ? {emoteName:name, emoteType:type, emoteLabel:button?.dataset.label || name} : null;
+    document.getElementById("pm-preview-name").textContent = button?.dataset.label || name || "Select an animation";
+    document.getElementById("pm-preview-category").textContent = type || "Browse the catalog to preview";
+    if (previewPlay) previewPlay.disabled = !selectedPreview || !!button?.disabled;
+    if (previewFavorite) previewFavorite.disabled = !selectedPreview || !!button?.disabled;
     if (key === lastPreviewKey) return;
     lastPreviewKey = key;
     clearTimeout(previewTimer);
@@ -223,6 +247,9 @@ window.addEventListener('message', (event) => {
             clearTimeout(previewTimer);
             pendingPreview = null;
             lastPreviewKey = null;
+            selectedPreview = null;
+            if (previewPlay) previewPlay.disabled = true;
+            if (previewFavorite) previewFavorite.disabled = true;
         } else {
             // A fresh menu session must not inherit a stale preview from its last opening.
             previewSession++;
