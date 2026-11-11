@@ -406,17 +406,25 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         if IsNuiFocused() then ToggleNUIMenu() end
         cb(true)
     elseif event == 'emotes:play' then
-        local item = args[1] or {}
-        if item.category and item.index and npCatalog[item.category] then
-            item = npCatalog[item.category][tonumber(item.index)] or item
+        local requested = args[1] or {}
+        -- Never trust a browser-provided animation name/type. Resolve against the
+        -- catalog built by RPEmotes and enforce the existing permission gate.
+        local item
+        if requested.category and requested.index and npCatalog[requested.category] then
+            item = npCatalog[requested.category][tonumber(requested.index)]
         end
-        if item.value then
-            if item.emoteType == EmoteType.SHARED then
-                if IsNuiFocused() then ToggleNUIMenu() end
-                OnGroupEmoteRequest(item.value)
-             else
-                RouteEmoteToFunction(item.value, item.emoteType or EmoteType.EMOTES, 1)
-            end
+        if not item and requested.value then
+            item = findNPItem(requested.value, requested.emoteType)
+        end
+        if not item or not HasEmotePermission(item.value, item.emoteType) then
+            cb(false)
+            return
+        end
+        if item.emoteType == EmoteType.SHARED then
+            if IsNuiFocused() then ToggleNUIMenu() end
+            SendSharedEmoteRequest(item.value)
+        else
+            RouteEmoteToFunction(item.value, item.emoteType, 1)
         end
         cb(true)
     elseif event == 'emotes:setFavorite' then
