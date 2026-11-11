@@ -3,7 +3,7 @@
 Branch: `development/powermoves-nui`
 
 ## Install / startup
-1. Download the **pm-emotes-server-test** artifact from a successful GitHub Actions run, extract `pm-emotes-server-test.zip` into the resources directory as `pm-emotes`.
+1. Download the **pm-emotes-server-test** artifact from a successful GitHub Actions run, extract `pm-emotes-server-test.zip` directly into the resources directory. The archive already contains the `pm-emotes/` folder; do not add another nested folder.
 2. Ensure the resource starts after framework dependencies. Remove or stop any duplicate rpemotes provider before testing.
 3. Confirm F8/server consoles contain no Lua parse errors, missing NUI assets, or NUI callback timeouts.
 4. Press F4 after joining. The NoPixel-inspired PowerMoves RP animation menu must open with white POWERMOVES and blue RP branding.
