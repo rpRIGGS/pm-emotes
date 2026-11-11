@@ -1,192 +1,57 @@
-/* PowerMoves RP interface theme. Official PM RP blue and gray; logo asset supplied separately. */
+/* PowerMoves RP emote browser — single authoritative theme, no stacked patches. */
 :root {
-  --pm-blue: #0438ff;
-  --pm-gray: #6b6f80;
-  --pm-surface: rgba(18, 23, 34, .96);
-  --color-bg-primary: var(--pm-surface);
-  --color-bg-sidebar: rgba(26, 32, 46, .98);
-  --color-text-primary: #f1f4fc;
-  --color-text-secondary: #a3aec4;
-  --color-border: rgba(133, 150, 184, .23);
-  --color-border-accent-primary: var(--pm-blue);
-  --color-btn-bg: rgba(39, 47, 65, .94);
-  --color-btn-popover-bg: #283148;
-  --color-btn-border: rgba(136, 155, 195, .2);
-  --color-btn-hover: #354461;
-  --color-scrollbar: var(--pm-blue);
-  --color-scrollbar-hover: #5174ff;
-  --color-accent-primary: var(--pm-blue);
-  --color-accent-primary-hover: #4568ff;
-  --color-accent-secondary: var(--pm-gray);
-  --color-accent-secondary-hover: #3d4961;
-  --border-radius-menu: 16px;
-  --border-radius-search-bar: 10px;
-  --border-radius-btn-sidebar: 10px;
-  --border-radius-btn-sidebar-hover: 10px;
-  --border-radius-btn-emote: 9px;
-  --border-radius-btn-emote-hover: 9px;
+ --pm-blue:#0438ff;--pm-gray:#6b6f80;
+ --color-bg-primary:rgba(12,15,22,.97);--color-bg-sidebar:rgba(12,15,22,.97);
+ --color-text-primary:#f4f6fb;--color-text-secondary:#aab3c4;
+ --color-border:#343c4e;--color-border-accent-primary:#0438ff;
+ --color-btn-bg:#202633;--color-btn-popover-bg:#252e3d;
+ --color-btn-border:#394254;--color-btn-hover:#303c52;
+ --color-scrollbar:#0438ff;--color-scrollbar-hover:#4569ff;
+ --color-accent-primary:#0438ff;--color-accent-primary-hover:#315cff;
+ --color-accent-secondary:#6b6f80;--color-accent-secondary-hover:#858a9c;
+ --border-radius-menu:4px;--border-radius-search-bar:4px;
+ --border-radius-btn-sidebar:3px;--border-radius-btn-sidebar-hover:3px;
+ --border-radius-btn-emote:3px;--border-radius-btn-emote-hover:3px;
 }
-.main-container {
-  border: 1px solid rgba(112, 135, 183, .24);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 24px 90px rgba(0,0,0,.6), 0 0 30px rgba(4,56,255,.09);
-}
-.header-container {
-  background: linear-gradient(105deg, #121a2d 0%, #1b2741 65%, #102c83 100%);
-  border-bottom: 1px solid rgba(95,125,255,.4);
-  min-height: 74px;
-  display: flex;
-  align-items: center;
-  padding: 14px 24px;
-}
-.pm-brand {display:flex;align-items:center;gap:14px;color:#fff;font-family:Arial,sans-serif;letter-spacing:.09em}
-.pm-brand-mark {display:grid;place-items:center;width:48px;height:48px;border:1px solid #6583ff;border-radius:12px;background:var(--pm-blue);font-weight:900;font-size:18px}
-.pm-brand-name {font-size:21px;font-weight:800;line-height:1.1}
-.pm-brand-subtitle {font-size:10px;font-weight:700;letter-spacing:.25em;color:#9db1ff;margin-top:6px}
-.pm-brand-logo {max-height:52px;max-width:200px;object-fit:contain}
-.btn-emote:focus-visible,.btn-sidebar:focus-visible,.search-input:focus-visible {outline:2px solid #7190ff;outline-offset:2px}
-
-/* Three-zone browsing layout: persistent category rail, results, and preview. */
-.main-container {width:min(1120px,94vw);height:min(730px,85vh);max-height:85vh;overflow:hidden}
+body,body.align-left {display:flex;justify-content:flex-start!important;align-items:center!important;padding:0 0 0 2vw!important;background:transparent!important}
+.main-container {width:min(690px,52vw)!important;height:min(780px,86vh)!important;max-height:86vh!important;display:flex;flex-direction:column;overflow:hidden;background:rgba(12,15,22,.97);border:1px solid #353e52;border-top:3px solid #0438ff;border-radius:4px;box-shadow:0 14px 40px rgba(0,0,0,.52)}
+.header-container {display:flex;align-items:center;min-height:72px;padding:9px 18px;background:#101521;border-bottom:1px solid #333e52}
+.pm-brand {display:flex;align-items:center;gap:14px;font-family:Arial,sans-serif;font-weight:800;letter-spacing:.09em}
+.pm-brand-logo {height:48px;max-width:160px;object-fit:contain}
+.pm-brand-name {font-size:16px;font-weight:800;white-space:nowrap}
+.pm-brand-word {color:#fff!important}.pm-brand-rp {color:#0438ff!important}
+.pm-brand-mark,.pm-brand-subtitle {display:none!important}
 .pm-workspace {display:flex;flex:1;min-height:0;overflow:hidden}
-.menu-container {flex:1;min-width:0;gap:0}
-.side-navigation {position:relative;flex:0 0 180px;max-width:180px;width:180px;box-shadow:none;border-right:1px solid var(--color-border)}
-.side-navigation:hover,.side-navigation:has(button:focus-visible) {max-width:180px;box-shadow:none}
-.side-navigation .btn-sidebar-label {display:block}
-.content-container {margin-left:0;min-width:0;gap:14px;padding:0 12px 14px}
-.search-container {padding:16px 0 0}
-.pm-preview-panel {flex:0 0 30%;min-width:240px;display:flex;flex-direction:column;padding:20px 18px;background:linear-gradient(180deg,#151c2b,#111725);border-left:1px solid var(--color-border)}
-.pm-preview-heading {font:700 11px Arial,sans-serif;letter-spacing:.2em;color:#aab9dc}
-.pm-preview-stage {flex:1;min-height:0;margin:14px 0;position:relative;border:1px solid rgba(90,113,170,.22);border-radius:14px;background:radial-gradient(ellipse at 50% 70%,rgba(4,56,255,.14),transparent 65%),linear-gradient(180deg,#1b2435,#101622)}
-.pm-preview-reticle {position:absolute;inset:18%;border:1px dashed rgba(125,147,203,.18);border-radius:50%}
-.pm-preview-help {font:12px/1.5 Arial,sans-serif;color:var(--color-text-secondary);text-align:center}
-.footer-container {flex-shrink:0;background:#141b2a}
-@media(max-width:850px) {.side-navigation{flex-basis:145px;max-width:145px;width:145px}.side-navigation:hover,.side-navigation:has(button:focus-visible){max-width:145px}.pm-preview-panel{flex-basis:25%;min-width:185px}}
-
-/* Show category names without requiring hover, retaining existing button IDs and handlers. */
-.side-navigation .sidebar-button-container {display:flex;align-items:center;min-height:58px;gap:3px}
-.side-navigation .btn-sidebar {flex:0 0 48px;width:48px;height:48px;margin:5px 3px 5px 8px;font-size:22px}
-.side-navigation .btn-sidebar-label {display:inline;flex:1;min-width:0;margin-right:8px;overflow:hidden;text-overflow:ellipsis;font:600 12px Arial,sans-serif;cursor:pointer}
-.side-navigation .sidebar-button-active {background:rgba(4,56,255,.12);border-left:3px solid var(--pm-blue)}
-.side-navigation .sidebar-button-active .btn-sidebar {margin-left:5px}
-.content-container .menu {min-width:0}
-
-/* The game-native scripted camera renders behind transparent NUI pixels. */
-.pm-preview-panel {background:rgba(12,18,31,.12)}
-.pm-preview-stage {background:transparent;border-color:rgba(115,145,255,.32)}
-.pm-preview-reticle {pointer-events:none;opacity:.35}
-.pm-preview-heading,.pm-preview-help {text-shadow:0 2px 6px #070b14}
-
-/* The redesigned widescreen interface is centered regardless of upstream MenuPosition. */
-body,body.align-left {align-items:center !important;justify-content:center;padding:0 1.5rem}
-.pm-workspace .menu-container {overflow:hidden}
-.pm-workspace .content-container {overflow-y:auto}
-.pm-workspace .menu {overflow-y:auto;align-content:start}
-.pm-preview-panel {position:relative}
-@media(max-width:680px) {
-  .main-container {width:98vw;height:90vh;max-height:90vh}
-  .side-navigation {flex:0 0 64px;max-width:64px;width:64px}
-  .side-navigation:hover,.side-navigation:has(button:focus-visible){max-width:64px}
-  .side-navigation .btn-sidebar-label {display:none}
-  .pm-preview-panel {min-width:120px;flex-basis:28%;padding:10px}
-  .pm-preview-heading {font-size:9px}
-  .pm-preview-help {font-size:10px}
-}
-
-/* Keep the category rail in normal flow and the central list scrollable. */
-.pm-workspace .menu-container {display:flex;min-height:0;flex:1 1 auto}
-.pm-workspace .side-navigation {position:relative;inset:auto;z-index:2;min-height:0;overflow-y:auto;overflow-x:hidden}
-.pm-workspace .sidebar-button-container {min-width:0;width:100%;box-sizing:border-box}
-.pm-workspace .content-container {flex:1 1 auto;min-height:0;min-width:0;margin:0;display:flex;flex-direction:column;overflow:hidden}
-.pm-workspace .content-container .menu {flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden}
-.pm-workspace .search-container {flex-shrink:0}
-.pm-workspace .pm-preview-panel {min-height:0;box-sizing:border-box}
-.pm-workspace .pm-preview-stage {pointer-events:none}
-
-/* Gameplay-first layout: keep the real player visible to the right of the menu.
-   The previous centered, opaque three-column shell hid the game and made the
-   scripted preview camera appear as an empty panel. */
-body, body.align-left {justify-content:flex-start !important;align-items:center !important;padding:0 0 0 2vw !important;background:transparent !important}
-.main-container {width:min(760px,56vw);height:min(730px,85vh);max-height:85vh}
-.pm-preview-panel {display:none !important}
-.pm-workspace .menu-container {width:100%;flex:1 1 100%}
-@media(max-width:850px){.main-container{width:min(650px,75vw)}}
-@media(max-width:680px){.main-container{width:96vw}}
-
-/* Brand: one official logo, no decorative PM placeholder or redundant subtitle. */
-.pm-brand-mark,.pm-brand-subtitle {display:none !important}
-.pm-brand {gap:12px;letter-spacing:0}
-.pm-brand-logo {display:block;max-height:54px;max-width:190px;width:auto;height:auto;object-fit:contain}
-.pm-brand-name {font:700 15px/1.2 Arial,sans-serif;letter-spacing:.06em}
-
-/* PowerMoves RP / NoPixel-inspired compact utility treatment.
-   No oversized emoji buttons, rounded toy tiles or faux 3D preview panel. */
-:root {--border-radius-menu:4px;--border-radius-btn-sidebar:3px;--border-radius-btn-emote:3px}
-body,body.align-left {justify-content:flex-start !important;align-items:center !important;padding:0 0 0 2vw !important;background:transparent !important}
-.main-container {width:min(650px,48vw);height:min(760px,84vh);border-radius:5px;background:rgba(10,13,19,.92);box-shadow:0 14px 38px rgba(0,0,0,.4)}
-.header-container {min-height:62px;padding:8px 16px;background:rgba(12,15,23,.97);border-bottom:2px solid var(--pm-blue)}
-.pm-brand-logo {max-height:46px}
-.pm-brand-name {font-size:13px;letter-spacing:.12em}
-.side-navigation {flex-basis:140px !important;width:140px !important;max-width:140px !important;background:rgba(12,16,24,.95)}
-.side-navigation:hover {max-width:140px !important}
-.side-navigation .sidebar-button-container {min-height:41px !important;gap:4px}
-.side-navigation .btn-sidebar {font-size:0 !important;width:7px !important;flex:0 0 7px !important;height:27px !important;margin:6px 4px 6px 10px !important;border:0 !important;border-radius:0 !important;background:rgba(117,132,159,.4) !important}
-.side-navigation .sidebar-button-active .btn-sidebar {background:var(--pm-blue) !important}
-.side-navigation .btn-sidebar-label {font-size:11px !important;font-weight:700 !important;letter-spacing:.045em;text-transform:uppercase}
-.pm-workspace .content-container {padding:0 12px 12px}
-.search-container {padding-top:10px}
-.search-input {border-radius:3px !important}
-.btn-emote {border-radius:3px !important;font-size:12px}
-.pm-preview-panel {display:none !important}
-.footer-container {min-height:20px;background:rgba(12,15,23,.97)}
-@media(max-width:900px){.main-container{width:min(620px,65vw)}}
-@media(max-width:680px){.main-container{width:95vw}.side-navigation{flex-basis:105px !important;width:105px !important;max-width:105px !important}}
-
-/* A transparent framed viewport over the game camera: the animated clone is
-   rendered by FiveM, not by a fake CSS image or a static placeholder. */
-.pm-preview-panel {
-  display:flex !important;
-  position:fixed !important;
-  right:2vw !important;
-  top:12vh !important;
-  width:31vw !important;
-  height:70vh !important;
-  min-width:0 !important;
-  flex:none !important;
-  box-sizing:border-box !important;
-  padding:12px !important;
-  background:transparent !important;
-  border:1px solid rgba(107,111,128,.5) !important;
-  border-top:2px solid var(--pm-blue) !important;
-  border-radius:4px !important;
-  pointer-events:none !important;
-}
-.pm-preview-stage {
-  display:block !important;
-  flex:1 !important;
-  background:transparent !important;
-  border:0 !important;
-  margin:0 !important;
-}
-.pm-preview-reticle {display:none !important}
-.pm-preview-heading {font-size:10px !important;color:#e1e4ee !important;letter-spacing:.16em}
-.pm-preview-help {font-size:10px !important;text-align:left !important;color:#c3c8d5 !important}
-@media(max-width:900px){.pm-preview-panel{right:1vw !important;width:30vw !important}}
-@media(max-width:680px){.pm-preview-panel{display:none !important}}
-
-.pm-brand-word{color:#fff !important}.pm-brand-rp{color:#0438ff !important}
-
-/* Live preview controls: usable selection state, no pretend thumbnail art. */
-.pm-preview-panel {gap:10px !important}
-.pm-preview-heading {display:flex;align-items:center;justify-content:space-between}
-.pm-live-indicator {font-size:11px;color:#0438ff;text-shadow:0 0 7px rgba(4,56,255,.65)}
-.pm-preview-meta {display:flex;flex-direction:column;gap:5px;padding:10px 0;border-top:1px solid rgba(180,190,210,.24);background:rgba(9,12,19,.5)}
-.pm-preview-meta strong {color:#fff;font:700 15px/1.25 Arial,sans-serif}
-.pm-preview-meta span {color:#aeb8ce;font:11px Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em}
-.pm-preview-actions {display:flex;gap:7px;pointer-events:auto}
-.pm-preview-actions button {flex:1;padding:10px 7px;background:rgba(16,21,33,.9);border:1px solid #526078;border-radius:3px;color:#fff;font:700 10px Arial,sans-serif;letter-spacing:.08em;cursor:pointer}
+.pm-workspace .menu-container {display:flex;flex:1;min-height:0;min-width:0;overflow:hidden}
+.pm-workspace .side-navigation {position:relative!important;inset:auto!important;z-index:2;display:block;flex:0 0 142px!important;width:142px!important;max-width:142px!important;min-height:0;overflow-y:auto;overflow-x:hidden;box-shadow:none!important;border-right:1px solid #343c4e;background:#111622}
+.pm-workspace .side-navigation:hover,.pm-workspace .side-navigation:has(button:focus-visible){max-width:142px!important;box-shadow:none!important}
+.side-navigation .sidebar-button-container {display:flex;align-items:center;gap:6px;min-height:42px;width:100%;padding:0 7px 0 10px;box-sizing:border-box;border-left:3px solid transparent}
+.side-navigation .sidebar-button-active {border-left-color:#0438ff;background:rgba(4,56,255,.17)}
+.side-navigation .btn-sidebar {display:block!important;flex:0 0 7px!important;width:7px!important;min-width:7px!important;height:26px!important;min-height:26px!important;margin:0!important;padding:0!important;font-size:0!important;border:0!important;border-radius:0!important;background:#667085!important}
+.side-navigation .sidebar-button-active .btn-sidebar {background:#0438ff!important}
+.side-navigation .btn-sidebar-label {display:block!important;flex:1;min-width:0;margin:0;color:#d5dbe7;font:700 11px Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;overflow:hidden;text-overflow:ellipsis}
+.pm-workspace .content-container {display:flex;flex:1;flex-direction:column;min-width:0;min-height:0;margin:0;padding:0 13px 13px;gap:9px;overflow:hidden}
+.pm-workspace .search-container {flex-shrink:0;margin:0;padding:12px 0 0}
+.search-input {border-radius:3px!important;background:#171e2b!important;border:1px solid #3b465c!important}
+.pm-workspace .content-container .menu {flex:1;min-height:0;min-width:0;overflow-y:auto;overflow-x:hidden;align-content:start}
+.btn-emote {min-height:36px;border-radius:3px!important;font-size:12px!important;background:#202633!important;border:1px solid #343f53!important;color:#e6eaf3!important}
+.btn-emote:hover,.btn-emote:focus-visible {background:#303e59!important;border-color:#0438ff!important}
+.btn-emote-favorite {border-left:3px solid #0438ff!important}
+.btn-emote-unavailable {opacity:.45}
+.footer-container {flex-shrink:0;min-height:25px;background:#111622;border-top:1px solid #343c4e}
+.footer-text {font:11px Arial,sans-serif;color:#abb5c9}
+.pm-preview-panel {position:fixed!important;right:2vw!important;top:12vh!important;width:30vw!important;height:70vh!important;display:flex!important;flex-direction:column;gap:10px;box-sizing:border-box;padding:14px;background:transparent!important;border:1px solid rgba(150,166,198,.45);border-top:2px solid #0438ff;border-radius:4px;pointer-events:none}
+.pm-preview-heading {display:flex;align-items:center;justify-content:space-between;color:#f0f2f9;font:700 11px Arial,sans-serif;letter-spacing:.14em;text-shadow:0 1px 4px #000}
+.pm-live-indicator {color:#0438ff}
+.pm-preview-stage {flex:1;min-height:0;margin:0!important;border:0!important;background:transparent!important}
+.pm-preview-meta {display:flex;flex-direction:column;gap:5px;padding:10px;background:rgba(12,15,22,.76);border:1px solid rgba(150,166,198,.28)}
+.pm-preview-meta strong {font:700 15px Arial,sans-serif;color:#fff}
+.pm-preview-meta span {font:11px Arial,sans-serif;color:#b9c2d4;text-transform:uppercase}
+.pm-preview-actions {display:flex;gap:8px;pointer-events:auto}
+.pm-preview-actions button {flex:1;padding:10px 5px;background:#202633;border:1px solid #46516a;border-radius:3px;color:#fff;font:700 11px Arial,sans-serif;cursor:pointer}
 .pm-preview-actions button:first-child {background:#0438ff;border-color:#0438ff}
-.pm-preview-actions button:disabled {opacity:.35;cursor:not-allowed}
-.pm-preview-actions button:not(:disabled):hover {filter:brightness(1.2)}
-.pm-preview-help {margin:0 !important}
+.pm-preview-actions button:disabled {opacity:.4;cursor:not-allowed}
+.pm-preview-help {margin:0!important;color:#d5dce9;font:11px/1.4 Arial,sans-serif;text-shadow:0 1px 4px #000}
+.pm-preview-reticle {display:none!important}
+@media(max-width:1050px){.main-container{width:57vw!important}.pm-preview-panel{width:34vw!important;right:1vw!important}}
+@media(max-width:680px){.main-container{width:94vw!important}.pm-preview-panel{display:none!important}.pm-workspace .side-navigation{flex-basis:112px!important;width:112px!important;max-width:112px!important}}
