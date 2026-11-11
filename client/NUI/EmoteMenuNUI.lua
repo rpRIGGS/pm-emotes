@@ -4,6 +4,7 @@ local npQuick = {false, false, false, false, false, false, false, false, false, 
 local nuiReady = false
 local initialDataLoaded = false
 local localesLoaded = false
+local pendingNuiOpen = false
 
 
 -- The NUI logic is designed to run *on top* of the existing NativeUI logic, since that menu already does all the data handling that we need.
@@ -340,14 +341,19 @@ function ToggleNUIMenu()
         -- The NoPixel page initializes asynchronously. Avoid sending the first
         -- F4 open before its message listener has registered.
         if not nuiReady or not initialDataLoaded then
+            -- Repeated F4 presses while the browser loads must not create
+            -- multiple wait threads that reopen the menu after it closes.
+            if pendingNuiOpen then return end
+            pendingNuiOpen = true
             CreateThread(function()
                 local deadline = GetGameTimer() + 10000
                 while (not nuiReady or not initialDataLoaded) and GetGameTimer() < deadline do
                     Wait(50)
                 end
+                pendingNuiOpen = false
                 if nuiReady and initialDataLoaded and not IsNuiFocused() then
                     ToggleNUIMenu()
-                else
+                elseif not nuiReady or not initialDataLoaded then
                     print('[pm-emotes] NUI did not become ready; F4 menu was not opened')
                 end
             end)
