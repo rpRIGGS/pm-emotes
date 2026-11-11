@@ -382,6 +382,9 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
     local event = data.event
     local args = data.args or {}
     if event == 'emotes:getEmotes' then
+        -- NativeUI builds the shared catalog asynchronously on initial startup.
+        local deadline = GetGameTimer() + 5000
+        while not next(npCatalog) and GetGameTimer() < deadline do Wait(50) end
         cb(npCatalog)
     elseif event == 'emotes:getFavorites' then
         local favorites = {}
