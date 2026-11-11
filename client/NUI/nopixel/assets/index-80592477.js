@@ -1,21 +1,24 @@
 // PM AutoShot exports flat preview IDs; legacy category folders remain supported as a fallback.
 const pmPreviewId = item => String(item?.value ?? "").replace(/[^a-z0-9_-]/gi, "_");
+const pmPreviewFailed = new Set();
 const pmPreviewUrl = item => `./previews/emotes/${pmPreviewId(item)}.webp`;
 const pmSetPreview = (image, url) => {
   // Solid recycles tile elements while searching and changing categories.
   // A previous item's failed lookup must not suppress this item's fallback.
   if (image.getAttribute("src") !== url) {
     delete image.dataset.pmPreviewFallback;
-    image.setAttribute("src", url);
+    image.setAttribute("src", pmPreviewFailed.has(url) ? wl : url);
   }
 };
 const pmPreviewError = (image, item) => {
   const category = String(item?.category ?? "").replace(/[^a-z0-9_-]/gi, "_");
   const legacy = `./previews/${category}/${pmPreviewId(item)}.webp`;
   if (!image.dataset.pmPreviewFallback) {
+    pmPreviewFailed.add(pmPreviewUrl(item));
     image.dataset.pmPreviewFallback = "1";
-    image.src = legacy;
+    image.src = pmPreviewFailed.has(legacy) ? wl : legacy;
   } else if (image.src !== wl) {
+    pmPreviewFailed.add(legacy);
     image.src = wl;
   }
 };
@@ -18412,7 +18415,7 @@ function j2() {
   } = en();
   let i;
   const a = s => s * 0.01 * window.innerHeight;
-  const o = $e(() => r.filter(s => e() === "all" ? true : e() === "favorites" ? t.some(d => d.category === s.category && d.index === s.index) : s.category === e()));
+  const o = $e(() => r.filter(s => e() === "all" ? true : e() === "favorites" ? t.some(d => d.value === s.value && (d.emoteType == null || d.emoteType === s.emoteType)) : s.category === e()));
   return (() => {
     const s = bl();
     const d = i;
@@ -18423,7 +18426,12 @@ function j2() {
     }
     Fe(s, Ae(L2, {
       get items() {
-        return o().filter((c, l) => n() ? c.label?.toLowerCase().includes(n().toLowerCase()) || l + 1 === Number(n()) : true);
+        const query = String(n() || "").trim().toLowerCase();
+        if (!query) return o();
+        return o().filter(c => String(c.label || "").toLowerCase().includes(query) ||
+          String(c.value || "").toLowerCase().includes(query) ||
+          String(c.category || "").toLowerCase().includes(query));
+
       },
       scrollTarget: i,
       get itemSize() {
@@ -18432,8 +18440,8 @@ function j2() {
           width: a(13.2)
         };
       },
-      crossAxisCount: c => Math.floor(7),
-      overscan: 0,
+      crossAxisCount: c => Math.max(1, Math.min(7, Math.floor((c?.width || window.innerWidth * .75) / a(13.2)))),
+      overscan: 2,
       children: c => Ae(M2, Gi(c, {
         containerRef: i
       }))
@@ -18523,7 +18531,8 @@ function tv() {
     const _ = {
       category: v.category,
       index: v.index,
-      value: v.value
+      value: v.value,
+      emoteType: v.emoteType
     };
     try {
       const saved = await Ge.execute("emotes:setQuickEmote", h.id, _);
@@ -18533,7 +18542,8 @@ function tv() {
     }
   });
   // Quick slots are refreshed together with the catalog when F4 opens.
-  const c = (l, m) => e.find(h => h.category === l && h.index === m);
+  const c = (l, m, value) => e.find(h => h.category === l && h.index === m && (!value || h.value === value)) ||
+    (value ? e.find(h => h.value === value) : null);
   return (() => {
     const l = Y2();
     const m = l.firstChild;
@@ -18548,7 +18558,7 @@ function tv() {
       children: (g, E) => {
         const A = k2(E());
         const I = ml(`quick:${E()}`);
-        const b = g ? c(g.category, g.index) : null;
+        const b = g ? c(g.category, g.index, g.value) : null;
         return (() => {
           const T = ev();
           const R = T.firstChild;
@@ -18914,8 +18924,9 @@ function yv() {
         /^Digit[0-9]$/.test(d.code)) {
       const slot = (Number(d.code.slice(-1)) + 9) % 10;
       const quick = quickSlots[String(slot)];
-      const item = quick && t.find(v =>
-        v.category === quick.category && v.index === quick.index);
+      const item = quick && (t.find(v =>
+        v.category === quick.category && v.index === quick.index && v.value === quick.value) ||
+        t.find(v => v.value === quick.value && (quick.emoteType == null || v.emoteType === quick.emoteType)));
       if (item) {
         d.preventDefault();
         Ge.execute("emotes:play", item);
