@@ -339,44 +339,21 @@ AddEventHandler("rpemotes:internal:handleNUIOpened", function()
     SendNUIMessage({type = "OPEN_MENU", value = true, shouldShowEmojiMenu = _showEmoji})
     SendNUIMessage({type = "TOGGLE_CURSOR_INPUT", value = true})
 
-    local scaleform_instructions = SetupButtons(keyListKeyboard)
-    local cursorActive = true
-
-    local function setCursorActive(state)
-        if cursorActive == state then return end
-        cursorActive = state
-        SetNuiFocus(true, state)
-        SendNUIMessage({type = "TOGGLE_CURSOR_INPUT", value = state})
-        SetScaleformMovieAsNoLongerNeeded(scaleform_instructions)
-        scaleform_instructions = SetupButtons(state and keyListMouse or keyListKeyboard)
-    end
-
+    -- NoPixel is mouse-driven: retain cursor focus and prevent gameplay controls
+    -- from firing behind the UI. Escape is handled by the frontend.
     while IsNuiFocused() do
-        -- The original NoPixel UI uses a mouse-first interaction model.
-        DisableControlAction(0,37,true)
-        DisableControlAction(0,200,true)
-        if IsControlJustPressed(0,19) then
-            -- As a toggle, every tap flips the cursor. Otherwise, it is only shown for as long as the key is held down.
-            if Config.CursorAsToggle then
-                setCursorActive(not cursorActive)
-            else
-                setCursorActive(true)
-            end
-        elseif not Config.CursorAsToggle and IsControlJustReleased(0,19) then
-            setCursorActive(false)
-        end
-        if cursorActive then
-            DisableControlAction(0,1,true)
-            DisableControlAction(0,2,true)
-            DisableControlAction(0,14,true)
-            DisableControlAction(0,15,true)
-            DisableControlAction(0,24,true)
-            DisableControlAction(0,25,true)
-        end
-        Wait(1)
+        DisableControlAction(0, 1, true)
+        DisableControlAction(0, 2, true)
+        DisableControlAction(0, 14, true)
+        DisableControlAction(0, 15, true)
+        DisableControlAction(0, 24, true)
+        DisableControlAction(0, 25, true)
+        DisableControlAction(0, 37, true)
+        DisableControlAction(0, 200, true)
+        Wait(0)
     end
     PMCloseCharacterPreview()
-    SetScaleformMovieAsNoLongerNeeded(scaleform_instructions)
+    SendNUIMessage({event = "emotes:closeUI", args = {}})
     SendNUIMessage({type = "OPEN_MENU", value = false, shouldShowEmojiMenu = _showEmoji})
 end)
 -- The quick bar is local per-player and survives resource restarts.
