@@ -53,11 +53,19 @@ for block in ("files", "client_scripts", "server_scripts", "shared_scripts"):
         declarations.extend(re.findall(r"['\"]([^'\"]+)['\"]", match))
 for name in re.findall(r"\bdata_file\s+['\"][^'\"]+['\"]\s+['\"]([^'\"]+)['\"]", manifest):
     declarations.append(name)
+# Every script and non-optional file glob must resolve to actual runtime files.
+# Generated preview WebPs are optional, but the shipped NUI JS/CSS are not.
+optional_globs = {
+    "client/NUI/nopixel/previews/**/*.webp",
+    "client/NUI/previews/*",
+}
 for declaration in declarations:
     if declaration.startswith("/") or declaration.startswith("@"):
-        continue  # Runtime dependency / external resource, not a bundled file.
+        continue
     if "*" in declaration:
-        # Some optional glob patterns (AutoShot previews) intentionally start empty.
+        matches = list(ROOT.glob(declaration))
+        if not matches and declaration not in optional_globs:
+            sys.exit(f"Unmatched fxmanifest asset glob: {declaration}")
         continue
     if not (ROOT / declaration).is_file():
         sys.exit(f"Missing fxmanifest runtime asset: {declaration}")
