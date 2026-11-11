@@ -434,6 +434,9 @@ function EmotePlayOnNonPlayerPed(ped, name)
     -- Preview must not delete nearby scenario props belonging to the world or
     -- other players. Scenario cleanup belongs to the real player lifecycle.
     if not DoesEntityExist(ped) then return false end
+    -- A later hover can replace this animation while LoadAnim yields.
+    -- Only the most recent preview request may animate the clone or spawn props.
+    local requestVersion = previewPropVersion
 
     -- NOTE: CancelPreviousEmote logic removed for non-player peds
     -- It was incorrectly setting the global ExitAndPlay flag
@@ -477,6 +480,11 @@ function EmotePlayOnNonPlayerPed(ped, name)
         return false
     end
 
+    if requestVersion ~= previewPropVersion or not DoesEntityExist(ped) then
+        RemoveAnimDict(emoteData.dict)
+        return false
+    end
+
     local flag = animOption?.Flag or animOption?.onFootFlag or 0
 
     ClearPedTasks(ped)
@@ -488,8 +496,9 @@ function EmotePlayOnNonPlayerPed(ped, name)
 
     -- A preview needs its prop when the animation begins, not after its duration.
     -- The preview lifecycle deletes these props on every selection and on menu close.
-    previewPropVersion = previewPropVersion + 1
-    addProps(animOption, nil, ped, nil, true, previewPropVersion)
+    -- Do not increment the request generation here: the generation belongs
+    -- to the selection lifecycle, not to individual prop attachments.
+    addProps(animOption, nil, ped, nil, true, requestVersion)
     return true
 end
 
