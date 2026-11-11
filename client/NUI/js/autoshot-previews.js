@@ -15,7 +15,15 @@ let entries = {};
 let selected = null;
 fetch('previews/manifest.json')
   .then(response => response.ok ? response.json() : null)
-  .then(data => { if (data && data.version === 1 && data.entries) entries = data.entries; })
+  .then(data => {
+    if (data && data.version === 1 && data.entries) {
+      entries = data.entries;
+      // Keyboard focus may already be on an emote when the manifest loads.
+      // Re-render that selection instead of waiting for another hover.
+      const current = document.activeElement?.closest?.('button[data-emoteid][data-emotetype]');
+      if (current) { selected = null; show(current); }
+    }
+  })
   .catch(() => {});
 function show(button) {
   const key = button?.dataset?.emotetype + ':' + button?.dataset?.emoteid;
