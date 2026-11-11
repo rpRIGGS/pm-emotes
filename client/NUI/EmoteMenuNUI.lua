@@ -148,70 +148,105 @@ RegisterNUICallback('CANCEL_EMOTE', function(data, cb)
     cb({["ok"] = true})
 end)
 
+-- Shared validation for legacy NativeUI NUI callbacks. The compiled NoPixel
+-- interface and older UI endpoints must use the same permission policy.
+local function validNUIEmote(name, emoteType)
+    return type(name) == 'string' and name ~= ''
+        and type(emoteType) == 'string'
+        and HasEmotePermission(name, emoteType)
+end
+
 RegisterNUICallback('ROUTE_EMOTE', function(data, cb)
-    if data.type == "emote" then
-        if data.emoteName == "_reset" then
+    if type(data) ~= 'table' or type(data.type) ~= 'string' then
+        cb({ok = false})
+        return
+    end
+    if data.type == 'emote' then
+        if data.emoteName == '_reset' then
             if data.emoteType == EmoteType.WALKS then
                 ResetWalk()
-                DeleteResourceKvp("walkstyle")
+                DeleteResourceKvp('walkstyle')
             elseif data.emoteType == EmoteType.EXPRESSIONS then
                 DeleteResourceKvp(EmoteType.EXPRESSIONS)
                 ClearFacialIdleAnimOverride(PlayerPedId())
+            else
+                cb({ok = false})
+                return
             end
-        else
+        elseif validNUIEmote(data.emoteName, data.emoteType) then
             RouteEmoteToFunction(data.emoteName, data.emoteType, 1)
+        else
+            cb({ok = false})
+            return
         end
-    elseif data.type == "groupemote" then
+    elseif data.type == 'groupemote' then
+        if type(data.emoteName) ~= 'string' or data.emoteName == '' then
+            cb({ok = false})
+            return
+        end
         PMCloseCharacterPreview()
-        if IsNuiFocused() then ToggleNUIMenu() end -- Important to close first. Group emote request blocks the thread until you actually start the request.
+        if IsNuiFocused() then ToggleNUIMenu() end
         OnGroupEmoteRequest(data.emoteName)
-    elseif data.type == "placement" then
-        if Config.PlacementEnabled then
-            PMCloseCharacterPreview()
-            StartNewPlacement(data.emoteName)
-            if IsNuiFocused() then ToggleNUIMenu() end -- Important to close *after* the placement request. Closing it before the request will block the preview ped on the screen.
+    elseif data.type == 'placement' then
+        if not Config.PlacementEnabled or type(data.emoteName) ~= 'string'
+            or not HasEmotePermission(data.emoteName, EmoteType.PROP_EMOTES) then
+            cb({ok = false})
+            return
         end
-    end
-
-    cb({["ok"] = true})
-end)
-
-RegisterNUICallback("FAVORITE_EMOTE", function(data, cb)
-    if data.emoteName and data.emoteType and data.emoteLabel then
-        local emoteData = {
-            id = data.emoteType.."_"..data.emoteName,
-            name = data.emoteName,
-            emoteType = data.emoteType,
-            label = data.emoteLabel or data.emoteName,
-            textureVariation = 1
-        }
-        ToggleFavoriteEmote(emoteData.id, emoteData)
-        local favData = GetFavoriteEmotes()
-        local favMap = GetFavoriteEmotesMap()
-        local favorites = {}
-        for index, emoteId in pairs(favMap) do
-            favorites[index] = favData[emoteId]
-        end
-        cb({["favorites"] = favorites})
+        PMCloseCharacterPreview()
+        StartNewPlacement(data.emoteName)
+        if IsNuiFocused() then ToggleNUIMenu() end
+    else
+        cb({ok = false})
         return
     end
-    cb({["ok"] = true})
+    cb({ok = true})
+end)
+
+RegisterNUICallback('FAVORITE_EMOTE', function(data, cb)
+    if type(data) ~= 'table' or not validNUIEmote(data.emoteName, data.emoteType) then
+        cb({ok = false})
+        return
+    end
+    local id = data.emoteType .. '_' .. data.emoteName
+    ToggleFavoriteEmote(id, {
+        id = id, name = data.emoteName, emoteType = data.emoteType,
+        label = type(data.emoteLabel) == 'string' and data.emoteLabel or data.emoteName,
+        textureVariation = 1
+    })
+    local favorites, stored, seen = {}, GetFavoriteEmotes(), {}
+    for _, emoteId in pairs(GetFavoriteEmotesMap()) do
+        if not seen[emoteId] and stored[emoteId] then
+            seen[emoteId] = true
+            favorites[#favorites + 1] = stored[emoteId]
+        end
+    end
+    cb({ok = true, favorites = favorites})
 end)
 
 RegisterNUICallback('KEYBIND_EMOTE', function(data, cb)
-    if data.type == "set" then
-        if data.emoteName and data.emoteType and data.emoteLabel and data.id then
-            EmoteBindStart({data.id, data.emoteName, data.emoteLabel, data.emoteType})
-            RebuildEmoteMenu()
-        end
-    elseif data.type == "clear" then
-        if data.id then
-            DeleteEmoteBind({data.id})
-            RebuildEmoteMenu()
-        end
+    if type(data) ~= 'table' or (data.type ~= 'set' and data.type ~= 'clear') then
+        cb({ok = false})
+        return
     end
-
-    cb({["ok"] = true})
+    local id = tonumber(data.id)
+    if not id or id % 1 ~= 0 or id < 1 or id > 10 then
+        cb({ok = false})
+        return
+    end
+    if data.type == 'set' then
+        if not validNUIEmote(data.emoteName, data.emoteType) then
+            cb({ok = false})
+            return
+        end
+        EmoteBindStart({id, data.emoteName,
+            type(data.emoteLabel) == 'string' and data.emoteLabel or data.emoteName,
+            data.emoteType})
+    else
+        DeleteEmoteBind({id})
+    end
+    RebuildEmoteMenu()
+    cb({ok = true})
 end)
 
 
