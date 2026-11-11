@@ -5,13 +5,14 @@ let pmActiveHoverToken = 0;
 let pmActiveHoverTimer = null;
 let pmHoveredItem = null;
 const pmTryHoveredPreview = () => {
-  if (!pmHoveredItem) return;
-  if (window.PMAutoShotNoPixel?.show(pmHoveredItem)) {
+  const item = pmHoveredItem;
+  if (!item) return;
+  if (window.PMAutoShotNoPixel?.show(item)) {
     Ge.execute("emotes:clearPreview").catch(() => {});
   } else {
     Ge.execute("emotes:preview", {
-      value: pmHoveredItem.value,
-      emoteType: pmHoveredItem.emoteType
+      value: item.value,
+      emoteType: item.emoteType
     }).catch(() => {});
   }
 };
