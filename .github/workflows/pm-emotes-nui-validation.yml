@@ -26,7 +26,9 @@ jobs:
           luac5.4 -p client/NUI/PMPreview.lua
           luac5.4 -p client/PMSeating.lua
       - name: Package complete FiveM resource
-        run: python3 tools/package_pm_emotes.py
+        run: |
+          python3 tools/package_pm_emotes.py
+          python3 tests/validate_release_zip.py
       - uses: actions/upload-artifact@v4
         with:
           name: pm-emotes-server-test
