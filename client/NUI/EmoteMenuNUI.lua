@@ -273,7 +273,7 @@ end
 
 function AddEmoteToNUIQueue(data)
     -- data = {emoteName, emoteType, label, categoryName, hasPermission, isFavorite}
-    if data.isFavorite then
+    if data.isFavorite and data.hasPermission ~= false then
         table.insert(dataForMenu["favorites"], data)
         -- Favorites are also catalog entries; do not hide them from search or All.
     end
@@ -297,7 +297,7 @@ function AddEmoteToNUIQueue(data)
         }
     end
     local tbl = dataForMenu[NUIEmoteCategories[data.categoryName] and NUIEmoteCategories[data.categoryName].id] or dataForMenu[NUIEmoteType[data.emoteType]]
-    if tbl ~= nil then
+    if tbl ~= nil and data.hasPermission ~= false then
         table.insert(tbl, data)
     end
 end
@@ -444,7 +444,7 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
             if fav and not seen[id] then
                 seen[id] = true
                 local item = findNPItem(fav.name, fav.emoteType)
-                if item then
+                if item and HasEmotePermission(item.value, item.emoteType) then
                     favorites[#favorites + 1] = {id = id, category = item.category, index = item.index, value = item.value, emoteType = item.emoteType}
                 end
             end
@@ -558,6 +558,11 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
                 and npCatalog[requested.category] then
                 item = npCatalog[requested.category][tonumber(requested.index) or -1]
                 if item and (requested.value ~= item.value or (requested.emoteType and requested.emoteType ~= item.emoteType)) then item = nil end
+            end
+            -- A saved favorite can be dragged after the catalog is rebuilt.
+            -- Resolve its stable animation identity if its old index moved.
+            if not item and type(requested) == 'table' and type(requested.value) == 'string' then
+                item = findNPItem(requested.value, requested.emoteType)
             end
             if not item or not HasEmotePermission(item.value, item.emoteType) then
                 cb(false)
