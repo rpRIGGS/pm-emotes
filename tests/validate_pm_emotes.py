@@ -106,7 +106,7 @@ check("preview lifecycle", all(f"function {fn}" in preview for fn in
 check("preview ped is not networked", "ClonePed(player, heading, false, false)" in preview)
 check("failed preview cleans up clone and camera",
       "if success then" in preview and
-      "else\\n        -- A failed clip must not leave a clone/camera" in preview and
+      "else\n        -- A failed clip must not leave a clone/camera" in preview and
       "clearPreview()" in preview)
 check("preview camera faces clone from ahead without crossing player",
       "stage.x + forward.x * 3.5" in preview and
