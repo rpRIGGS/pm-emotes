@@ -18577,15 +18577,14 @@ function tv() {
       if (moveToSlot && destination === slot) return;
       const current = r[String(slot)];
       try {
-        if (moveToSlot && current) {
-          const saved = await Ge.execute("emotes:setQuickEmote", destination, current);
-          if (!saved) return;
-          t(state => ({...state, [destination]: current}));
-        }
-        const cleared = await Ge.execute("emotes:setQuickEmote", slot, null);
-        if (cleared) t(state => ({...state, [slot]: null}));
+        const moved = await Ge.execute("emotes:moveQuickEmote", slot, moveToSlot ? destination : null);
+        if (moved) t(state => ({
+          ...state,
+          ...(moveToSlot ? {[destination]: current} : {}),
+          [slot]: null
+        }));
       } catch (error) {
-        console.error("[PowerMoves RP] Could not update quick slots", error);
+        console.error("[PowerMoves RP] Could not move quick slot", error);
       }
       return;
     }
