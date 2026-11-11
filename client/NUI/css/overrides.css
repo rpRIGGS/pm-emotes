@@ -113,3 +113,9 @@ body, body.align-left {justify-content:flex-start !important;align-items:center 
 .pm-workspace .menu-container {width:100%;flex:1 1 100%}
 @media(max-width:850px){.main-container{width:min(650px,75vw)}}
 @media(max-width:680px){.main-container{width:96vw}}
+
+/* Brand: one official logo, no decorative PM placeholder or redundant subtitle. */
+.pm-brand-mark,.pm-brand-subtitle {display:none !important}
+.pm-brand {gap:12px;letter-spacing:0}
+.pm-brand-logo {display:block;max-height:54px;max-width:190px;width:auto;height:auto;object-fit:contain}
+.pm-brand-name {font:700 15px/1.2 Arial,sans-serif;letter-spacing:.06em}
