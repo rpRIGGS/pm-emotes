@@ -438,10 +438,10 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         for i = 1, 10 do
             local saved = npQuick[i]
             if type(saved) == 'table' and saved.value then
-                local item = findNPItem(saved.value)
+                local item = findNPItem(saved.value, saved.emoteType)
                 if item and HasEmotePermission(item.value, item.emoteType) then
-                    if saved.category ~= item.category or saved.index ~= item.index then
-                        npQuick[i] = {category = item.category, index = item.index, value = item.value}
+                    if saved.category ~= item.category or saved.index ~= item.index or saved.emoteType ~= item.emoteType then
+                        npQuick[i] = {category = item.category, index = item.index, value = item.value, emoteType = item.emoteType}
                         changed = true
                     end
                 else
@@ -472,6 +472,7 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         local item
         if requested.category and requested.index and npCatalog[requested.category] then
             item = npCatalog[requested.category][tonumber(requested.index)]
+            if item and requested.value and item.value ~= requested.value then item = nil end
         end
         if not item and requested.value then
             item = findNPItem(requested.value, requested.emoteType)
@@ -493,6 +494,7 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         local item
         if requested.category and requested.index and npCatalog[requested.category] then
             item = npCatalog[requested.category][tonumber(requested.index)]
+            if item and requested.value and item.value ~= requested.value then item = nil end
         end
         if not item and requested.value then
             item = findNPItem(requested.value)
@@ -535,12 +537,13 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
             if type(requested) == 'table' and requested.category and requested.index
                 and npCatalog[requested.category] then
                 item = npCatalog[requested.category][tonumber(requested.index)]
+                if item and requested.value and item.value ~= requested.value then item = nil end
             end
             if not item or not HasEmotePermission(item.value, item.emoteType) then
                 cb(false)
                 return
             end
-            stored = {category = item.category, index = item.index, value = item.value}
+            stored = {category = item.category, index = item.index, value = item.value, emoteType = item.emoteType}
         end
         npQuick[slot + 1] = stored
         SetResourceKvp(quickKvp, json.encode(npQuick))
@@ -557,7 +560,7 @@ end)
 local function playNPQuickSlot(slot)
     local saved = npQuick[slot + 1]
     if type(saved) ~= 'table' or type(saved.value) ~= 'string' then return end
-    local item = findNPItem(saved.value)
+    local item = findNPItem(saved.value, saved.emoteType)
     if not item or not HasEmotePermission(item.value, item.emoteType) then return end
 
     if item.emoteType == EmoteType.SHARED then
