@@ -56,9 +56,9 @@ jobs:
           assert 'data-action="sitNearby"' in Path("client/NUI/index.html").read_text()
           assert 'case "sitNearby":' in Path("client/NUI/js/utils.js").read_text()
           utils = Path("client/NUI/js/utils.js").read_text()
-          assert "requestId !== searchRequestGeneration" in utils, "search results must reject stale responses"
-          assert "container.replaceChildren(buttons)" in utils, "search results must batch DOM updates"
-          assert 'document.createElement("button")' in utils, "search results must avoid interpolated HTML"
+          assert '.menu:not(.search-menu) [data-emoteid]' in utils, "search must cover the full live RPEmotes catalog"
+          assert "container.replaceChildren(matches)" in utils, "search results must batch DOM updates"
+          assert "source.cloneNode(true)" in utils, "search must retain original emote metadata and permission state"
 
           for path in files:
               assert f"'client/{path.name}'" in manifest, f"not loaded: {path.name}"
