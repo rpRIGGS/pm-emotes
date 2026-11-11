@@ -276,10 +276,25 @@ function AddEmoteToNUIQueue(data)
         table.insert(dataForMenu["favorites"], data)
         -- Favorites are also catalog entries; do not hide them from search or All.
     end
+    -- Keep one canonical entry per animation. NativeUI inserts favorites again
+    -- while building its Favorites tab; without deduplication the NoPixel All
+    -- and Search views show duplicate tiles and quick slots can shift.
     local cat = ({[EmoteType.DANCES] = 'dances', [EmoteType.EXPRESSIONS] = 'expressions', [EmoteType.WALKS] = 'walks', [EmoteType.SHARED] = 'synced', [EmoteType.ANIMAL_EMOTES] = 'animals', [EmoteType.PROP_EMOTES] = 'placed'})[data.emoteType] or 'emotes'
     npCatalog[cat] = npCatalog[cat] or {}
-    local index = #npCatalog[cat] + 1
-    npCatalog[cat][index] = {category = cat, index = index, value = data.emoteName, label = data.label or data.emoteName, emoteType = data.emoteType}
+    local found = false
+    for _, existing in ipairs(npCatalog[cat]) do
+        if existing.value == data.emoteName and existing.emoteType == data.emoteType then
+            found = true
+            break
+        end
+    end
+    if not found and data.hasPermission ~= false then
+        local index = #npCatalog[cat] + 1
+        npCatalog[cat][index] = {
+            category = cat, index = index, value = data.emoteName,
+            label = data.label or data.emoteName, emoteType = data.emoteType
+        }
+    end
     local tbl = dataForMenu[NUIEmoteCategories[data.categoryName] and NUIEmoteCategories[data.categoryName].id] or dataForMenu[NUIEmoteType[data.emoteType]]
     if tbl ~= nil then
         table.insert(tbl, data)
