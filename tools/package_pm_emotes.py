@@ -43,15 +43,23 @@ files = sorted(
     and path.name not in EXCLUDED_FILES
     and not path.name.startswith(EXCLUDED_PREFIXES)
 )
-# Validate literal runtime file declarations before creating a distributable ZIP.
-# Wildcard declarations are checked against the runtime files in the archive.
+# Validate all explicit runtime assets, not only the NUI files block.
+# A ZIP that omits a client script can install cleanly but fail at startup.
 manifest = (ROOT / "fxmanifest.lua").read_text(encoding="utf-8")
-file_block = re.search(r"\bfiles\s*\{(.*?)\}", manifest, flags=re.S)
-if not file_block:
-    sys.exit("fxmanifest.lua does not declare a files block")
-declarations = re.findall(r"['\"]([^'\"]+)['\"]", file_block.group(1))
+declarations = []
+for block in ("files", "client_scripts", "server_scripts", "shared_scripts"):
+    matches = re.findall(r"\\b" + block + r"\\s*\\{(.*?)\\}", manifest, flags=re.S)
+    for match in matches:
+        declarations.extend(re.findall(r"['\\\"]([^'\\\"]+)['\\\"]", match))
+for name in re.findall(r"\\bdata_file\\s+['\\\"][^'\\\"]+['\\\"]\\s+['\\\"]([^'\\\"]+)['\\\"]", manifest):
+    declarations.append(name)
 for declaration in declarations:
-    if "*" not in declaration and not (ROOT / declaration).is_file():
+    if declaration.startswith("/") or declaration.startswith("@"):
+        continue  # Runtime dependency / external resource, not a bundled file.
+    if "*" in declaration:
+        # Some optional glob patterns (AutoShot previews) intentionally start empty.
+        continue
+    if not (ROOT / declaration).is_file():
         sys.exit(f"Missing fxmanifest runtime asset: {declaration}")
 
 with ZipFile(OUTPUT, "w", compression=ZIP_DEFLATED, compresslevel=6) as archive:
