@@ -527,6 +527,22 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
             slots[tostring(i - 1)] = npQuick[i] or false
         end
         cb(slots)
+    elseif event == 'emotes:preview' then
+        local requested = args[1]
+        if not IsNuiFocused() or type(requested) ~= 'table'
+            or type(requested.value) ~= 'string' then
+            cb(false)
+            return
+        end
+        local item = findNPItem(requested.value, requested.emoteType)
+        if not item or not HasEmotePermission(item.value, item.emoteType) then
+            cb(false)
+            return
+        end
+        cb(PMPreviewCharacterEmote(item.value, item.emoteType) == true)
+    elseif event == 'emotes:clearPreview' then
+        PMCloseCharacterPreview()
+        cb(true)
     elseif event == 'emotes:close' then
         pendingOpenToken = pendingOpenToken + 1
         pendingNuiOpen = false
