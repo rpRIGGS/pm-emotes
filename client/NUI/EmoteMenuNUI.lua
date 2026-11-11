@@ -1,4 +1,5 @@
 local npCatalog = {}
+local npCatalogReady = false
 local npFavorites = {}
 local npQuick = {false, false, false, false, false, false, false, false, false, false}
 local nuiReady = false
@@ -314,6 +315,7 @@ AddEventHandler("rpemotes:internal:loadEmoteDataToNUI", function(EmoteData, Cate
 end)
 
 function ResetNUIQueue()
+    npCatalogReady = false
     npCatalog = {}
     for key, val in pairs(dataForMenu) do
         if type(val) == "table" then
@@ -354,6 +356,8 @@ function AddEmoteToNUIQueue(data)
 end
 
 AddEventHandler("rpemotes:internal:sendMenuDataToNUI", function()
+    -- NativeUI has finished populating every category at this point.
+    npCatalogReady = true
     local deadline = GetGameTimer() + 15000
     while (not nuiReady or not initialDataLoaded) and GetGameTimer() < deadline do Wait(50) end
     if not nuiReady or not initialDataLoaded then
@@ -483,10 +487,10 @@ end
 -- The compiled NoPixel frontend requests favorites and quick slots independently.
 -- Neither request may invalidate saved entries while the catalog is still building.
 local function waitForNPCatalog()
-    if next(npCatalog) then return true end
+    if npCatalogReady then return true end
     local deadline = GetGameTimer() + 5000
-    while not next(npCatalog) and GetGameTimer() < deadline do Wait(50) end
-    return next(npCatalog) ~= nil
+    while not npCatalogReady and GetGameTimer() < deadline do Wait(50) end
+    return npCatalogReady
 end
 
 local function findNPItem(name, emoteType)
