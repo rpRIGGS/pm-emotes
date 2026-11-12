@@ -1,5 +1,25 @@
 # PM Emotes — reference capability inventory
 
+## Reconciliation update — 2026-11-11
+
+**Do not use the older file references and implementation labels below as a current completion claim.** The active UI is `client/NUI/nopixel/index.html` with `assets/index-80592477.js`, `assets/index-5495b930.css` and optional `assets/pm-autoshot-bridge.js`. Its NoPixel RPC adapter is in `client/NUI/EmoteMenuNUI.lua`. The legacy `client/NUI/js/main.js` and earlier custom-NUI plans are not the active frontend.
+
+| Capability | Current source evidence | Reconciled status |
+|---|---|---|
+| PowerMoves branding | Active HTML/CSS and compiled NUI | Implemented; do not reopen redesign |
+| Search, catalog, dances, props, expressions, walks | NoPixel frontend + `PM_NP_RPC` adapter + RPEmotes engine | Integrated; detailed feature-parity and FiveM validation pending |
+| Favorites and ten quick slots | `client/Favorites.lua`; NUI RPC; KVP persistence; 0–9 browser mapping | Integrated; automated checks passing, gameplay acceptance pending |
+| Live cloned-ped hover | `client/NUI/PMPreview.lua` and NUI preview RPC | Integrated; FiveM camera/prop cleanup acceptance pending |
+| Optional preview images | `pm-autoshot-bridge.js` and manifest WebP glob | Optional integration; generated files supplied by separate PM AutoShot project later |
+| 213-model nearby seating | `client/PMSeating.lua` | **Known failing in user testing:** floor clipping and backward facing; original offsets/heading need reconciliation |
+| Choose sit emote and place on arbitrary furniture/surface | `client/Placement.lua` exists; active NUI route not yet proven | **Not verified; required feature** |
+| Shared/group and placement | Existing Lua engine and NUI route | Source integration present; end-to-end feature parity not established |
+
+**Next step is a full reference-to-active-frontend-to-Lua parity audit, before speculative seating fixes.** Compare the original per-model seating coordinates and rotation convention first; then verify menu-selected sit placement wiring. Only after this audit should implementation gaps be prioritized. Automated CI success is not a substitute for a FiveM test.
+
+---
+
+
 This is an engineering gap inventory against the externally supplied example, not an assertion of parity. The external project is reference-only: do not copy its bundled UI, proprietary assets, or compiled runtime. PM Emotes retains the RPEmotes Reborn engine and implements original NUI integration.
 
 ## Comparison baseline
