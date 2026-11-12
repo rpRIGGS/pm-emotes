@@ -617,7 +617,14 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         pendingOpenToken = pendingOpenToken + 1
         pendingNuiOpen = false
         previewRequestToken = previewRequestToken + 1
-        if IsNuiFocused() then ToggleNUIMenu() end
+        if IsNuiFocused() then
+            ToggleNUIMenu()
+        else
+            -- Closing an already-hidden menu must still clean up any
+            -- lingering preview and pending browser input state.
+            PMCloseCharacterPreview()
+            SetNuiFocusKeepInput(false)
+        end
         cb(true)
     elseif event == 'emotes:play' then
         local requested = args[1] or {}
