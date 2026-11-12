@@ -1,6 +1,6 @@
 fx_version 'cerulean'
 game 'gta5'
-description 'rpemotes-reborn'
+description 'PowerMoves RP Emotes — QBCore-compatible NoPixel-style animation menu'
 version '2.2.0'
 
 use_experimental_fxv2_oal 'yes'
