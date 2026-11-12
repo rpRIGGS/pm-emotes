@@ -38,3 +38,7 @@ The NUI `BUILD_EMOTE_MENUS` handler renders buttons with `data-emoteid` and `dat
 The `client/NUI/previews/*` manifest file declaration is present. The preview manifest itself is intentionally absent until assets are generated. The installer now refuses an incompatible NUI without `js/autoshot-previews.js` and the corresponding script reference. The optional overlay clears stale images when changing buttons or rebuilding menus.
 
 **Offline limitation:** The dynamic NUI render path, the optional manifest fetch, and actual WebP display have not been exercised in FiveM. No installation or live acceptance is authorized by this audit.
+
+## Final offline release handoff — 2026-11-12
+
+PM AutoShot has completed its five offline audit/validation/documentation tasks. This does **not** mean the preview library has been captured, deployed or verified inside FiveM. PM Emotes must continue to work with no `client/NUI/previews/manifest.json` and no preview WebP files. Its menu, animations and placement work remain independent of PM AutoShot. The first live acceptance must be a single captured sample followed by installer dry-run and NUI hover verification, as recorded in PM AutoShot's `development-reference/PREVIEW-DEPLOYMENT.md`. Do not block ongoing PM Emotes development on this optional asset pipeline.
