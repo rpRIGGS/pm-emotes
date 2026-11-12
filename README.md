@@ -1,3 +1,11 @@
+# PowerMoves RP — PM Emotes development note
+
+PM Emotes remains an RPEmotes-based FiveM resource with an approved NoPixel-style NUI. Animated preview media will be produced externally by [PowerMoves Development — EmotePreviewer](https://github.com/rpRIGGS/EmotePreviewer), a separate Windows desktop application. PM Emotes will only consume exported preview assets after the media format and manifest contract are validated; it will not capture, render or encode them. The former PM AutoShot integration has been retired. This does not affect the existing in-game emote preview/placement gameplay features.
+
+Development decisions and live-test handoff: [development-reference/EMOTE-PREVIEWER-INTEGRATION.md](development-reference/EMOTE-PREVIEWER-INTEGRATION.md) and [development-reference/SERVER-TEST-ACCEPTANCE.md](development-reference/SERVER-TEST-ACCEPTANCE.md).
+
+---
+
 <img width="1920" height="1080" alt="rpemotesrebornbanner" src="https://github.com/user-attachments/assets/a515b5ed-da1b-45d4-9a1d-b83399ba9d17" />
 
 Rpemotes-reborn is a community-driven FiveM emote menu allowing players to express themselves in roleplay with custom animations, countless facial expressions, walk styles, and props.
