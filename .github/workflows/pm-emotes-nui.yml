@@ -96,7 +96,7 @@ jobs:
           assert "local previewPropVersion = 0" in emote, "preview prop token missing"
           assert "data.previewVersion ~= previewPropVersion" in emote, "async prop guard missing"
           assert "local newProp = CreateObject(" in emote, "prop handles must be local"
-          assert "return EmotePlayOnNonPlayerPed(previewPed, emoteName) ~= false" in preview
+          assert "EmotePlayOnNonPlayerPed(ped, emoteName) ~= false" in preview
           print("Preview lifecycle contracts verified")
           PY
       - name: Validate NUI file references and required hooks
