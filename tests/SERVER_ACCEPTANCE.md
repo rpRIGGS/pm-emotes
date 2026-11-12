@@ -47,3 +47,15 @@ The automated workflow verifies source syntax and integration contracts; it **ca
 On a **placed** tile or an emote/dance whose ID contains `sit`, click **PLACE** (or right-click the tile). Verify that the NUI closes and the live preview camera is released, the ghost ped appears, the player can adjust position/rotation on a chair or countertop, and confirm/cancel restore normal gameplay. Confirm that ordinary left-click still plays the emote, that unavailable/restricted emotes cannot be placed, and that the menu does not reopen unexpectedly. This is source-implemented but **not yet FiveM-accepted**.
 
 Automatic nearby seating (`/pmsit`) is a **separate feature**, with known floor-clipping and backward-facing reports; it is not fixed by the menu placement change.
+
+## Automatic chair seating — targeted regression matrix
+
+This is **separate from manual PLACE**. Use `/pmsit` and `/pmstand` at a supported chair. The current source hypothesis is `boundsMax.z + reference verticalOffset` for height and `chairHeading + 180 + reference headingOffset` for facing. **These transforms are not confirmed reference-runtime equivalents and must be checked in FiveM.**
+
+1. Test a picnic bench (`prop_picnictable_01`, reference Z -0.5, heading 0): player should sit on the seat surface, not sink through it or face the back.
+2. Test an ordinary office/dining chair (for example `v_res_fa_chair01`, reference Z -0.68, forward 0.07) and a chair with reference heading -180: verify both height and facing, not just scenario start.
+3. Test a rotated chair at 90 and 270 degrees. Facing must follow chair rotation and any model-specific heading adjustment.
+4. Test chair occupancy with a second player using a scenario: refuse occupied seat without displacing either ped.
+5. Test `/pmstand`, movement interruption, vehicle/death rejection and resource stop; verify no stuck seating state.
+6. Record chair model, heading, observed vertical/facing error and F8 messages for any failure. Do **not** declare all 213 models correct based on a few samples.
+
