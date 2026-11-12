@@ -18354,7 +18354,40 @@ const M2 = e => {
         }
       }
     }), false, true);
-    v.$$mouseup = () => {
+    // Manual placement is distinct from ordinary click-to-play. Expose a
+    // visible action on placeable tiles without replacing the NoPixel layout.
+    const pmPlaceable = e.item.category === "placed" ||
+      (["emotes", "dances"].includes(e.item.category) &&
+       /sit/i.test(String(e.item.value ?? "")));
+    if (pmPlaceable) {
+      const placeButton = document.createElement("button");
+      placeButton.type = "button";
+      placeButton.className = "pm-place-action";
+      placeButton.textContent = "PLACE";
+      placeButton.title = "Position this emote on furniture or a surface";
+      placeButton.setAttribute("aria-label", "Place " + (e.item.label || e.item.value));
+      placeButton.addEventListener("pointerdown", event => event.stopPropagation());
+      placeButton.addEventListener("mousedown", event => event.stopPropagation());
+      placeButton.addEventListener("mouseup", event => event.stopPropagation());
+      placeButton.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        Ge.execute("emotes:place", {
+          value: e.item.value,
+          emoteType: e.item.emoteType
+        }).catch(error => console.error("[PowerMoves RP] Placement failed", error));
+      });
+      m.appendChild(placeButton);
+      m.addEventListener("contextmenu", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        Ge.execute("emotes:place", {
+          value: e.item.value,
+          emoteType: e.item.emoteType
+        }).catch(error => console.error("[PowerMoves RP] Placement failed", error));
+      });
+    }
+    v.$mouseup = () => {
       setTimeout(() => {
         i(false);
       }, 100);
