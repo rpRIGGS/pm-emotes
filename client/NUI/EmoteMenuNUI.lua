@@ -129,7 +129,13 @@ RegisterNUICallback('CLOSE_MENU', function(data, cb)
     pendingOpenToken = pendingOpenToken + 1
     pendingNuiOpen = false
     previewRequestToken = previewRequestToken + 1
-    if IsNuiFocused() then ToggleNUIMenu() end
+    if IsNuiFocused() then
+        ToggleNUIMenu()
+    else
+        -- A close during the async initial load cancels the pending F4 open.
+        PMCloseCharacterPreview()
+        SetNuiFocusKeepInput(false)
+    end
     PlaySoundFrontend(-1, "QUIT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
     cb({["ok"] = true})
 end)
@@ -438,6 +444,7 @@ function ToggleNUIMenu()
         menuSession = menuSession + 1
         previewRequestToken = previewRequestToken + 1
         PMCloseCharacterPreview()
+        SetNuiFocusKeepInput(false)
         SetNuiFocus(false, false)
         SendNUIMessage({event = "emotes:closeUI", args = {}})
     end
