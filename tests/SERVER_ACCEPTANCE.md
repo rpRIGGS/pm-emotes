@@ -29,7 +29,8 @@ Branch: `development/powermoves-nui`
 - Play normal, dance, prop, expression and walk-style animations; cancel each.
 - Request/accept/reject a shared synchronized animation with a second player.
 - Test group emotes, placement interactions, and the existing 213-model seating flow.
-- Use nearby seating and stand up; verify no stranded focus, camera, collision, or scenario prop.
+- **Known failing:** test nearby seating on several chair models for correct height, position, and facing; prior FiveM tests clipped below the floor and then faced backward. Reconcile original model offsets before treating this as passed. Stand up and verify no stranded focus, camera, collision, or scenario prop.
+- Select a **sitting emote in the active NoPixel NUI**, launch manual ghost placement, position and rotate it on a chair, desk or another surface, then confirm and cancel in separate tests. The existence of `client/Placement.lua` alone does not establish this menu feature.
 - Try F4 rapidly during initial loading, close/reopen quickly, and restart the resource while the menu is open.
 
 ## Exit criteria
