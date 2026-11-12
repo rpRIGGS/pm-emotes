@@ -1,5 +1,35 @@
 # PM Emotes — reference capability inventory
 
+## Active frontend-to-Lua contract audit — 2026-11-11
+
+Static inspection of `client/NUI/nopixel/assets/index-80592477.js` found these **11 distinct `Ge.execute` names**: `emotes:clearPreview`, `emotes:preview`, `emotes:play`, `emotes:setFavorite`, `emotes:moveQuickEmote`, `emotes:setQuickEmote`, `emotes:close`, `emotes:getEmotes`, `emotes:getFavorites`, `emotes:getQuickEmotes`, and `__npx_sdk:sockets:init`.
+
+- The **ten `emotes:*` calls all have matching branches** in the `PM_NP_RPC` dispatcher. This confirms static name-level coverage, **not** gameplay behavior or payload correctness.
+- `__npx_sdk:sockets:init` is an inherited SDK websocket initialization call. The frontend checks for absent `API_URL` / `API_KEY` and returns `false`; the PowerMoves integration does not supply an SDK socket service. **Audit whether the unused socket path has side effects**; do not add a new runtime dependency just to satisfy inherited code.
+- The legacy NUI exposes `ROUTE_EMOTE`, `SIT_NEARBY`, `PREVIEW_EMOTE` and other callbacks, but **the active NoPixel frontend does not invoke them through `Ge.execute`**. Consequently the presence of those callbacks is not proof of accessible features.
+- **Confirmed active-menu feature gap:** the compiled frontend has **zero `emotes:place` calls** and no functional placement action found by static text inspection; `emotes:play` only plays. Menu-selected manual sit placement remains missing from the active interaction contract.
+- **Nearby seating availability:** the Lua command `/pmsit` and legacy `SIT_NEARBY` callback exist, but no `Ge.execute` call to nearby seating exists in the active frontend. The command is present; a menu entry is not established.
+- **Preview fallback:** the frontend uses the optional `PMAutoShotNoPixel` image bridge and otherwise calls `emotes:preview` for cloned-ped rendering. Missing generated WebP files are not a release blocker.
+- **Quick slots:** the frontend calls `emotes:moveQuickEmote` and `emotes:setQuickEmote`; the Lua dispatcher persists assignments to KVP. Server restart and cross-session behavior remain FiveM acceptance tasks.
+- **Search, categories, favorites, and browser controls:** visible source routes exist, but interaction-level acceptance is still required. Reference catalog counts in the earlier audit are **not** equivalent to feature parity.
+
+### Current classification
+
+| Area | Classification | Remaining gate |
+|---|---|---|
+| Active RPC names | All ten emote RPC names matched | Validate payloads and transitions |
+| Catalog/search/dances/props | Integrated, not certified parity | Full catalog equivalence and in-game |
+| Favorites/quick slots | Integrated | Gameplay/persistence acceptance |
+| Preview/WebP | Integrated, WebP optional | Camera/prop cleanup and fallback |
+| Menu-selected sitting placement | **Missing active route** | Add frontend action + authorized Lua placement route |
+| Nearby seating | **Known failing behavior** | Reconcile per-model transform and facing |
+| Legacy-only callbacks | **Not evidence of active features** | Explicitly map or retire as appropriate |
+| Inherited SDK socket init | Nonessential inherited call | Verify harmless failure/no dependency |
+
+**Audit boundary:** these are verified source-level observations. The next pass must compare the original reference's actual placement and seating transforms and the broader UI action inventory before prioritizing code fixes.
+
+---
+
 ## Active callback trace — first reconciliation findings (2026-11-11)
 
 This trace is based on the active source, not assumptions about the original reference.
