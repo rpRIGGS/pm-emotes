@@ -1,5 +1,26 @@
 # PM Emotes — reference capability inventory
 
+## Active callback trace — first reconciliation findings (2026-11-11)
+
+This trace is based on the active source, not assumptions about the original reference.
+
+- The active compiled NoPixel frontend communicates through `PM_NP_RPC`. Its dispatcher handles **ten event names**: `emotes:getEmotes`, `emotes:getFavorites`, `emotes:getQuickEmotes`, `emotes:preview`, `emotes:clearPreview`, `emotes:close`, `emotes:play`, `emotes:setFavorite`, `emotes:moveQuickEmote`, `emotes:setQuickEmote`. **There is no `emotes:place` / placement event in this dispatcher.**
+- A legacy `ROUTE_EMOTE` callback **does** support `data.type == 'placement'` and calls `StartNewPlacement(data.emoteName)`, but restricts this path to `EmoteType.PROP_EMOTES`. That does **not** prove the active NoPixel frontend offers a sit-placement action, and the restriction needs examination against the intended sitting-emote catalog.
+- `emotes:play` validates a requested catalog item and routes ordinary animations to `RouteEmoteToFunction`; shared animations go to `SendSharedEmoteRequest`. It has **no placement branch**. **Menu-selected sitting emote placement is an identified integration gap pending full frontend trace**, not a verified feature.
+- `client/Placement.lua` exposes `StartNewPlacement(emoteName, options)`. The original menu code in `client/EmoteMenu.lua` also has a placement call, but that alone does not make it accessible from the active NoPixel UI.
+- `client/PMSeating.lua` holds the model-specific `x/y/z/heading` reference data, but its active `PMToggleNearbySeat` computes Z using `GetModelDimensions` and `math.max(0.0, boundsMax.z - 0.45)`, then adds `config.heading` to the chair entity heading. The imported `config.z` is not used in the active positioning calculation. This is a **specific deviation requiring reference coordinate-space comparison**, not proof of a correct replacement formula.
+- The user reported two failed FiveM seating outcomes: below-floor placement and backward-facing placement. Status: **known failing**.
+
+### Next reconciliation tasks
+
+1. Inspect the active compiled frontend for actual placement controls and RPC payloads; map each user action to the dispatcher above.
+2. Compare the original reference's seat position and heading transforms to `PMToggleNearbySeat` (including whether Z offsets apply to entity origin, world coordinates, or scenario ped origin).
+3. Inventory any other reference actions lacking an active NUI route and update this matrix before gameplay fixes.
+
+**Do not declare reference feature parity or mark sitting placement complete from the presence of Lua modules.**
+
+---
+
 ## Reconciliation update — 2026-11-11
 
 **Do not use the older file references and implementation labels below as a current completion claim.** The active UI is `client/NUI/nopixel/index.html` with `assets/index-80592477.js`, `assets/index-5495b930.css` and optional `assets/pm-autoshot-bridge.js`. Its NoPixel RPC adapter is in `client/NUI/EmoteMenuNUI.lua`. The legacy `client/NUI/js/main.js` and earlier custom-NUI plans are not the active frontend.
