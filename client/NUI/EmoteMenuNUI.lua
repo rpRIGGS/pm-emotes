@@ -770,6 +770,9 @@ end)
 local function playNPQuickSlot(slot)
     local saved = npQuick[slot + 1]
     if type(saved) ~= 'table' or type(saved.value) ~= 'string' then return end
+    -- Quick commands may be triggered during resource startup, before the
+    -- emote catalog is populated. Wait briefly instead of dropping the input.
+    if not waitForNPCatalog() then return end
     local item = findNPItem(saved.value, saved.emoteType)
     if not item or not HasEmotePermission(item.value, item.emoteType) then return end
 
