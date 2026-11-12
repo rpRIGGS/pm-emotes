@@ -137,6 +137,8 @@ check("menu close releases NUI keep-input mode",
 check("invalid or restricted hover clears stale preview",
       "if not item or not HasEmotePermission(item.value, item.emoteType) then\n            -- A rejected hover" in bridge and
       "PMCloseCharacterPreview()\n            cb(false)" in bridge)
+check("quick-slot commands wait for catalog readiness",
+      "if not waitForNPCatalog() then return end" in bridge)
 check("temporarily unavailable quick slots remain saved",
       "Do not erase a saved assignment merely because an animation" in bridge and
       "slots[tostring(i - 1)] = visible" in bridge)
