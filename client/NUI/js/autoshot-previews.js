@@ -25,9 +25,18 @@ fetch('previews/manifest.json')
     }
   })
   .catch(() => {});
+function hide() {
+  preview.style.display = 'none';
+  preview.removeAttribute('src');
+  selected = null;
+}
 function show(button) {
-  const key = button?.dataset?.emotetype + ':' + button?.dataset?.emoteid;
-  if (!button?.dataset?.emoteid || selected === key) return;
+  if (!button?.dataset?.emoteid || !button?.dataset?.emotetype) {
+    hide();
+    return;
+  }
+  const key = button.dataset.emotetype + ':' + button.dataset.emoteid;
+  if (selected === key) return;
   selected = key;
   const file = entries[key];
   if (!file || !/^previews\/[A-Za-z0-9_-]+\.webp$/.test(file)) {
@@ -41,17 +50,18 @@ function show(button) {
 document.addEventListener('focusin', event => {
   const button = event.target.closest?.('button[data-emoteid][data-emotetype]');
   if (button) show(button);
+  else if (event.target.closest?.('.menu-container')) hide();
 });
 document.addEventListener('mouseover', event => {
   const button = event.target.closest?.('button[data-emoteid][data-emotetype]');
   if (button) show(button);
+  else if (event.target.closest?.('.menu-container')) hide();
 });
 document.addEventListener('mouseleave', event => {
   if (event.target.closest?.('.menu-container')) {
-    preview.style.display = 'none';
-    selected = null;
+    hide();
   }
 }, true);
 window.addEventListener('message', event => {
-  if (event.data?.type === 'BUILD_EMOTE_MENUS') selected = null;
+  if (event.data?.type === 'BUILD_EMOTE_MENUS') hide();
 });
