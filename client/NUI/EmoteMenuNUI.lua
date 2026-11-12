@@ -9,6 +9,7 @@ local pendingNuiOpen = false
 local menuSession = 0
 local pendingOpenToken = 0
 local previewRequestToken = 0
+local catalogBuildGeneration = 0
 
 
 -- The NUI logic is designed to run *on top* of the existing NativeUI logic, since that menu already does all the data handling that we need.
@@ -323,6 +324,7 @@ AddEventHandler("rpemotes:internal:loadEmoteDataToNUI", function(EmoteData, Cate
 end)
 
 function ResetNUIQueue()
+    catalogBuildGeneration = catalogBuildGeneration + 1
     npCatalogReady = false
     npCatalog = {}
     for key, val in pairs(dataForMenu) do
@@ -364,6 +366,7 @@ function AddEmoteToNUIQueue(data)
 end
 
 AddEventHandler("rpemotes:internal:sendMenuDataToNUI", function()
+    local generation = catalogBuildGeneration
     -- NativeUI has finished populating every category at this point.
     npCatalogReady = true
     local deadline = GetGameTimer() + 15000
@@ -372,6 +375,10 @@ AddEventHandler("rpemotes:internal:sendMenuDataToNUI", function()
         print('[pm-emotes] NUI menu build timed out waiting for browser')
         return
     end
+
+    -- A newer catalog rebuild supersedes this waiting sender. Never drain
+    -- its queue or send an obsolete catalog to the browser.
+    if generation ~= catalogBuildGeneration then return end
 
     -- Multiple builds can queue sends while waiting above (e.g. InitMenu plus a
     -- RebuildEmoteMenu during startup). The first send empties the queue, so a
