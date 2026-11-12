@@ -30,3 +30,11 @@ PM AutoShot implements ordinary dictionary-animation capture **and** a native PM
 **PM Emotes development must not be blocked by PM AutoShot.** Finish its NUI, emote playback, placement, branding and gameplay features without waiting for previews. The overlay is optional and must continue to fail gracefully when a manifest or individual WebP is absent. Bulk preview generation is a separate follow-up operation after a successful one-emote capture and NUI smoke test.
 
 The canonical status and acceptance gates are maintained in `rpRIGGS/pm-autoshot/development-reference/DECISIONS-AND-STATUS.md`; the capture/deployment checklist is in that repository's `development-reference/PREVIEW-DEPLOYMENT.md`. Do not claim production readiness until actual FiveM validation is recorded.
+
+## Task 3 integration contract audit — 2026-11-12
+
+The NUI `BUILD_EMOTE_MENUS` handler renders buttons with `data-emoteid` and `data-emotetype`. The types in `types.lua` use `Emotes`, `Dances`, `Exits`, and `PropEmotes`, matching PM AutoShot's catalog and installer category names. The installer resolves original keys (including spaces and punctuation) from the installed animation catalog rather than reconstructing them from sanitized filenames. Preview manifest keys are `<EmoteType>:<exact emote key>`; values are relative `previews/<sanitized filename>.webp`.
+
+The `client/NUI/previews/*` manifest file declaration is present. The preview manifest itself is intentionally absent until assets are generated. The installer now refuses an incompatible NUI without `js/autoshot-previews.js` and the corresponding script reference. The optional overlay clears stale images when changing buttons or rebuilding menus.
+
+**Offline limitation:** The dynamic NUI render path, the optional manifest fetch, and actual WebP display have not been exercised in FiveM. No installation or live acceptance is authorized by this audit.
