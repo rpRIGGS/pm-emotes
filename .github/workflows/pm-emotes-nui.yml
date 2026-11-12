@@ -90,7 +90,7 @@ jobs:
           from pathlib import Path
           preview = Path("client/NUI/PMPreview.lua").read_text()
           emote = Path("client/Emote.lua").read_text()
-          assert "previewGeneration" not in preview, "obsolete preview generation counter"
+          assert "previewGeneration" in preview, "preview generation guard missing"
           assert "PMInvalidatePreviewProps()" in preview, "preview must invalidate async props"
           assert "ClearFacialIdleAnimOverride(previewPed)" in preview, "preview must clear old facial overrides"
           assert "local previewPropVersion = 0" in emote, "preview prop token missing"
