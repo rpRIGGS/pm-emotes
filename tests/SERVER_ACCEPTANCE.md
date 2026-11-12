@@ -41,3 +41,9 @@ Branch: `development/powermoves-nui`
 - Only after these pass should the test ZIP be treated as a release candidate.
 
 The automated workflow verifies source syntax and integration contracts; it **cannot** certify in-game behavior. Record FiveM failures with exact F8 output and reproduction steps.
+
+## Manual placement — new active NoPixel menu path
+
+On a **placed** tile or an emote/dance whose ID contains `sit`, click **PLACE** (or right-click the tile). Verify that the NUI closes and the live preview camera is released, the ghost ped appears, the player can adjust position/rotation on a chair or countertop, and confirm/cancel restore normal gameplay. Confirm that ordinary left-click still plays the emote, that unavailable/restricted emotes cannot be placed, and that the menu does not reopen unexpectedly. This is source-implemented but **not yet FiveM-accepted**.
+
+Automatic nearby seating (`/pmsit`) is a **separate feature**, with known floor-clipping and backward-facing reports; it is not fixed by the menu placement change.
