@@ -18577,7 +18577,7 @@ function tv() {
       if (moveToSlot && destination === slot) return;
       const current = r[String(slot)];
       try {
-        const moved = await Ge.execute("emotes:moveQuickEmote", slot, moveToSlot ? destination : null);
+        const moved = await Ge.execute("emotes:moveQuickEmote", slot, moveToSlot ? destination : false);
         if (moved) t(state => ({
           ...state,
           ...(moveToSlot ? {[destination]: current} : {}),
