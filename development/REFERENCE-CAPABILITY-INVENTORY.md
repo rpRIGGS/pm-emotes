@@ -1,5 +1,20 @@
 # PM Emotes — reference capability inventory
 
+## Reference runtime and placement-engine trace — 2026-11-11
+
+**Original runtime inspected:** `[QB]/emotes/build/cl_main.js` in the pinned reference tree is a ~731 KB obfuscated JavaScript bundle. Its ordinary text does not expose `verticalOffset`, `forwardOffset`, `headingOffset` or readable `TaskStartScenarioAtPosition` calls. Therefore the reference's exact seat-coordinate transform **has not been established** by inspecting the configuration table alone. Do not present an inferred transform as copied/reference-correct. A reliable implementation will need a documented native transform hypothesis and representative FiveM tests for floor height and facing.
+
+**Existing PM placement engine traced:**
+- `StartNewPlacement(emoteName, options)` checks ped busy state and `LocalPlayer.state.canEmote`, creates a locally invisible-to-network cloned ped, then enters `PlacementState.PREVIEWING`.
+- `positionPreviewPed` raycasts against world, vehicles and props, allows camera-based placement and height/rotation adjustment, and starts the chosen emote on the preview ped.
+- Confirmed placement uses `walkPedToPlacementPosition`: player walks toward the target with a five-second timeout, aborts on movement or excessive distance, then sets position/rotation and calls `OnEmotePlay(emoteName)`. This is **not** a generic unrestricted teleport; keep its existing safety/anti-abuse constraints.
+- Existing `ROUTE_EMOTE` placement callback is restricted to `EmoteType.PROP_EMOTES`, while `StartNewPlacement` takes an emote name and does not itself enforce that catalog type. The active frontend has no placement action. The implementation must resolve the selected animation against the authoritative catalog and permissions, then offer placement only for eligible sitting/placed emotes; do not expose arbitrary browser-controlled names.
+- The preview-ped raycast applies a ped-height offset above the hit point. For sitting on desks/chairs this offset and the animation's root motion require a **separate in-game acceptance test**; NUI wiring alone will not prove placement accuracy.
+
+**Audit outcome:** source-level routing and placement internals are understood; the original chair runtime's obfuscation prevents claiming exact reference transform parity. The next code batch should implement the missing active-NUI placement action with permission checks, then reconcile seat transform as an independently testable change, not a blind replacement.
+
+---
+
 ## Original seating data verified directly — 2026-11-11
 
 Inspected the original public reference at `lumo073/emotes-nopixel-4.0`, pinned tree `86c4e998307800896b702d5baa60798f1ba13be1`, file `[QB]/emotes/sitchair.js`.
