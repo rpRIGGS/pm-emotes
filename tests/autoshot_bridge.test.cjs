@@ -6,6 +6,8 @@ const assert = require("node:assert/strict");
 const source = fs.readFileSync("client/NUI/nopixel/assets/pm-autoshot-bridge.js", "utf8");
 const events = {};
 const listeners = {};
+const dispatched = [];
+
 const element = {
   style: {}, attributes: {},
   setAttribute(key, value) { this.attributes[key] = value; },
@@ -17,7 +19,7 @@ const element = {
 };
 const window = {
   addEventListener(name, callback) { events[name] = callback; },
-  dispatchEvent(event) { events[event.type]?.(event); }
+  dispatchEvent(event) { dispatched.push(event); events[event.type]?.(event); }
 };
 const context = {
   document: {
@@ -42,6 +44,7 @@ vm.runInContext(source, context);
 setImmediate(() => {
   const bridge = window.PMAutoShotNoPixel;
   assert.equal(bridge.ready, true, "manifest should load");
+  assert.ok(dispatched.some(event => event.type === "pm-autoshot-manifest-ready"), "NUI must be notified when the optional manifest finishes loading");
   assert.equal(bridge.hasPreview({emoteType:"Emotes",value:"wave"}), true);
   assert.equal(bridge.hasPreview({emoteType:"Emotes",value:"unsafe"}), false);
   assert.equal(bridge.hasPreview({emoteType:"Emotes",value:"traversal"}), false);
@@ -49,6 +52,7 @@ setImmediate(() => {
   assert.equal(element.src, "../previews/wave.webp");
   assert.equal(element.style.display, "block");
   listeners.error();
+  assert.ok(dispatched.some(event => event.type === "pm-autoshot-preview-failed" && event.detail.key === "Emotes:wave"), "failed WebP must notify NUI to restore live preview");
   assert.equal(bridge.hasPreview({emoteType:"Emotes",value:"wave"}), false);
   assert.equal(element.style.display, "none");
   assert.equal(bridge.show({emoteType:"Emotes",value:"missing"}), false);
@@ -58,6 +62,7 @@ setImmediate(() => {
   events.message?.({data:{event:"emotes:closeUI"}});
   assert.equal(element.style.display, "none");
   assert.equal(element.getAttribute("src"), null);
+  assert.equal(bridge.show({emoteType:"Emotes",value:"wave"}), false, "failed preview must stay disabled for the session");
   console.log("PASS: PM AutoShot bridge manifest, path security, hover, error fallback, close cleanup");
   // The integration must remain optional when AutoShot has not been installed.
   const missingOverlay = {
