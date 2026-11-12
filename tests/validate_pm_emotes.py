@@ -133,8 +133,8 @@ check("preview props attach to the correct generation",
 check("NUI invalidates obsolete preview requests",
       "previewRequestToken" in bridge and "token ~= previewRequestToken" in bridge)
 check("invalid or restricted hover clears stale preview",
-      "if not item or not HasEmotePermission(item.value, item.emoteType) then\\n            -- A rejected hover" in bridge and
-      "PMCloseCharacterPreview()\\n            cb(false)" in bridge)
+      "if not item or not HasEmotePermission(item.value, item.emoteType) then\n            -- A rejected hover" in bridge and
+      "PMCloseCharacterPreview()\n            cb(false)" in bridge)
 check("quick-slot move preserves an occupied destination",
       "local displaced = destination ~= nil and npQuick[destination + 1] or false" in bridge and
       "npQuick[from] = displaced or false" in bridge)
