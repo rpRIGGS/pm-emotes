@@ -27,4 +27,4 @@ The current build is at the **install and live-test** handoff. Recent offline co
 
 ## Scope boundaries
 
-This document records a **testing handoff**, not a claim that the features above have passed. The upstream README remains preserved for attribution/reference. PM AutoShot has a separate development and validation track: see `development-reference/PM-AUTOSHOT-PREVIEWS.md`. Do not block PM Emotes core development or acceptance on bulk preview generation.
+This document records a **testing handoff**, not a claim that the features above have passed. The root README is left unchanged; PM-specific development status is maintained only under `development-reference/`. PM AutoShot has a separate development and validation track: see `development-reference/PM-AUTOSHOT-PREVIEWS.md`. Do not block PM Emotes core development or acceptance on bulk preview generation.
