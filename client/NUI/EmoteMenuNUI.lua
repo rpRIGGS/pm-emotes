@@ -579,11 +579,15 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         local requested = args[1]
         if not IsNuiFocused() or type(requested) ~= 'table'
             or type(requested.value) ~= 'string' then
+            PMCloseCharacterPreview()
             cb(false)
             return
         end
         local item = findNPItem(requested.value, requested.emoteType)
         if not item or not HasEmotePermission(item.value, item.emoteType) then
+            -- A rejected hover must not leave the previous emote's camera
+            -- and cloned ped visible while browsing a different tile.
+            PMCloseCharacterPreview()
             cb(false)
             return
         end
