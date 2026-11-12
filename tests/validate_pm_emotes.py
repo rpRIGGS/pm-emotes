@@ -137,6 +137,9 @@ check("menu close releases NUI keep-input mode",
 check("invalid or restricted hover clears stale preview",
       "if not item or not HasEmotePermission(item.value, item.emoteType) then\n            -- A rejected hover" in bridge and
       "PMCloseCharacterPreview()\n            cb(false)" in bridge)
+check("stale catalog sends cannot overwrite newer rebuilds",
+      "catalogBuildGeneration = catalogBuildGeneration + 1" in bridge and
+      "if generation ~= catalogBuildGeneration then return end" in bridge)
 check("quick-slot commands wait for catalog readiness",
       "if not waitForNPCatalog() then return end" in bridge)
 check("temporarily unavailable quick slots remain saved",
