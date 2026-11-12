@@ -251,11 +251,12 @@ function PMToggleNearbySeat()
         SimpleNotify('No supported chair within reach')
         return
     end
-    -- GTA scenario coordinates are world positions, not an offset below the
-    -- chair's origin. The imported negative Z offsets buried the player.
-    -- Use the chair's model bounds to estimate its seating surface instead.
-    local boundsMin, boundsMax = GetModelDimensions(GetEntityModel(chair))
-    local seatHeight = math.max(0.0, boundsMax.z - 0.45)
+    -- The reference verticalOffset is measured down from the model's top,
+    -- NOT down from the entity origin. Using it as an origin offset buried
+    -- the player; discarding it broke model-specific chair heights.
+    -- Keep the reference offset relative to the actual model bounds.
+    local _, boundsMax = GetModelDimensions(GetEntityModel(chair))
+    local seatHeight = math.max(0.0, boundsMax.z + config.z)
     local pos = GetOffsetFromEntityInWorldCoords(chair, config.x, config.y, seatHeight)
     -- Do not place the local player on top of another nearby seated player.
     for _, player in ipairs(GetActivePlayers()) do
@@ -269,7 +270,9 @@ function PMToggleNearbySeat()
             end
         end
     end
-    local heading = (GetEntityHeading(chair) + config.heading) % 360.0
+    -- Most chair props face opposite the scenario ped's forward direction.
+    -- Preserve each reference headingOffset as an adjustment to that base.
+    local heading = (GetEntityHeading(chair) + 180.0 + config.heading) % 360.0
     EmoteCancel(true)
     -- Allow an existing emote's exit transition to settle before seating.
     Wait(150)
