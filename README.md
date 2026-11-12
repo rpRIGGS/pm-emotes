@@ -1,17 +1,3 @@
-# PowerMoves RP — PM Emotes
-
-> **Development handoff (2026-11-12): server installation and live acceptance testing are next.** The repository has completed a series of offline audits and integration/documentation changes; that is not proof of successful FiveM testing. See [server test checklist](development-reference/SERVER-TEST-ACCEPTANCE.md) for the acceptance sequence and known risks.
->
-> **Known live-test concern:** the 213-model seating/placement system previously positioned the character partly through the floor or above some chairs. Treat seating offsets and exit behavior as unverified until retested on the current build. Do not mark this resolved based on offline review.
->
-> **Optional integration:** PM AutoShot preview assets are not required for PM Emotes to run. See [PM AutoShot previews](development-reference/PM-AUTOSHOT-PREVIEWS.md). Missing preview manifests/WebP assets must not break the NUI.
->
-> **Branding:** POWERMOVES in white, RP in PM Blue (`#0438ff`). The approved NUI design and behavior must be verified in the server; upstream screenshots and descriptions below are historical reference, not acceptance evidence for this fork.
-
----
-
-## Upstream RPEmotes reference
-
 <img width="1920" height="1080" alt="rpemotesrebornbanner" src="https://github.com/user-attachments/assets/a515b5ed-da1b-45d4-9a1d-b83399ba9d17" />
 
 Rpemotes-reborn is a community-driven FiveM emote menu allowing players to express themselves in roleplay with custom animations, countless facial expressions, walk styles, and props.
