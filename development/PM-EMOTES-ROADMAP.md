@@ -1,36 +1,26 @@
-# PM Emotes — implementation reference
+# PM Emotes — current implementation and completion plan (2026-11-11)
 
-## Scope
-Modernize the existing RPEmotes Reborn NUI for PowerMoves RP while retaining the existing emote engine and public exports. This is a QBCore-oriented fork. No external framework runtime or copied third-party compiled frontend is required.
+Branch: `development/powermoves-nui`. This document supersedes earlier plans for a temporary custom NUI shell. The active page is `client/NUI/nopixel/index.html`, using the NoPixel-style compiled UI with the RPEmotes Lua engine. Do not restart a branding redesign or substitute a temporary menu.
 
-## Branding
-- Primary accent: `#0438FF`
-- Secondary gray: placeholder until the official color is provided
-- Logo: temporary text treatment, replaced with the supplied transparent PowerMoves Roleplay PNG
-- The GitHub README banner is independent of the in-game NUI
+## Confirmed source implementation
+- POWERMOVES white / RP blue (`#0438ff`) branding is in place; the oversized PM placeholder is removed. No branding work is pending.
+- Animation catalogs, search, favorites, ten saved quick slots, emote execution, shared/group support, preview clone, and optional WebP bridge have source integrations. **Source integration is not verified FiveM behavior or complete reference parity.**
+- Quick-slot moves swap occupied slots; persisted slots survive temporarily missing packs or permissions; commands wait for catalog readiness.
+- Menu focus/preview cleanup and asynchronous catalog rebuild generation guards are implemented.
+- Both GitHub workflows passed on `a4dbe53f`. Later changes require their own checks.
 
-## Existing code to preserve
-- `client/Emote.lua` — animation execution and preview ped handling
-- `client/Placement.lua` — transparent ped placement, rotation and confirmation
-- `client/Favorites.lua` — persistent favorites
-- `client/GroupEmote.lua` and `client/Syncing.lua` — group/shared emotes
-- `client/Expressions.lua`, `client/Walk.lua`, `client/AnimationList.lua` — catalog and styles
-- `client/NUI/EmoteMenuNUI.lua` — established NUI callback contract
-- `client/NUI/js/*.js` — current navigation and message handling (replace only when equivalent behavior is verified)
+## Priority order — no feature work before reconciliation
+1. **Document and verify reference feature parity:** inventory the original NoPixel categories and interactions against the active compiled frontend, Lua RPC dispatcher and RPEmotes features. Identify gaps explicitly; do not infer parity from file presence.
+2. **Seating/placement reconciliation:** compare the original 213-model reference offsets and heading conventions against `client/PMSeating.lua`. User's actual FiveM tests: player partially below floor; after a correction, player faced backward. Mark **known failing**, not complete. Do not guess a generic seat-height/heading fix before comparison.
+3. **Menu-selected sitting emote placement:** verify that selecting a sitting emote in the active NUI starts the existing `client/Placement.lua` ghost placement workflow, allows position/rotation on chairs, desks and other surfaces, and correctly confirms/cancels. Existing placement Lua alone does not establish this feature.
+4. Reconcile other feature gaps found in step 1; validate end-to-end menu callbacks and gameplay paths.
+5. Audit manifest, packaged assets, dependencies and installation. Produce one versioned test ZIP, then run the server acceptance checklist. AutoShot-generated WebP files are optional and **not** a blocker.
 
-## Existing NUI callback contract
-`NUI_READY`, `INITIAL_DATA_LOADED`, `LOCALES_LOADED`, `CLOSE_MENU`, `SEARCH_BAR_FOCUS`, `CANCEL_EMOTE`, `ROUTE_EMOTE`, `FAVORITE_EMOTE`, `KEYBIND_EMOTE`, `PREVIEW_EMOTE`, `SEARCH_EMOTES`, `PLAY_SOUND_FRONTEND`, `GET_LOCALES`.
+## Completion criteria
+- Feature-parity matrix with evidence and explicit statuses.
+- All menu-to-gameplay transitions accounted for, including sit placement and shared/group interactions.
+- Both automated workflows green on the final SHA and a ZIP built from that SHA.
+- FiveM acceptance completed separately; CI cannot prove seating coordinates, orientation, animations or camera behavior.
 
-## Implementation sequence
-1. Create an independent PowerMoves UI theme and branded shell; retain existing callback contract.
-2. Rework navigation, categories, search, favorites, and keyboard/controller accessibility without removing existing menu functions.
-3. Verify existing preview ped behavior; add a dedicated preview camera/viewing region only if required, with reliable restoration of the gameplay camera.
-4. Keep existing ghost placement logic; make menu-to-placement transitions and cancellation consistent.
-5. Verify emotes, props, walkstyles, expressions, shared/group emotes, favorites persistence, preview, placement, and cleanup.
-6. Update README introduction and imagery without discarding the original feature descriptions, documentation, credits, or license.
-
-## Reference handling
-External NUI examples are behavioral/design research only. No runtime dependencies on their framework, SDK, or compiled JavaScript. Implement original PowerMoves styling and use native FiveM APIs and existing RPEmotes callbacks.
-
-## Testing
-Code review and static validation can be performed from GitHub. Final character rendering, placement, keybinds, and focus behavior require an in-game test on the user's local FiveM server.
+## Scope boundaries
+QBCore remains the framework; preserve RPEmotes exports and existing engine. No ox_inventory migration. PM AutoShot is a separate project: its WebP assets can be dropped into the documented preview path when available. Do not change this project to depend on PM AutoShot at runtime.
