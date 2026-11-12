@@ -655,6 +655,39 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
             RouteEmoteToFunction(item.value, item.emoteType, 1)
         end
         cb(true)
+    elseif event == 'emotes:place' then
+        local requested = args[1]
+        if not Config.PlacementEnabled or not IsNuiFocused()
+            or type(requested) ~= 'table' or type(requested.value) ~= 'string'
+            or not waitForNPCatalog() then
+            cb(false)
+            return
+        end
+        -- Browser payloads are untrusted. Resolve the emote and permission
+        -- from the authoritative catalog, never directly from a supplied name.
+        local item = findNPItem(requested.value, requested.emoteType)
+        local placeable = item and (
+            item.emoteType == EmoteType.PROP_EMOTES
+            or ((item.emoteType == EmoteType.EMOTES or item.emoteType == EmoteType.DANCES)
+                and item.value:lower():find('sit', 1, true) ~= nil)
+        )
+        if not placeable or not HasEmotePermission(item.value, item.emoteType) then
+            cb(false)
+            return
+        end
+        local ped = PlayerPedId()
+        if IsPedInAnyVehicle(ped, false) or IsPedDeadOrDying(ped, true)
+            or LocalPlayer.state.canEmote == false then
+            cb(false)
+            return
+        end
+        -- Release the scripted preview camera and NUI focus before starting
+        -- the placement raycast and ghost ped. This also invalidates hover RPCs.
+        previewRequestToken = previewRequestToken + 1
+        PMCloseCharacterPreview()
+        if IsNuiFocused() then ToggleNUIMenu() end
+        StartNewPlacement(item.value)
+        cb(true)
     elseif event == 'emotes:setFavorite' then
         local requested = args[1] or {}
         if type(requested) ~= 'table' then cb(false) return end
