@@ -23,7 +23,10 @@ The overlay uses the emote button's existing `data-emotetype` and
 `data-emoteid` values to resolve keys such as `Emotes:wave`. It never
 replaces PM Emotes animation playback.
 
-**Current limitation:** PM AutoShot only generates plain dictionary-animation
-previews. Props, scenarios, shared, and other specialized emotes are not yet
-supported by that capture pipeline. End-to-end testing on a FiveM server is
-required before treating the preview system as production-ready.
+## Integration status — 2026-11-11
+
+PM AutoShot implements ordinary dictionary-animation capture **and** a native PM Emotes playback path for supported prop/scenario entries. Those paths, animated WebP output and the NUI overlay have passed offline source/Node checks, **not** an end-to-end FiveM capture-and-display test. Shared, animal and other specialized entries are not yet fully supported.
+
+**PM Emotes development must not be blocked by PM AutoShot.** Finish its NUI, emote playback, placement, branding and gameplay features without waiting for previews. The overlay is optional and must continue to fail gracefully when a manifest or individual WebP is absent. Bulk preview generation is a separate follow-up operation after a successful one-emote capture and NUI smoke test.
+
+The canonical status and acceptance gates are maintained in `rpRIGGS/pm-autoshot/development-reference/DECISIONS-AND-STATUS.md`; the capture/deployment checklist is in that repository's `development-reference/PREVIEW-DEPLOYMENT.md`. Do not claim production readiness until actual FiveM validation is recorded.
