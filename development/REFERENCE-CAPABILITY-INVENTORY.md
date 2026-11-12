@@ -1,5 +1,19 @@
 # PM Emotes — reference capability inventory
 
+## Original seating data verified directly — 2026-11-11
+
+Inspected the original public reference at `lumo073/emotes-nopixel-4.0`, pinned tree `86c4e998307800896b702d5baa60798f1ba13be1`, file `[QB]/emotes/sitchair.js`.
+
+- The reference entries explicitly declare `prop`, `scenario`, `verticalOffset`, `forwardOffset`, `leftOffset`, and optional `headingOffset` / `scenarioExit`. They are **signed offsets**, not generic chair dimensions.
+- Example: `prop_picnictable_01` uses `verticalOffset: -0.5`, `forwardOffset: 0`, `leftOffset: 0`; `v_res_fa_chair01` uses `verticalOffset: -0.68`, `forwardOffset: 0.07`; `sf_prop_sf_chair_stool_08a_np` uses `headingOffset: -90`.
+- The PM Lua model table retains corresponding `z/y/x/heading` values, but the **active calculation ignores `config.z`**, replacing it with `math.max(0, boundsMax.z - 0.45)`. This explains why simply having the original data table did not preserve reference positioning.
+- **Do not infer that directly adding the negative reference Z to the world object origin is correct**: that produced a below-floor result in the user's test. The original runtime's transform and scenario origin convention must be traced before choosing the replacement formula.
+- Likewise `headingOffset` is a relative offset; correct use depends on the original entity-facing convention and scenario native. The backward-facing FiveM report remains unresolved.
+
+The original reference's `sitchair.js` is a **configuration table**, not itself the seating transform implementation. A final source-level seating fix needs the runtime consumer (compiled reference client) or a proven equivalent transform with in-game checks. No gameplay code changed in this audit.
+
+---
+
 ## Active frontend-to-Lua contract audit — 2026-11-11
 
 Static inspection of `client/NUI/nopixel/assets/index-80592477.js` found these **11 distinct `Ge.execute` names**: `emotes:clearPreview`, `emotes:preview`, `emotes:play`, `emotes:setFavorite`, `emotes:moveQuickEmote`, `emotes:setQuickEmote`, `emotes:close`, `emotes:getEmotes`, `emotes:getFavorites`, `emotes:getQuickEmotes`, and `__npx_sdk:sockets:init`.
