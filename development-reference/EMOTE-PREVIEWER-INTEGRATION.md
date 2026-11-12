@@ -2,7 +2,7 @@
 
 Recorded: 2026-11-12
 Source: PowerMoves Development — [EmotePreviewer](https://github.com/rpRIGGS/EmotePreviewer)
-Status: **Architectural requirements only; final integration deferred pending exporter format and manifest validation.**
+Status: **Approved replacement for PM AutoShot; final media integration deferred pending exporter format and manifest validation.**
 
 ## Responsibility boundary
 
@@ -27,9 +27,9 @@ Status: **Architectural requirements only; final integration deferred pending ex
 - Versioned persistent preview index is under development.
 - Windows rendering, media compatibility and final output structure remain unverified.
 
-## Existing PM Emotes preview code — compatibility note
+## Superseded architecture and cleanup
 
-The repository already contains optional PM AutoShot/WebP overlay integration, documented separately in [PM-AUTOSHOT-PREVIEWS.md](PM-AUTOSHOT-PREVIEWS.md). This is an **existing provisional path**, not evidence that EmotePreviewer's APNG/export manifest is compatible or approved. Preserve existing optional behavior while awaiting a verified exporter contract. Do not conflate the two tools or silently replace one with the other.
+The 2026-11-12 decision **abandons PM AutoShot**, rather than adding another optional exporter. The legacy `client/NUI/js/autoshot-previews.js`, its HTML script hook, the legacy preview asset declaration in `fxmanifest.lua`, and the old PM AutoShot development reference have been removed. No AutoShot WebP or manifest assumptions carry forward as requirements. Preserve the approved NoPixel-style NUI and all unrelated RPEmotes functionality, including **in-game emote preview and placement**. Do not add a replacement overlay or generation pipeline before the exporter contract is approved.
 
 ## Gate before final integration
 
