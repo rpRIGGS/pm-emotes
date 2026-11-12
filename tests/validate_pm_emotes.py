@@ -84,7 +84,7 @@ check("NoPixel drag-to-slot uses numeric RPC slot IDs",
       'const slot = /^quick:[0-9]$/.test(targetId)' in js and
       'Ge.execute("emotes:setQuickEmote", slot, _)' in js)
 check("quick slot moves are atomic and persisted once",
-      'Ge.execute("emotes:moveQuickEmote", slot, moveToSlot ? destination : null)' in js and
+      'Ge.execute("emotes:moveQuickEmote", slot, moveToSlot ? destination : false)' in js and
       "elseif event == 'emotes:moveQuickEmote' then" in bridge)
 check("quick slots use all ten slots", "for slot = 0, 9 do" in bridge)
 check("quick slots remain unbound by default",
