@@ -14,7 +14,7 @@ Branch: `development/powermoves-nui`. This is the controlling status checklist. 
 | Live preview | `PMPreview.lua`; hover RPC | Integrated; camera/props/interior checks pending |
 | Optional WebP | `pm-autoshot-bridge.js`; preview manifest path | Optional; **not a release blocker** |
 | Manual sit emote placement | `Placement.lua` exists, legacy `ROUTE_EMOTE` placement callback exists; active frontend lacks placement RPC | **Implemented in source on current branch**: PLACE button / right-click on eligible tiles invokes validated `emotes:place`; FiveM placement accuracy, confirm/cancel and focus acceptance pending |
-| Nearby 213-model seating | `PMSeating.lua`, `/pmsit`, `/pmstand` | **Known failing in user's FiveM tests:** below-floor placement, then backward facing; reference offsets/heading reconciliation required |
+| Nearby 213-model seating | `PMSeating.lua`, `/pmsit`, `/pmstand` | **Revised in source, awaiting FiveM regression:** model-top + reference vertical offset and chair heading + 180° + reference heading offset; prior below-floor/backward-facing failures remain open until tested |
 | Release CI | Both GitHub workflows green on `a4dbe53f` | Verified at that SHA; latest changes require green runs |
 | ZIP | Release workflow packages `pm-emotes-server-test.zip` in `pm-emotes-server-test` artifact | Packaging implemented; obtain final-SHA artifact before test |
 
@@ -36,3 +36,7 @@ Branch: `development/powermoves-nui`. This is the controlling status checklist. 
 ## Scope guardrails
 
 Keep QBCore, qb-inventory, RPEmotes engine and public exports. Do not substitute a temporary UI or reopen settled branding. PM AutoShot is separate and optional. Do not claim 100% reference parity, live FiveM acceptance or finished seating based solely on source inspection or green CI.
+
+## Automatic seating correction — 2026-11-12
+
+The seat-height and facing formulas were revised in `client/PMSeating.lua` while retaining all 213 model definitions, occupancy checks, exit commands and scenario lifecycle. These formulas are **engineering hypotheses grounded in reference configuration**, not a recovered transformation from the obfuscated original runtime. Static release tests check the formulas; the new `tests/SERVER_ACCEPTANCE.md` matrix requires representative chairs, rotated props and a second player. Do not mark seating passed before that in-game evidence.
