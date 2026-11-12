@@ -18581,7 +18581,7 @@ function tv() {
         if (moved) t(state => ({
           ...state,
           ...(moveToSlot ? {[destination]: current} : {}),
-          [slot]: null
+          [slot]: moveToSlot ? (state[String(destination)] ?? null) : null
         }));
       } catch (error) {
         console.error("[PowerMoves RP] Could not move quick slot", error);
