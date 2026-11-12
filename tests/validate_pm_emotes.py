@@ -157,6 +157,19 @@ check("seating has its own lifecycle", "onResourceStop" in seating)
 check("NUI focus release on stop",
       "SetNuiFocus(false, false)" in bridge and "onResourceStop" in bridge)
 
+check("NoPixel tile exposes visible manual placement action",
+      'placeButton.textContent = "PLACE"' in js and
+      'Ge.execute("emotes:place"' in js and
+      'm.appendChild(placeButton)' in js)
+check("manual placement cannot be triggered by untrusted arbitrary animation",
+      "elseif event == 'emotes:place' then" in bridge and
+      "local item = findNPItem(requested.value, requested.emoteType)" in bridge and
+      "HasEmotePermission(item.value, item.emoteType)" in bridge)
+check("placement releases preview and NUI before ghost raycast",
+      "previewRequestToken = previewRequestToken + 1\n        PMCloseCharacterPreview()" in bridge and
+      "StartNewPlacement(item.value)" in bridge)
+check("placement button styling present", ".pm-place-action" in css)
+
 for label, passed in checks:
     print(("PASS" if passed else "FAIL") + "  " + label)
 failed = [label for label, passed in checks if not passed]
