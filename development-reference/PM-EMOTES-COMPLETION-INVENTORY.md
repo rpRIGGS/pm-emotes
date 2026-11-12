@@ -13,7 +13,7 @@ Branch: `development/powermoves-nui`. This is the controlling status checklist. 
 | Synced / group | `Syncing.lua`, `GroupEmote.lua`, Lua routing | Existing engine; active UI behavior and two-player test pending |
 | Live preview | `PMPreview.lua`; hover RPC | Integrated; camera/props/interior checks pending |
 | Optional WebP | `pm-autoshot-bridge.js`; preview manifest path | Optional; **not a release blocker** |
-| Manual sit emote placement | `Placement.lua` exists, legacy `ROUTE_EMOTE` placement callback exists; active frontend lacks placement RPC | **Confirmed active-menu integration gap**; must expose sit-placement workflow |
+| Manual sit emote placement | `Placement.lua` exists, legacy `ROUTE_EMOTE` placement callback exists; active frontend lacks placement RPC | **Implemented in source on current branch**: PLACE button / right-click on eligible tiles invokes validated `emotes:place`; FiveM placement accuracy, confirm/cancel and focus acceptance pending |
 | Nearby 213-model seating | `PMSeating.lua`, `/pmsit`, `/pmstand` | **Known failing in user's FiveM tests:** below-floor placement, then backward facing; reference offsets/heading reconciliation required |
 | Release CI | Both GitHub workflows green on `a4dbe53f` | Verified at that SHA; latest changes require green runs |
 | ZIP | Release workflow packages `pm-emotes-server-test.zip` in `pm-emotes-server-test` artifact | Packaging implemented; obtain final-SHA artifact before test |
@@ -28,8 +28,8 @@ Branch: `development/powermoves-nui`. This is the controlling status checklist. 
 
 ## Next work in order
 
-1. **Finish reference reconciliation:** original seat-coordinate/heading transforms, placed-emote controls and other user-facing reference actions vs active NUI; record precise gaps.
-2. **Implement verified gaps in coherent batches:** active-menu sit placement and reference-correct seating behavior, plus any other confirmed missing actions.
+1. **Validate new active-menu placement:** test PLACE on sitting/placed tiles, camera/focus cleanup, ghost adjustment, confirm/cancel and surface alignment; audit remaining reference interactions.
+2. **Resolve automatic seating independently:** compare model-specific reference data with actual chair position and scenario heading; correct and test the floor-clipping/backward-facing failures.
 3. **Run integration, regression, manifest, package and CI audits** on the final SHA.
 4. **Deliver a complete test ZIP**, then conduct FiveM acceptance with user, including reported seating failures. Keep failed scenarios open until corrected.
 
