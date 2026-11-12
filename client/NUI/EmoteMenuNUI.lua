@@ -554,31 +554,29 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
         -- Catalog order can change when animation packs or categories change.
         -- Resolve saved slots by animation name, not a stale array index.
         local changed = false
+        local slots = {}
         for i = 1, 10 do
             local saved = npQuick[i]
-            if catalogReady and type(saved) == 'table' and saved.value then
+            local visible = false
+            if catalogReady and type(saved) == 'table' and type(saved.value) == 'string' then
                 local item = findNPItem(saved.value, saved.emoteType)
                 if item and HasEmotePermission(item.value, item.emoteType) then
+                    visible = {category = item.category, index = item.index, value = item.value, emoteType = item.emoteType}
                     if saved.category ~= item.category or saved.index ~= item.index or saved.emoteType ~= item.emoteType then
-                        npQuick[i] = {category = item.category, index = item.index, value = item.value, emoteType = item.emoteType}
+                        npQuick[i] = visible
                         changed = true
                     end
-                else
-                    npQuick[i] = false
-                    changed = true
                 end
+                -- Do not erase a saved assignment merely because an animation
+                -- pack is missing or permissions are temporarily restricted.
             elseif catalogReady and saved ~= false then
                 npQuick[i] = false
                 changed = true
             end
+            -- NoPixel uses 0..9; the persistent Lua array uses 1..10.
+            slots[tostring(i - 1)] = visible
         end
         if changed then SetResourceKvp(quickKvp, json.encode(npQuick)) end
-        -- NoPixel's drag-and-drop slots are numbered 0..9. Lua arrays are
-        -- 1..10, so returning npQuick directly offsets every displayed slot.
-        local slots = {}
-        for i = 1, 10 do
-            slots[tostring(i - 1)] = npQuick[i] or false
-        end
         cb(slots)
     elseif event == 'emotes:preview' then
         previewRequestToken = previewRequestToken + 1
