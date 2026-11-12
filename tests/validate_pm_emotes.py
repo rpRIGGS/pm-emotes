@@ -137,6 +137,9 @@ check("menu close releases NUI keep-input mode",
 check("invalid or restricted hover clears stale preview",
       "if not item or not HasEmotePermission(item.value, item.emoteType) then\n            -- A rejected hover" in bridge and
       "PMCloseCharacterPreview()\n            cb(false)" in bridge)
+check("temporarily unavailable quick slots remain saved",
+      "Do not erase a saved assignment merely because an animation" in bridge and
+      "slots[tostring(i - 1)] = visible" in bridge)
 check("quick-slot move preserves an occupied destination",
       "local displaced = destination ~= nil and npQuick[destination + 1] or false" in bridge and
       "npQuick[from] = displaced or false" in bridge)
