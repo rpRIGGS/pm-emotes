@@ -4,6 +4,18 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 const assert = require("node:assert/strict");
 const source = fs.readFileSync("client/NUI/nopixel/assets/pm-autoshot-bridge.js", "utf8");
+
+// Check the actual PowerMoves bundle still owns the optional bridge lifecycle.
+// This catches regressions where the bridge passes isolated tests but is no
+// longer connected to the interface that players actually open.
+const activeNui = fs.readFileSync("client/NUI/nopixel/index.html", "utf8");
+const activeBundle = fs.readFileSync("client/NUI/nopixel/assets/index-80592477.js", "utf8");
+assert.match(activeNui, /pm-autoshot-bridge\\.js/, "active NUI must load the AutoShot bridge");
+assert.match(activeBundle, /pm-autoshot-manifest-ready/, "active NUI must refresh selected preview when manifest arrives");
+assert.match(activeBundle, /pm-autoshot-preview-failed/, "active NUI must fall back after a failed WebP");
+assert.match(activeBundle, /PMAutoShotNoPixel\\?\\.hide\\(\\)/, "active NUI must hide WebP when closing");
+assert.match(activeBundle, /emotes:clearPreview/, "active NUI must clear the cloned-ped preview");
+
 const events = {};
 const listeners = {};
 const dispatched = [];
