@@ -1,52 +1,38 @@
-# PM Emotes — November 10 inventory reconciliation (updated November 11)
+# PM Emotes — controlling completion inventory (reconciled 2026-11-11)
 
-This is the **controlling completion checklist**, not a new feature roadmap.
-Branch: `development/powermoves-nui`. Keep PM AutoShot work inside the
-existing NoPixel NUI scope.
+Branch: `development/powermoves-nui`. This is the controlling status checklist. Detailed reference comparisons live in [capability inventory](../development/REFERENCE-CAPABILITY-INVENTORY.md); test procedures in [server acceptance](../tests/SERVER_ACCEPTANCE.md).
 
-## 1. Resource inventory — source inspected
+## Evidence and statuses
 
-| Area | Evidence | Status |
-| --- | --- | --- |
-| Active NoPixel NUI | `fxmanifest.lua` points to `client/NUI/nopixel/index.html`; compiled JS/CSS present | Integrated in source; visual parity not verified |
-| Branding | NoPixel page title and compiled UI include POWERMOVES RP and PM blue | Present; in-game visual check pending |
-| Emote catalog | `client/NUI/EmoteMenuNUI.lua` builds a shared catalog and exposes `emotes:getEmotes` | Integrated; completeness pending server test |
-| Search/categories | Compiled NoPixel UI includes category browsing; catalog maps emote types | Integrated; UX pending server test |
-| Favorites | `emotes:getFavorites` / `emotes:setFavorite`, stable animation type and permission checks | Integrated; persistence pending server test |
-| Quick slots | Ten persisted slots, `emotes:getQuickEmotes` / `emotes:setQuickEmote`; no default inventory number-key overrides | Integrated; in-game keybind test pending |
-| Animation playback | `emotes:play` routes through existing RPEmotes animation engine | Integrated; animation-by-animation test pending |
-| Synced/group | Existing shared request and group emote handlers retained | Integrated; two-player test pending |
-| Prop/placement | Existing placement and prop handlers retained | Integrated; in-game test pending |
-| Live character preview | `client/NUI/PMPreview.lua` clones local ped, creates camera, cleans up on close/stop | Integrated; interior/prop/concurrency tests pending |
-| PM AutoShot | Optional version 1 WebP manifest, active NoPixel bridge, live preview fallback | Integrated; capture installer and CEF test pending |
-| Seating | `client/PMSeating.lua` model-aware seating plus `/pmsit`, `/pmstand` | Integrated; 213-model coverage/runtime test pending |
-| Release validation | `tests/validate_pm_emotes.py`, GitHub Actions syntax checks and ZIP artifact workflow | Authored; successful run not yet confirmed |
-| Test ZIP | Workflow packages `pm-emotes-server-test.zip` | **Not yet confirmed built/downloadable** |
+| Area | Source evidence | Status / gate |
+|---|---|---|
+| Active NUI | `fxmanifest.lua` -> `client/NUI/nopixel/index.html`; compiled assets | Integrated; visual FiveM acceptance pending |
+| Branding | POWERMOVES white / RP blue `#0438ff` | Implemented; no redesign pending |
+| Catalog / search / dance packs | `EmoteMenuNUI.lua`; `PMDanceCatalog01..05.lua` | Integrated; reference feature coverage and in-game checks pending |
+| Favorites and quick slots | Ten active `emotes:*` RPC calls all matched by Lua branches; KVP quick slots | Integrated; persistence/gameplay checks pending |
+| Synced / group | `Syncing.lua`, `GroupEmote.lua`, Lua routing | Existing engine; active UI behavior and two-player test pending |
+| Live preview | `PMPreview.lua`; hover RPC | Integrated; camera/props/interior checks pending |
+| Optional WebP | `pm-autoshot-bridge.js`; preview manifest path | Optional; **not a release blocker** |
+| Manual sit emote placement | `Placement.lua` exists, legacy `ROUTE_EMOTE` placement callback exists; active frontend lacks placement RPC | **Confirmed active-menu integration gap**; must expose sit-placement workflow |
+| Nearby 213-model seating | `PMSeating.lua`, `/pmsit`, `/pmstand` | **Known failing in user's FiveM tests:** below-floor placement, then backward facing; reference offsets/heading reconciliation required |
+| Release CI | Both GitHub workflows green on `a4dbe53f` | Verified at that SHA; latest changes require green runs |
+| ZIP | Release workflow packages `pm-emotes-server-test.zip` in `pm-emotes-server-test` artifact | Packaging implemented; obtain final-SHA artifact before test |
 
-## 2. Completion order — no detours
+## Completed source-level audit
 
-1. **Close integration defects** across the active NoPixel frontend, Lua RPC,
-   preview lifecycle, catalog identity, and optional AutoShot assets.
-2. **Run the automated release gates** and fix actual failures. A source-only
-   review does not count as a successful CI run.
-3. **Build and obtain the complete resource ZIP**, with the actual manifest,
-   all bundled UI assets, and runtime files. Confirm the archive is accessible.
-4. **Test in FiveM** against `tests/SERVER_ACCEPTANCE.md`: F4, categories,
-   search, favorites, quick slots, animations, two-player sync, props,
-   seating, previews, close/reopen, resource restart, and F8 errors.
-5. **Mark complete only after those checks pass.** Keep test failures as
-   specific actionable items; do not silently claim runtime verification.
+1. Active frontend uses ten `emotes:*` RPC event names, all with matching `PM_NP_RPC` branches. **Name coverage is not behavioral parity.**
+2. Lua sends `emotes:open` / `emotes:closeUI`; the active frontend registers both.
+3. Legacy-only callbacks including `SIT_NEARBY` and `ROUTE_EMOTE` placement do **not** establish active-menu access.
+4. Compiled frontend contains an inherited `__npx_sdk:sockets:init` path; no PowerMoves SDK socket service is supplied. Check harmless fallback rather than introducing a new runtime dependency.
+5. Current nearby seating computes height from model dimensions and does not use the per-chair `config.z` values retained in its model table. Do not guess replacement offsets before comparing reference coordinate transforms.
 
-## 3. Release blockers (truthful status)
+## Next work in order
 
-- No confirmed passing GitHub Actions run/artifact in this review.
-- No completed in-server FiveM acceptance pass.
-- Visual fidelity to the requested NoPixel reference has not been verified
-  by an actual game screenshot.
-- PM AutoShot generated captures have not been deployed and observed in CEF.
+1. **Finish reference reconciliation:** original seat-coordinate/heading transforms, placed-emote controls and other user-facing reference actions vs active NUI; record precise gaps.
+2. **Implement verified gaps in coherent batches:** active-menu sit placement and reference-correct seating behavior, plus any other confirmed missing actions.
+3. **Run integration, regression, manifest, package and CI audits** on the final SHA.
+4. **Deliver a complete test ZIP**, then conduct FiveM acceptance with user, including reported seating failures. Keep failed scenarios open until corrected.
 
-## 4. Scope discipline
+## Scope guardrails
 
-No replacement temporary UI. No migration away from QBCore, qb-inventory,
-or the existing RPEmotes animation engine. No new unrelated feature work.
-Do not confuse a merged source change with a verified working resource.
+Keep QBCore, qb-inventory, RPEmotes engine and public exports. Do not substitute a temporary UI or reopen settled branding. PM AutoShot is separate and optional. Do not claim 100% reference parity, live FiveM acceptance or finished seating based solely on source inspection or green CI.
