@@ -13,3 +13,7 @@ html,body{font-family:Gilroy,Roboto,Arial,sans-serif} ._title_nwncl_10{font-fami
 ._emotes_1jigh_1 ._emote_1jigh_1 ._center_1jigh_74 *:not(svg):not(path),
 ._quick_16ksr_1 ._emote_16ksr_36{color:#fff!important;text-shadow:none!important;filter:none}
 ._emotes_1jigh_1 ._emote_1jigh_1 ._header_1jigh_38 ._command_1jigh_58{color:#0438ff!important;background:rgba(4,56,255,.15)!important;text-shadow:none!important}
+
+/* PowerMoves manual placement: compact action integrated into existing tiles. */
+.pm-place-action{position:absolute;bottom:5px;right:5px;z-index:15;padding:3px 7px;border:1px solid #0438ff;border-radius:4px;background:rgba(4,14,37,.94);color:#fff;font:700 10px Roboto,sans-serif;letter-spacing:.06em;cursor:pointer;opacity:.88;pointer-events:auto;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.pm-place-action:hover,.pm-place-action:focus-visible{background:#0438ff;color:#fff;opacity:1;outline:2px solid rgba(255,255,255,.6);outline-offset:1px}
