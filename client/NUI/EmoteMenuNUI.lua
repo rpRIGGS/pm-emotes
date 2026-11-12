@@ -701,13 +701,16 @@ RegisterNUICallback('PM_NP_RPC', function(data, cb)
             cb(true)
             return
         end
+        -- Preserve an occupied destination by swapping it into the source.
+        -- Otherwise dragging a slot over another silently deletes its emote.
+        local displaced = destination ~= nil and npQuick[destination + 1] or false
         if destination ~= nil then
             npQuick[destination + 1] = {
                 category = item.category, index = item.index,
                 value = item.value, emoteType = item.emoteType
             }
         end
-        npQuick[from] = false
+        npQuick[from] = displaced or false
         SetResourceKvp(quickKvp, json.encode(npQuick))
         cb(true)
     elseif event == 'emotes:setQuickEmote' then
