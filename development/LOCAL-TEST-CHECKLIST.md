@@ -1,31 +1,14 @@
-# PM Emotes — local FiveM smoke test
+# PM Emotes — FiveM acceptance notes (2026-11-11)
 
-Install the **development/powermoves-nui** branch as a complete resource, not only the modified files. Keep the upstream resource name and all original streamed assets. Do not run this fork alongside a second copy of RPEmotes.
+Active branch: `development/powermoves-nui`. For a packaged server test, use the **PM Emotes release validation** workflow artifact `pm-emotes-server-test`, which contains `pm-emotes-server-test.zip` with the top-level `pm-emotes/` resource folder. Do not use the older `pm-emotes-fivem` artifact instructions as the current deployment path. Keep all streamed assets; ensure only one RPEmotes provider is active.
 
-## Install the complete resource
+**Status:** source checks passed through `a4dbe53f`; no claim of full feature parity or in-game acceptance. See `tests/SERVER_ACCEPTANCE.md` for the full test sequence.
 
-1. Open **Actions → PM Emotes NUI static checks** in this repository, select the latest successful development run, and download the **pm-emotes-fivem** artifact.
-2. Extract the artifact, then extract its `pm-emotes-fivem.zip` file. Copy the contained **pm-emotes** directory into your development server's resources folder.
-3. Stop/remove any other running copy of RPEmotes. In `server.cfg`, use `ensure pm-emotes` after QBCore and other required dependencies. Keep all bundled `stream/` assets and the entire resource together.
-4. Restart the development server and open the menu using the existing RPEmotes menu command/keybind. Use F8 for the first client error, if one occurs.
+## Known user-reported failures — must reproduce and resolve
+- Automatic nearby seating (`/pmsit`): first test placed the player partly under furniture/floor; a later correction resulted in backward orientation. Current `client/PMSeating.lua` uses a model-dimension-derived Z height instead of the reference's per-model Z values. Do not mark the 213-model system working merely because models are registered.
+- Menu-selected sit emote placement: required to choose a sitting animation in the active NUI and place/rotate it onto a chair, desk or other surface. `client/Placement.lua` exists, but the active NoPixel menu-to-placement interaction still needs verification.
 
-The artifact is a **complete resource build**, not a patch or collection of commits. GitHub static checks cannot replace a live FiveM test.
+## Required acceptance
+Open/close/reopen F4; catalog search/categories; favorites persistence; ten quick-slot save/swap/clear/restart; default keybind collision avoidance; hover clone and prop/camera cleanup; emotes, dances, walks, expressions, shared/group interactions; automatic chair position and heading on representative models; menu-selected sitting placement confirm/cancel; resource stop while open.
 
-## In-game sequence
-1. Open the emote menu. Confirm the category rail, emote list, and transparent character-preview panel appear.
-2. Select a standard looping emote, then a prop emote. Check clone animation and attached props; ensure your actual player remains unchanged.
-3. Change emotes quickly and close/reopen the menu. Confirm no orphan clone, props, or scripted camera.
-4. Test search, favorites (including reopening), keybinds, walks, moods, emojis, and custom categories.
-5. Start placement from an emote's context menu. The scripted preview camera must end **before** ghost placement begins.
-6. Try shared/group emotes. Closing the menu must restore gameplay camera.
-7. Stop/restart the resource while the menu is open. Camera and clone must be cleaned up.
-8. Test keyboard and mouse navigation; the menu must not trap input after closing.
-
-## Known visual validation
-The GTA scripted camera renders behind the transparent NUI panel, not inside an HTML 3D canvas. Final camera framing, ped ground placement on sloped terrain, and streamed prop animations must be validated in FiveM. The preview camera currently shows a nearby local clone and changes the game camera while the menu is open; it does **not** teleport the player.
-
-## Temporary branding
-Replace the text treatment with the supplied transparent PowerMoves Roleplay logo later. The accent is `#0438FF`; `--pm-gray` is provisional.
-
-## Debugging
-Report the first F8 client error, if any, plus the action that caused it. If the menu opens but the clone is not visible, check camera composition and preview-ped creation first. No third-party preview runtime is required.
+Optional PM AutoShot WebP previews are not a prerequisite for this acceptance. The current bridge must degrade gracefully when those files are absent.
