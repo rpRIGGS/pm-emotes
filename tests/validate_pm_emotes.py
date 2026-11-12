@@ -132,6 +132,11 @@ check("preview props attach to the correct generation",
       "addProps(animOption, nil, ped, nil, true, requestVersion)" in emote_engine)
 check("NUI invalidates obsolete preview requests",
       "previewRequestToken" in bridge and "token ~= previewRequestToken" in bridge)
+check("quick-slot move preserves an occupied destination",
+      "local displaced = destination ~= nil and npQuick[destination + 1] or false" in bridge and
+      "npQuick[from] = displaced or false" in bridge)
+check("quick-slot NUI mirrors destination swap",
+      "[slot]: moveToSlot ? (state[String(destination)] ?? null) : null" in js)
 check("favorites retain animation type",
       "emoteType: e.item.emoteType" in js)
 
