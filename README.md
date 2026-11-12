@@ -1,3 +1,19 @@
+# PowerMoves RP — PM Emotes development status
+
+> **Active development branch:** `development/powermoves-nui` · **Status:** integrated NUI, feature-parity reconciliation and FiveM acceptance outstanding (2026-11-11).
+
+This fork retains the RPEmotes Reborn engine, exports, streamed props and upstream acknowledgments. The active in-game interface is the NoPixel-style PowerMoves RP NUI at `client/NUI/nopixel/index.html`; POWERMOVES is white and RP is PM Blue (`#0438ff`). The old temporary UI and placeholder branding are **not** the current target.
+
+**Implemented in source:** animation catalog and search, favorites, ten persistent drag/drop quick slots, shared/group routes, cloned-ped preview and optional PM AutoShot WebP image bridge. These are **not** a claim of complete NoPixel reference parity or in-game acceptance.
+
+**Known failing/unverified:** nearby furniture seating placed the player below the floor in one FiveM test and backward in another; the current 213-model table is not accepted as working. Menu-selected sitting emote placement onto chairs/desks/surfaces must also be verified through the active NUI and existing placement engine. See [implementation roadmap](development/PM-EMOTES-ROADMAP.md), [reference capability inventory](development/REFERENCE-CAPABILITY-INVENTORY.md), [local test notes](development/LOCAL-TEST-CHECKLIST.md) and [server acceptance](tests/SERVER_ACCEPTANCE.md).
+
+**Build:** use the `PM Emotes release validation` GitHub Actions workflow's `pm-emotes-server-test` artifact (ZIP includes `pm-emotes/`). Both workflows passed at `a4dbe53f`; check the final branch SHA before installation. PM AutoShot is a separate optional preview producer and does not block testing the emote resource.
+
+---
+
+## Upstream RPEmotes Reborn documentation
+
 <img width="1920" height="1080" alt="rpemotesrebornbanner" src="https://github.com/user-attachments/assets/a515b5ed-da1b-45d4-9a1d-b83399ba9d17" />
 
 Rpemotes-reborn is a community-driven FiveM emote menu allowing players to express themselves in roleplay with custom animations, countless facial expressions, walk styles, and props.
