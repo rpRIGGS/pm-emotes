@@ -39,6 +39,15 @@ for asset in ("index-80592477.js", "index-5495b930.css"):
 check("frontend contains substantive bundled JS", len(js) > 100000)
 check("frontend contains substantive bundled CSS", len(css) > 10000)
 check("frontend PowerMoves branding", "POWERMOVES" in js and "#0438ff" in js)
+check("PowerMoves title renders white name and blue RP",
+      'POWERMOVES <span style=\\\"color:#0438ff\\\">RP</span>' in js)
+check("PowerMoves title has no temporary PM placeholder",
+      "PM PLACEHOLDER" not in js and "PM PLACEHOLDER" not in html)
+check("PowerMoves blue replaces old title highlight",
+      "._title_nwncl_10 span{color:#0438ff!important" in css)
+check("PowerMoves cards use white labels and blue command tags",
+      "._emotes_1jigh_1 ._emote_1jigh_1 ._center_1jigh_74" in css and
+      "._command_1jigh_58{color:#0438ff!important" in css)
 check("NUI transparent root", "background: transparent" in html)
 check("NoPixel loads AutoShot integration", "pm-autoshot-bridge.js" in html)
 check("FiveM registers AutoShot manifest and WebP assets",
