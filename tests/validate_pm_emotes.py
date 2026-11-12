@@ -170,6 +170,15 @@ check("placement releases preview and NUI before ghost raycast",
       "StartNewPlacement(item.value)" in bridge)
 check("placement button styling present", ".pm-place-action" in css)
 
+check("seating applies reference model-specific vertical offset to bounds",
+      "boundsMax.z + config.z" in seating and
+      "math.max(0.0, boundsMax.z + config.z)" in seating)
+check("seating applies 180-degree base facing plus per-model heading",
+      "GetEntityHeading(chair) + 180.0 + config.heading" in seating)
+check("seating preserves occupancy and safe exit",
+      "This seat is occupied" in seating and
+      "RegisterCommand('pmstand', stand, false)" in seating)
+
 for label, passed in checks:
     print(("PASS" if passed else "FAIL") + "  " + label)
 failed = [label for label, passed in checks if not passed]
