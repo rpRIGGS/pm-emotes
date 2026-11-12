@@ -133,7 +133,7 @@ check("preview props attach to the correct generation",
 check("NUI invalidates obsolete preview requests",
       "previewRequestToken" in bridge and "token ~= previewRequestToken" in bridge)
 check("menu close releases NUI keep-input mode",
-      "PMCloseCharacterPreview()\\n        SetNuiFocusKeepInput(false)\\n        SetNuiFocus(false, false)" in bridge)
+      "PMCloseCharacterPreview()\n        SetNuiFocusKeepInput(false)\n        SetNuiFocus(false, false)" in bridge)
 check("invalid or restricted hover clears stale preview",
       "if not item or not HasEmotePermission(item.value, item.emoteType) then\n            -- A rejected hover" in bridge and
       "PMCloseCharacterPreview()\n            cb(false)" in bridge)
