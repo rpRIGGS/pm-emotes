@@ -22,7 +22,11 @@
                 <span class="brand-divider" aria-hidden="true"></span>
                 <span class="brand-copy"><span class="brand-name">POWER<span class="brand-word">MOVES</span><span class="brand-rp">RP</span></span><span class="brand-subtitle">EMOTES</span></span>
             </div>
-            <div class="close-hint"><kbd>ESC</kbd><span data-locale="btn_close">Close</span></div>
+            <div class="header-controls">
+                <button id="compact-toggle" class="header-control" type="button" title="Toggle compact menu" aria-label="Toggle compact menu">▣</button>
+                <button id="reset-menu-settings" class="header-control" type="button" title="Reset menu layout" aria-label="Reset menu layout">↺</button>
+                <div class="close-hint"><kbd>ESC</kbd><span data-locale="btn_close">Close</span></div>
+            </div>
         </header>
 
         <main class="menu-container" tabindex="-1">
@@ -42,6 +46,12 @@
                         <button id="moods-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="moods-menu"><span aria-hidden="true">☻</span><span class="nav-label">Expressions</span></button>
                     </li>
                     <li class="sidebar-button-container">
+                        <button id="sittinglaying-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="sittinglaying-menu"><span aria-hidden="true">🪑</span><span class="nav-label">Sitting / Laying</span></button>
+                    </li>
+                    <li class="sidebar-button-container">
+                        <button id="scenarios-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="scenarios-menu"><span aria-hidden="true">▤</span><span class="nav-label">Scenarios</span></button>
+                    </li>
+                    <li class="sidebar-button-container">
                         <button id="walkstyles-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="walkstyles-menu"><span aria-hidden="true">♟</span><span class="nav-label" data-locale="walkingstyles">Walk Styles</span></button>
                     </li>
                     <li class="sidebar-button-container">
@@ -57,6 +67,7 @@
             <section class="content-container" aria-label="Emote list">
                 <div class="content-toolbar">
                     <div class="menu-heading"><h1 id="active-menu-title">All Emotes</h1><span id="emote-count" class="emote-count"></span></div>
+                    <select id="compact-category-select" class="compact-category-select" aria-label="Emote category"></select>
                     <div class="list-tools">
                         <form class="search-container btn-list">
                             <span class="search-icon" aria-hidden="true">⌕</span>
@@ -87,6 +98,8 @@
                     <button class="btn btn-emote btn-style-reset" data-emoteid="_reset" data-emotetype="_null" data-locale="normalreset"></button>
                     <button class="btn btn-emote" data-emoteid="emote1">Emote 1</button>
                 </article>
+                <article class="menu sittinglaying-menu doublecolumn btn-list"></article>
+                <article class="menu scenarios-menu doublecolumn btn-list"></article>
                 <article class="menu emojis-menu triplecolumn btn-list">
                     <button class="btn btn-emoji" data-emoji="emote1">😀</button>
                 </article>
@@ -109,5 +122,25 @@
             <div class="control-hint"><kbd>ESC</kbd><span>Cancel / Back</span></div>
         </footer>
     </div>
+    <section id="positioning-overlay" class="positioning-overlay" hidden aria-label="Adjust emote position">
+        <div id="position-gizmo" class="position-gizmo" aria-label="Drag an axis to adjust the emote">
+            <svg width="250" height="250" viewBox="-125 -125 250 250" aria-hidden="true">
+                <g class="gizmo-rotation" data-gizmo-axis="rotZ"><circle cx="0" cy="0" r="80" fill="none" stroke="#00bcd4" stroke-width="6"/><circle cx="80" cy="0" r="8" fill="#00bcd4"/></g>
+                <g class="gizmo-axis" data-gizmo-axis="x"><line x1="0" y1="0" x2="100" y2="0" stroke="#f44336" stroke-width="6"/><polygon points="112,0 94,-9 94,9" fill="#f44336"/></g>
+                <g class="gizmo-axis" data-gizmo-axis="y" transform="rotate(-45)"><line x1="0" y1="0" x2="0" y2="-100" stroke="#2196f3" stroke-width="6"/><polygon points="0,-112 -9,-94 9,-94" fill="#2196f3"/></g>
+                <g class="gizmo-axis" data-gizmo-axis="z"><line x1="0" y1="0" x2="0" y2="-100" stroke="#4caf50" stroke-width="6"/><polygon points="0,-112 -9,-94 9,-94" fill="#4caf50"/></g>
+                <circle cx="0" cy="0" r="6" fill="#f1f5f9"/>
+            </svg>
+        </div>
+        <div class="positioning-panel">
+            <div class="positioning-title"><div><span class="eyebrow">POWER MOVES RP</span><h2>Adjust Emote Position</h2></div><kbd>ESC</kbd></div>
+            <p class="positioning-description">Drag the gizmo axes or fine-tune the controls. Save to keep this position for the current session; cancel restores the starting position.</p>
+            <label class="position-slider"><span>Left / Right <output id="position-x-value">0.00</output></span><input id="position-x" type="range" min="-2.5" max="2.5" step="0.01" value="0"></label>
+            <label class="position-slider"><span>Forward / Back <output id="position-y-value">0.00</output></span><input id="position-y" type="range" min="-2.5" max="2.5" step="0.01" value="0"></label>
+            <label class="position-slider"><span>Height <output id="position-z-value">0.00</output></span><input id="position-z" type="range" min="0" max="2.5" step="0.01" value="0"></label>
+            <label class="position-slider"><span>Rotation <output id="position-rot-value">0°</output></span><input id="position-rot" type="range" min="-180" max="180" step="1" value="0"></label>
+            <div class="positioning-actions"><button id="position-cancel" class="preview-action secondary" type="button">Cancel</button><button id="position-save" class="preview-action primary" type="button">Save Position</button></div>
+        </div>
+    </section>
 </body>
 </html>

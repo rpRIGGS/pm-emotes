@@ -283,6 +283,27 @@ RegisterNetEvent("rpemotes:server:syncHeading", function(heading)
     state:set("emoteHeading", heading, true)
 end)
 
+RegisterNetEvent("rpemotes:server:syncPosition", function(requestedCoords, heading)
+    local serverId = source
+    local ped = GetPlayerPed(serverId)
+    if not ped or ped == 0 or not DoesEntityExist(ped) then return end
+    if type(requestedCoords) ~= "table" then return end
+    local x, y, z = tonumber(requestedCoords.x), tonumber(requestedCoords.y), tonumber(requestedCoords.z)
+    if not x or not y or not z or x ~= x or y ~= y or z ~= z or math.abs(x) > 10000 or math.abs(y) > 10000 or math.abs(z) > 2000 then return end
+    local coords = vector3(x, y, z)
+    if #(GetEntityCoords(ped) - coords) > 5.0 then return end
+    if type(heading) ~= "number" or heading ~= heading or heading == math.huge or heading == -math.huge then
+        heading = GetEntityHeading(ped)
+    end
+    heading = heading % 360
+    Player(serverId).state:set("emoteHeading", heading, true)
+    TriggerClientEvent("rpemotes:client:updatePlayerPosition", -1, serverId, {
+        x = coords.x,
+        y = coords.y,
+        z = coords.z,
+    }, heading)
+end)
+
 local function initPlayerState(playerId)
     local state = Player(playerId).state
     state:set("canEmote", true, true)

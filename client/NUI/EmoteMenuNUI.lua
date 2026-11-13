@@ -1,6 +1,27 @@
 local nuiReady = false
 local initialDataLoaded = false
 local localesLoaded = false
+local positioningState = nil
+
+local function closeEmotePositioning(save, restoreMouse)
+    if not positioningState then return false end
+    local ped = PlayerPedId()
+    if not save and DoesEntityExist(ped) then
+        SetEntityCoordsNoOffset(ped, positioningState.coords.x, positioningState.coords.y, positioningState.coords.z, false, false, false)
+        SetEntityHeading(ped, positioningState.heading)
+    end
+    if DoesEntityExist(ped) then
+        local coords = GetEntityCoords(ped)
+        TriggerServerEvent("rpemotes:server:syncPosition", {x = coords.x, y = coords.y, z = coords.z}, GetEntityHeading(ped))
+    end
+    FreezeEntityPosition(ped, false)
+    positioningState = nil
+    SendNUIMessage({type = "POSITIONING_MODE", value = false})
+    SetNuiFocus(true, restoreMouse == true)
+    SetNuiFocusKeepInput(true)
+    SendNUIMessage({type = "TOGGLE_CURSOR_INPUT", value = restoreMouse == true})
+    return true
+end
 
 
 -- The NUI logic is designed to run *on top* of the existing NativeUI logic, since that menu already does all the data handling that we need.
@@ -14,6 +35,8 @@ local dataForMenu = {
     -- ["Custom Category Name"] = {} -- Automagically added by the builder.
     ["walkstyles"] = {},
     ["moods"] = {},
+    ["scenarios"] = {},
+    ["sittinglaying"] = {},
     ["emojis"] = {},
     ["favorites"] = {}
 }
@@ -153,6 +176,105 @@ RegisterNUICallback('ROUTE_EMOTE', function(data, cb)
     cb({["ok"] = true})
 end)
 
+RegisterNUICallback("START_EMOTE_POSITIONING", function(data, cb)
+    if positioningState or type(data.emoteName) ~= "string" or type(data.emoteType) ~= "string" then
+        cb({ok = false})
+        return
+    end
+    local emoteData = data.emoteType == EmoteType.SHARED and SharedEmoteData[data.emoteName] or EmoteData[data.emoteName]
+    local options = emoteData and emoteData.AnimationOptions
+    local supported = options and (options.onFootFlag == AnimFlag.LOOP or options.onFootFlag == AnimFlag.STUCK or options.EmoteLoop == true or options.EmoteStuck == true)
+    if not supported or data.emoteType == EmoteType.SHARED or data.emoteType == EmoteType.WALKS or data.emoteType == EmoteType.EXPRESSIONS or IsPedInAnyVehicle(PlayerPedId(), false) then
+        cb({ok = false})
+        return
+    end
+
+    if LocalPlayer.state.currentEmote ~= data.emoteName then
+        EmoteMenuStart(data.emoteName, 1, data.emoteType)
+        local timeout = GetGameTimer() + 2500
+        while LocalPlayer.state.currentEmote ~= data.emoteName and GetGameTimer() < timeout do Wait(25) end
+    end
+    if LocalPlayer.state.currentEmote ~= data.emoteName then
+        cb({ok = false})
+        return
+    end
+
+    local ped = PlayerPedId()
+    positioningState = {name = data.emoteName, coords = GetEntityCoords(ped), heading = GetEntityHeading(ped)}
+    FreezeEntityPosition(ped, true)
+    SetNuiFocus(true, true)
+    SetNuiFocusKeepInput(false)
+    SendNUIMessage({type = "POSITIONING_MODE", value = true, values = {x = 0, y = 0, z = 0, rotZ = 0}})
+    SendNUIMessage({type = "TOGGLE_CURSOR_INPUT", value = true})
+    cb({ok = true})
+end)
+
+RegisterNUICallback("UPDATE_EMOTE_POSITION", function(data, cb)
+    if not positioningState then cb({ok = false}); return end
+    local function bounded(value, minimum, maximum)
+        value = tonumber(value)
+        if not value or value ~= value or value == math.huge or value == -math.huge then return nil end
+        return math.max(minimum, math.min(maximum, value))
+    end
+    local x = bounded(data.x, -2.5, 2.5)
+    local y = bounded(data.y, -2.5, 2.5)
+    local z = bounded(data.z, 0, 2.5)
+    local rotZ = bounded(data.rotZ, -360, 360)
+    if not x or not y or not z or not rotZ then cb({ok = false}); return end
+
+    local ped = PlayerPedId()
+    local headingRadians = math.rad(positioningState.heading)
+    local rightX, rightY = math.cos(headingRadians), math.sin(headingRadians)
+    local forwardX, forwardY = -math.sin(headingRadians), math.cos(headingRadians)
+    local target = positioningState.coords + vector3(rightX * x + forwardX * y, rightY * x + forwardY * y, z)
+    SetEntityCoordsNoOffset(ped, target.x, target.y, target.z, false, false, false)
+    SetEntityHeading(ped, (positioningState.heading + rotZ + 360) % 360)
+    cb({ok = true})
+end)
+
+RegisterNUICallback("FINISH_EMOTE_POSITIONING", function(data, cb)
+    cb({ok = closeEmotePositioning(data.save == true, data.restoreMouse == true)})
+end)
+
+RegisterNetEvent("rpemotes:client:updatePlayerPosition", function(serverId, coords, heading)
+    if serverId == GetPlayerServerId(PlayerId()) or type(coords) ~= "table" then return end
+    local player = GetPlayerFromServerId(serverId)
+    if player == -1 or not NetworkIsPlayerActive(player) then return end
+    local ped = GetPlayerPed(player)
+    if not DoesEntityExist(ped) then return end
+    SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, false, false, false)
+    SetEntityHeading(ped, heading)
+end)
+
+CreateThread(function()
+    while true do
+        if positioningState then
+            if LocalPlayer.state.currentEmote ~= positioningState.name then
+                closeEmotePositioning(false)
+                SetNuiFocus(false, false)
+                SetNuiFocusKeepInput(false)
+            else
+                local ped = PlayerPedId()
+                local bone = GetPedBoneIndex(ped, 31036)
+                local point = GetPedBoneCoords(ped, bone)
+                local onScreen, screenX, screenY = GetScreenCoordFromWorldCoord(point.x, point.y, point.z)
+                local camDistance = #(GetGameplayCamCoord() - point)
+                SendNUIMessage({type = "POSITIONING_SCREEN_POINT", onScreen = onScreen, screenX = screenX, screenY = screenY, camDist = camDistance})
+            end
+            Wait(75)
+        else
+            Wait(700)
+        end
+    end
+end)
+
+AddEventHandler("onResourceStop", function(resourceName)
+    if resourceName == GetCurrentResourceName() and positioningState then
+        FreezeEntityPosition(PlayerPedId(), false)
+        positioningState = nil
+    end
+end)
+
 RegisterNUICallback("FAVORITE_EMOTE", function(data, cb)
     if data.emoteName and data.emoteType and data.emoteLabel then
         local emoteData = {
@@ -256,6 +378,10 @@ function AddEmoteToNUIQueue(data)
     local tbl = dataForMenu[NUIEmoteCategories[data.categoryName] and NUIEmoteCategories[data.categoryName].id] or dataForMenu[NUIEmoteType[data.emoteType]]
     if tbl ~= nil then
         table.insert(tbl, data)
+    end
+    if data.emoteType == EmoteType.EMOTES then
+        if data.isScenario then table.insert(dataForMenu.scenarios, data) end
+        if data.isSittingOrLaying then table.insert(dataForMenu.sittinglaying, data) end
     end
 end
 

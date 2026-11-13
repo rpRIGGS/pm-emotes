@@ -1,6 +1,7 @@
 "use strict";
 import { Locale } from "./classes.js";
 import { CONFIG, EMOTE_TYPE_ICONS } from "./main.js";
+import { createEmoteCardMarkup } from "./emote-card.js";
 
 export function ClearHTMLContainer(elementClass) {
     const ELEMENT = document.querySelector(elementClass);
@@ -65,11 +66,13 @@ export function HandleEmoteFilter(_search, menu = ".grid") {
     const gridElements = CONTENT_CONTAINER.querySelectorAll(menu);
     
     gridElements.forEach((grid) => {
-        const buttons = grid.querySelectorAll("[data-emoteid]");
-        buttons.forEach((button) => {
-            const emoteId = button.dataset.emoteid.toLowerCase()+button.textContent.toLowerCase();
-            const card = button.closest(".emote-card");
-            (card || button).classList.toggle("hidden", !emoteId.includes(searchValue));
+        const items = [
+            ...grid.querySelectorAll(".emote-card"),
+            ...[...grid.querySelectorAll(".btn-emote:not(.btn-style-reset), .btn-emoji")].filter((button) => !button.closest(".emote-card")),
+        ];
+        items.forEach((item) => {
+            const emoteId = `${item.dataset.emoteid || ""}${item.dataset.label || item.textContent || ""}`.toLowerCase();
+            item.classList.toggle("hidden", !emoteId.includes(searchValue));
         })
     })
     window.PMUpdateEmoteCount?.();
@@ -86,9 +89,12 @@ export async function HandleEmoteSearch(_search) {
     
     ClearHTMLContainer(".search-menu");
     emotes.forEach((emote) => {
-        container.insertAdjacentHTML("beforeend", `
-            <button class="btn btn-emote" data-emoteid="${emote.name}" data-emotetype="${emote.data.emoteType}" data-label="${emote.data.label}">${emote.data.emoteType !== 'Emojis' ? EMOTE_TYPE_ICONS[emote.data.emoteType]+" " : ""}${emote.data.label}</button>
-            `)
+        container.insertAdjacentHTML("beforeend", createEmoteCardMarkup({
+            name: emote.name,
+            emoteType: emote.data.emoteType || emote.table,
+            label: emote.data.label || emote.name,
+            canPosition: emote.canPosition === true,
+        }, EMOTE_TYPE_ICONS, {placementEnabled: CONFIG?.PlacementEnabled !== false}));
     })
     window.PMUpdateEmoteCount?.(container);
 

@@ -17,6 +17,9 @@ Starting commit: `e3f6df0f15f7fe3b94b806a6da31490dbc2a3d40` (`e3f6df0`)
 - Corrected a misleading source comment: the consumer is active in `main.js`; FiveM CEF playback acceptance is still pending.
 - Added regression coverage for exporter-shaped metadata, changing selection while image callbacks are outstanding, and out-of-order manifest responses.
 - Corrected placement destination Z to match the lowered position displayed by the translucent preview ped. This fixes the source-level preview/commit mismatch; it does not establish chair alignment.
+- Compared the NUI against the supplied NoPixel-style reference script, then filled source-level gaps: direct card play/favorite/place actions, compact draggable mode, resettable layout, per-category scroll restoration, dedicated scenario and sitting/laying categories, and a bounded position editor for eligible active emotes. The position editor routes through RPEmotes, restores the transform on cancel, retains it on save, and relays the final transform to other clients through a server-validated event.
+- Kept RPEmotes' existing Lua catalog, playback/cancel, favorites, keybinds, search, group-emote, preview-ped, and placement implementations. The PM animated selection panel intentionally replaces per-card WebP animation previews from the reference with EmotePreviewer's selected-only APNG export.
+- The position editor has a screen-positioned gizmo plus bounded sliders. It does not include the reference's right-mouse camera-control gesture; both adjustment and multiplayer replication still need in-game acceptance.
 
 ## Producer contract review
 
@@ -30,11 +33,11 @@ This repository does not contain a chair-model-indexed 213-model alignment table
 
 ## Verification
 
-`node --test tests/*.test.mjs` in this repository: **18 passed, 0 failed** (includes the RPEmotes/NUI callback-contract checks).
+`node --test tests/*.test.mjs` in this repository: **22 passed, 0 failed** (includes card action, callback registration, and RPEmotes/NUI contract checks).
 
 ES-module syntax checks for the modified NUI JavaScript files and `git diff --check` also passed. These are source-level validations; they do not execute FiveM APIs or CEF rendering.
 
-Coverage includes supported/unsupported manifests, safe paths, duplicate and ambiguous identity handling, missing manifest/media fallback, selected-only lifecycle, stale image callbacks, out-of-order manifest loads, and an exporter-shaped manifest with extra metadata.
+Coverage includes card markup and escaping, direct action availability, registered RPEmotes callbacks, supported/unsupported manifests, safe paths, duplicate and ambiguous identity handling, missing manifest/media fallback, selected-only lifecycle, stale image callbacks, out-of-order manifest loads, and an exporter-shaped manifest with extra metadata.
 
 Static packaging review: `fxmanifest.lua` declares `client/NUI/previews/manifest.json` and `client/NUI/previews/**/*.png`; no preview package is bundled, preserving the optional fallback path.
 
@@ -42,4 +45,4 @@ No live FiveM server or FiveM CEF runtime was available for this audit. Therefor
 
 ## Exact remaining server steps
 
-Follow [SERVER-TEST-ACCEPTANCE.md](SERVER-TEST-ACCEPTANCE.md): deploy this commit to the development server; inspect server, F8 and NUI consoles; verify the approved NUI and standard RPEmotes flows; test seating on multiple chair models/heights for clipping, floating, repeat use, rotation and cancel/get-up; then install one real EmotePreviewer export and verify hover/focus display, APNG animation, missing-media fallback, navigation/close cleanup, and ordinary emote playback. Record the server build SHA, chair/prop names, reproduction details and logs before updating the acceptance status.
+Follow [SERVER-TEST-ACCEPTANCE.md](SERVER-TEST-ACCEPTANCE.md): deploy this commit to the development server; inspect server, F8 and NUI consoles; test all NoPixel-reference functions mapped in [NO-PIXEL-NUI-PARITY.md](NO-PIXEL-NUI-PARITY.md) alongside the retained RPEmotes flows; test positioning and multiplayer replication; test seating on multiple chair models/heights for clipping, floating, repeat use, rotation and cancel/get-up; then install a real EmotePreviewer export and verify selected APNG playback, missing-media fallback, navigation/close cleanup, and ordinary emote playback. Record the server build SHA, chair/prop names, reproduction details and logs before updating acceptance status.

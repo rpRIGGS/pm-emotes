@@ -11,11 +11,11 @@ test("PowerMoves NUI keeps the RPEmotes menu structure and branded preview contr
 
   for (const selector of [
     "emotes-menu", "search-menu", "favorites-menu", "walkstyles-menu",
-    "moods-menu", "emojis-menu", "keybinds-menu", "menu-anchor",
+    "moods-menu", "emojis-menu", "keybinds-menu", "sittinglaying-menu", "scenarios-menu", "menu-anchor",
     "sidebar-button-anchor", "search-container", "keybinds-list",
   ]) assert.match(html, new RegExp(`class="[^"]*\\b${selector}\\b`), `${selector} menu hook remains in markup`);
 
-  for (const id of ["emotes-menu-btn", "search-menu-btn", "favorites-menu-btn", "walkstyles-menu-btn", "moods-menu-btn", "keybinds-menu-btn", "emojis-menu-btn", "cancel-emote-btn", "preview-use-emote", "preview-place-emote", "preview-favorite"]) {
+  for (const id of ["emotes-menu-btn", "search-menu-btn", "favorites-menu-btn", "walkstyles-menu-btn", "moods-menu-btn", "sittinglaying-menu-btn", "scenarios-menu-btn", "keybinds-menu-btn", "emojis-menu-btn", "cancel-emote-btn", "preview-use-emote", "preview-place-emote", "preview-favorite", "compact-toggle", "reset-menu-settings", "compact-category-select"]) {
     assert.match(html, new RegExp(`id="${id}"`), `${id} control remains in markup`);
   }
 
@@ -24,15 +24,26 @@ test("PowerMoves NUI keeps the RPEmotes menu structure and branded preview contr
   assert.match(main, /data-action="openMenu"/);
   assert.match(main, /<span class="nav-label">\$\{key\}<\/span>/, "Lua-provided custom category names render in the sidebar");
   assert.match(main, /MENUS = CONTENT_CONTAINER\.querySelectorAll\("\.menu"\)/, "new category menus join the same RPEmotes event handling");
+  assert.match(main, /cardAction\.dataset\.cardAction === "favorite"/, "emote tiles have a direct favorite action");
+  assert.match(main, /cardAction\.dataset\.cardAction === "place"/, "emote tiles have a direct placement action");
+  assert.match(main, /cardAction\.dataset\.cardAction === "play"/, "emote tiles have a direct play action");
+  assert.match(main, /cardAction\.dataset\.cardAction === "position"/, "eligible emote tiles open the RPEmotes position adjustment");
+  assert.match(main, /UPDATE_EMOTE_POSITION/);
+  assert.match(main, /FINISH_EMOTE_POSITIONING/);
+  assert.match(main, /POSITIONING_SCREEN_POINT/);
+  assert.match(main, /pmEmotesCompact/, "compact mode persists across menu opens");
+  assert.match(main, /pmEmotesWindowOffset/, "compact window position persists");
+  assert.match(main, /pmEmotesScrollPositions/, "category scroll positions persist and restore");
   assert.doesNotMatch(html + main, /Hiii/);
 });
 
 test("NUI callback calls are registered by the RPEmotes Lua bridge", async () => {
-  const [main, utils, navigation, lua] = await Promise.all([
+  const [main, utils, navigation, lua, server] = await Promise.all([
     read("client/NUI/js/main.js"),
     read("client/NUI/js/utils.js"),
     read("client/NUI/js/navigation.js"),
     read("client/NUI/EmoteMenuNUI.lua"),
+    read("server/Server.lua"),
   ]);
   const js = `${main}\n${utils}\n${navigation}`;
   const calls = new Set([...js.matchAll(/ExecuteNUICallback\(["']([A-Z_]+)["']/g)].map((match) => match[1]));
@@ -43,12 +54,20 @@ test("NUI callback calls are registered by the RPEmotes Lua bridge", async () =>
     assert.ok(calls.has(feature), `${feature} remains wired from NUI`);
     assert.ok(registrations.has(feature), `${feature} remains registered in Lua`);
   }
+  for (const callback of ["START_EMOTE_POSITIONING", "UPDATE_EMOTE_POSITION", "FINISH_EMOTE_POSITIONING"]) {
+    assert.ok(registrations.has(callback), `Lua registers ${callback}`);
+  }
+  assert.match(lua, /SetEntityCoordsNoOffset\(ped, positioningState\.coords/);
+  assert.match(lua, /AnimFlag\.LOOP or options\.onFootFlag == AnimFlag\.STUCK/);
+  assert.match(server, /RegisterNetEvent\("rpemotes:server:syncPosition"/);
+  assert.match(server, /rpemotes:client:updatePlayerPosition/);
 });
 
 test("NUI still receives RPEmotes menu data, locales, and keybind updates", async () => {
-  const [main, lua] = await Promise.all([
+  const [main, lua, emoteMenu] = await Promise.all([
     read("client/NUI/js/main.js"),
     read("client/NUI/EmoteMenuNUI.lua"),
+    read("client/EmoteMenu.lua"),
   ]);
   for (const message of ["LOAD_EMOTE_DATA", "BUILD_EMOTE_MENUS", "BUILD_KEYBINDS_MENU", "OPEN_MENU", "TOGGLE_CURSOR_INPUT"]) {
     assert.match(main, new RegExp(`event\\.data\\.type === ["']${message}["']`), `NUI handles ${message}`);
@@ -58,4 +77,8 @@ test("NUI still receives RPEmotes menu data, locales, and keybind updates", asyn
   }
   assert.match(lua, /SendNUIMessage\(dataForMenu\)/);
   assert.match(lua, /type = "BUILD_KEYBINDS_MENU"/);
+  assert.match(lua, /\["scenarios"\]\s*=\s*\{\}/, "scenario category receives a separate RPEmotes list");
+  assert.match(lua, /\["sittinglaying"\]\s*=\s*\{\}/, "sitting/laying category receives a separate RPEmotes list");
+  assert.match(emoteMenu, /isScenario = data\.scenario ~= nil/);
+  assert.match(emoteMenu, /isSittingOrLaying = isSittingOrLayingEmote/);
 });

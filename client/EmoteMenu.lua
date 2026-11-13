@@ -54,6 +54,23 @@ local function isEmoteTypePlayable(emoteType)
         or emoteType == EmoteType.EMOTES
 end
 
+local function isSittingOrLayingEmote(emoteName, emoteData)
+    local options = emoteData and emoteData.AnimationOptions or {}
+    if options.PlacementOverridesPhysics or options.PlacementOffset then return true end
+
+    local name = string.lower(emoteName or "")
+    for _, prefix in ipairs({"sit", "lay", "lie", "kneel"}) do
+        if name:sub(1, #prefix) == prefix then return true end
+    end
+    if name:find("sleep", 1, true) then return true end
+
+    local seatingWords = {sit = true, sitting = true, seated = true, lay = true, laying = true, lie = true, lying = true, sleep = true, sleeping = true, kneel = true, kneeling = true, chair = true, couch = true, sofa = true, bed = true}
+    for word in string.lower((emoteData and emoteData.label) or ""):gmatch("[%a]+") do
+        if seatingWords[word] then return true end
+    end
+    return false
+end
+
 local function addEmoteToMenu(menu, items, emoteName, label, description, emoteType)
     local item = NativeUI.CreateItem(label, description)
     local hasPermission = HasEmotePermission(emoteName, emoteType)
@@ -512,7 +529,9 @@ local function addFavoritesMenu(parent)
         local item = NativeUI.CreateItem(label, "")
         menu.menu:AddItem(item)
         menu.items[#menu.items+1] = {name = emoteData.name, label = emoteData.label, emoteType = emoteData.emoteType}
-        AddEmoteToNUIQueue({emoteName = emoteData.name, emoteType = emoteData.emoteType, label = emoteData.label, isFavorite = true, categoryName = "favorites", hasPermission = true})
+        local options = (EmoteData[emoteData.name] or SharedEmoteData[emoteData.name] or {}).AnimationOptions
+        local canPosition = emoteData.emoteType ~= EmoteType.SHARED and options ~= nil and (options.onFootFlag == AnimFlag.LOOP or options.onFootFlag == AnimFlag.STUCK or options.EmoteLoop == true or options.EmoteStuck == true)
+        AddEmoteToNUIQueue({emoteName = emoteData.name, emoteType = emoteData.emoteType, label = emoteData.label, isFavorite = true, categoryName = "favorites", hasPermission = true, canPosition = canPosition})
     end
 
     menu.menu.OnItemSelect = function(_, __, index)
@@ -528,6 +547,15 @@ local function addFavoritesMenu(parent)
     end
 
     return menu
+end
+
+local function emoteCanBePositioned(emoteName, emoteType)
+    if emoteType == EmoteType.SHARED or emoteType == EmoteType.WALKS or emoteType == EmoteType.EXPRESSIONS or emoteType == EmoteType.EMOJI then
+        return false
+    end
+    local data = getEmoteData(emoteName, emoteType)
+    local options = data and data.AnimationOptions
+    return options ~= nil and (options.onFootFlag == AnimFlag.LOOP or options.onFootFlag == AnimFlag.STUCK or options.EmoteLoop == true or options.EmoteStuck == true)
 end
 
 local function addEmoteMenu(menu)
@@ -588,7 +616,7 @@ local function addEmoteMenu(menu)
                         local label = prefix .. data.label
                         addEmoteToMenu(categoryMenu.menu, categoryMenu.items, emoteName, label, string.format("/e (%s)", emoteName), data.emoteType)
                     end
-                    AddEmoteToNUIQueue({emoteName = emoteName, emoteType = emoteType, label = data.label, categoryName = categoryName, hasPermission = hasPermission})
+                    AddEmoteToNUIQueue({emoteName = emoteName, emoteType = emoteType, label = data.label, categoryName = categoryName, hasPermission = hasPermission, canPosition = emoteCanBePositioned(emoteName, emoteType)})
                     ::continue::
                 end
             end
@@ -612,7 +640,16 @@ local function addEmoteMenu(menu)
     for _, emoteName in ipairs(emotesList) do
         local data = EmoteData[emoteName]
         addEmoteToMenu(emoteMenu.menu, emoteMenu.items, emoteName, data.label, string.format("/e (%s)", emoteName), data.emoteType)
-        AddEmoteToNUIQueue({emoteName = emoteName, emoteType = EmoteType.EMOTES, label = data.label, categoryName = EmoteType.EMOTES, hasPermission = true})
+        AddEmoteToNUIQueue({
+            emoteName = emoteName,
+            emoteType = EmoteType.EMOTES,
+            label = data.label,
+            categoryName = EmoteType.EMOTES,
+            hasPermission = true,
+            isScenario = data.scenario ~= nil,
+            isSittingOrLaying = isSittingOrLayingEmote(emoteName, data),
+            canPosition = emoteCanBePositioned(emoteName, data.emoteType)
+        })
     end
 end
 
@@ -622,7 +659,7 @@ function SearchEmotes(input)
         if matchesSearchTerm(emoteName, emoteData, input) then
             -- Check model compatibility
             if not CachedPlayerModel or IsModelCompatible(CachedPlayerModel, emoteName) then
-                results[#results + 1] = { table = emoteData.emoteType, name = emoteName, data = emoteData }
+            results[#results + 1] = { table = emoteData.emoteType, name = emoteName, data = emoteData, canPosition = emoteCanBePositioned(emoteName, emoteData.emoteType) }
             end
         end
     end
@@ -632,7 +669,7 @@ function SearchEmotes(input)
             if matchesSearchTerm(emoteName, emoteData, input) then
                 -- Also check model compat here.
                 if not CachedPlayerModel or IsModelCompatible(CachedPlayerModel, emoteName) then
-                    results[#results + 1] = { table = EmoteType.SHARED, name = emoteName, data = emoteData }
+                    results[#results + 1] = { table = EmoteType.SHARED, name = emoteName, data = emoteData, canPosition = false }
                 end
             end
         end

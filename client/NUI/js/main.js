@@ -2,6 +2,7 @@
 import { ClearHTMLContainer, HandleSidebarButtonPress, ExecuteNUICallback, PlaySoundFrontend, HandleEmoteFilter, HandleEmoteSearch, querySelectorVisible } from './utils.js';
 import { Locale, Popover } from './classes.js'
 import { createPreviewPanel } from './preview-panel.js'
+import { createEmoteCardMarkup } from './emote-card.js'
 
 
 const SIDE_NAVIGATION = document.querySelector(".side-navigation");
@@ -17,8 +18,180 @@ export let EMOTE_TYPE_ICONS = {}
 export let CONFIG;
 export let UsingMouse = false;
 let selectedPreviewButton = null;
+let compactMode = localStorage.getItem("pmEmotesCompact") === "true";
+let windowOffset = (() => {
+    try { return JSON.parse(localStorage.getItem("pmEmotesWindowOffset") || "{\"x\":0,\"y\":0}"); }
+    catch (_) { return {x: 0, y: 0}; }
+})();
+let scrollPositions = (() => {
+    try { return JSON.parse(localStorage.getItem("pmEmotesScrollPositions") || "{}"); }
+    catch (_) { return {}; }
+})();
+
+function applyCompactMode() {
+    document.body.classList.toggle("compact-menu", compactMode);
+    document.querySelector("#compact-toggle")?.setAttribute("aria-pressed", String(compactMode));
+    document.querySelector("#compact-toggle")?.setAttribute("title", compactMode ? "Return to full menu" : "Toggle compact menu");
+}
+
+function applyWindowOffset() {
+    const root = document.querySelector(".main-container");
+    if (root) root.style.transform = compactMode ? `translate(${Number(windowOffset.x) || 0}px, ${Number(windowOffset.y) || 0}px)` : "";
+}
+
+function refreshCompactCategories(selectedMenu) {
+    const select = document.querySelector("#compact-category-select");
+    if (!select) return;
+    const current = selectedMenu || select.value;
+    select.replaceChildren();
+    document.querySelectorAll(".side-navigation [data-action='openMenu']").forEach((button) => {
+        if (button.closest(".hidden")) return;
+        const option = document.createElement("option");
+        option.value = button.dataset.menu;
+        option.textContent = button.querySelector(".nav-label")?.textContent || button.textContent.trim();
+        select.append(option);
+    });
+    if ([...select.options].some((option) => option.value === current)) select.value = current;
+    else select.value = document.querySelector(".sidebar-button-active .btn-sidebar")?.dataset.menu || "emotes-menu";
+}
+
+applyCompactMode();
+applyWindowOffset();
+refreshCompactCategories();
+
+document.querySelector("#compact-toggle")?.addEventListener("click", () => {
+    compactMode = !compactMode;
+    localStorage.setItem("pmEmotesCompact", String(compactMode));
+    applyCompactMode();
+});
+
+document.querySelector("#compact-category-select")?.addEventListener("change", (event) => {
+    document.querySelector(`.side-navigation [data-menu="${CSS.escape(event.target.value)}"]`)?.click();
+});
+
+document.querySelector("#reset-menu-settings")?.addEventListener("click", () => {
+    compactMode = false;
+    windowOffset = {x: 0, y: 0};
+    scrollPositions = {};
+    localStorage.removeItem("pmEmotesCompact");
+    localStorage.removeItem("pmEmotesWindowOffset");
+    localStorage.removeItem("pmEmotesScrollPositions");
+    document.querySelectorAll(".menu").forEach((menu) => { menu.scrollTop = 0; });
+    document.querySelector("#emote_search").value = "";
+    document.querySelector("#sort-emotes").value = "asc";
+    applyCompactMode();
+    applyWindowOffset();
+});
+
+let positioningMode = false;
+let positionUpdateTimer = null;
+let positioningPreviousMouse = false;
+const positionOverlay = document.querySelector("#positioning-overlay");
+const positionGizmo = document.querySelector("#position-gizmo");
+const positionInputs = {
+    x: document.querySelector("#position-x"),
+    y: document.querySelector("#position-y"),
+    z: document.querySelector("#position-z"),
+    rotZ: document.querySelector("#position-rot"),
+};
+let gizmoDrag = null;
+
+function displayPositionValues(values = {}) {
+    for (const [key, input] of Object.entries(positionInputs)) {
+        if (!input) continue;
+        if (Number.isFinite(Number(values[key]))) input.value = String(values[key]);
+        const output = document.querySelector(`#position-${key === "rotZ" ? "rot" : key}-value`);
+        if (output) output.textContent = key === "rotZ" ? `${Number(input.value).toFixed(0)}°` : Number(input.value).toFixed(2);
+    }
+}
+
+function finishPositioning(save) {
+    if (!positioningMode) return;
+    positioningMode = false;
+    clearTimeout(positionUpdateTimer);
+    positionOverlay.hidden = true;
+    document.body.classList.remove("positioning-mode");
+    ExecuteNUICallback("FINISH_EMOTE_POSITIONING", {save, restoreMouse: positioningPreviousMouse});
+}
+
+Object.values(positionInputs).forEach((input) => input?.addEventListener("input", () => {
+    const values = Object.fromEntries(Object.entries(positionInputs).map(([key, el]) => [key, Number(el.value)]));
+    displayPositionValues(values);
+    clearTimeout(positionUpdateTimer);
+    positionUpdateTimer = setTimeout(() => ExecuteNUICallback("UPDATE_EMOTE_POSITION", values), 35);
+}));
+positionGizmo?.addEventListener("mousedown", (event) => {
+    const handle = event.target.closest?.("[data-gizmo-axis]");
+    if (!positioningMode || !handle) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const axis = handle.dataset.gizmoAxis;
+    const rect = positionGizmo.getBoundingClientRect();
+    const startAngle = Math.atan2(event.clientY - (rect.top + rect.height / 2), event.clientX - (rect.left + rect.width / 2)) * 180 / Math.PI;
+    gizmoDrag = {
+        axis, x: event.clientX, y: event.clientY, startAngle,
+        initial: Object.fromEntries(Object.entries(positionInputs).map(([key, input]) => [key, Number(input.value)])),
+    };
+});
+window.addEventListener("mousemove", (event) => {
+    if (!gizmoDrag) return;
+    const {axis, x, y, startAngle, initial} = gizmoDrag;
+    if (axis === "rotZ") {
+        const rect = positionGizmo.getBoundingClientRect();
+        const angle = Math.atan2(event.clientY - (rect.top + rect.height / 2), event.clientX - (rect.left + rect.width / 2)) * 180 / Math.PI;
+        let delta = angle - startAngle;
+        if (delta > 180) delta -= 360;
+        if (delta < -180) delta += 360;
+        positionInputs.rotZ.value = String(initial.rotZ + delta);
+    } else {
+        const dx = Math.max(-150, Math.min(150, event.clientX - x));
+        const dy = Math.max(-150, Math.min(150, event.clientY - y));
+        if (axis === "x") positionInputs.x.value = String(initial.x + dx * .005);
+        if (axis === "y") positionInputs.y.value = String(initial.y - dy * .005);
+        if (axis === "z") positionInputs.z.value = String(initial.z - dy * .005);
+    }
+    const input = positionInputs[axis === "rotZ" ? "rotZ" : axis];
+    input?.dispatchEvent(new Event("input", {bubbles: true}));
+});
+window.addEventListener("mouseup", () => { gizmoDrag = null; });
+positionOverlay?.addEventListener("contextmenu", (event) => event.preventDefault());
+document.querySelector("#position-save")?.addEventListener("click", () => finishPositioning(true));
+document.querySelector("#position-cancel")?.addEventListener("click", () => finishPositioning(false));
+document.addEventListener("keyup", (event) => {
+    if (positioningMode && event.key === "Escape") {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        finishPositioning(false);
+    }
+}, true);
+CONTENT_CONTAINER.addEventListener("scroll", (event) => {
+    const menu = event.target.closest?.(".menu");
+    const menuName = [...(menu?.classList || [])].find((name) => name.endsWith("-menu"));
+    if (!menuName || menuName === "search-menu") return;
+    scrollPositions[menuName] = menu.scrollTop;
+    localStorage.setItem("pmEmotesScrollPositions", JSON.stringify(scrollPositions));
+}, true);
+
+const dragHeader = document.querySelector(".header-container");
+dragHeader?.addEventListener("mousedown", (event) => {
+    if (!compactMode || event.target.closest("button, .close-hint")) return;
+    const start = {x: event.clientX, y: event.clientY, offset: {...windowOffset}};
+    const move = (moveEvent) => {
+        windowOffset = {x: start.offset.x + moveEvent.clientX - start.x, y: start.offset.y + moveEvent.clientY - start.y};
+        applyWindowOffset();
+    };
+    const finish = () => {
+        localStorage.setItem("pmEmotesWindowOffset", JSON.stringify(windowOffset));
+        window.removeEventListener("mousemove", move);
+        window.removeEventListener("mouseup", finish);
+    };
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", finish);
+});
 
 function getEmoteButton(target) {
+    const card = target?.closest?.(".emote-card");
+    if (card) return card.querySelector(".btn-emote[data-emoteid][data-emotetype]");
     return target?.closest?.("[data-emoteid][data-emotetype]") || null;
 }
 
@@ -41,7 +214,11 @@ function updateEmoteCount(menu = CONTENT_CONTAINER.querySelector(".grid")) {
 window.PMUpdateEmoteCount = updateEmoteCount;
 
 function routeSelectedPreview(type) {
-    const data = selectedPreviewButton?.dataset;
+    routeEmoteButton(selectedPreviewButton, type);
+}
+
+function routeEmoteButton(button, type) {
+    const data = button?.dataset;
     if (!data?.emoteid || !data.emotetype || data.emoteid === "_reset") return;
     ExecuteNUICallback("ROUTE_EMOTE", {type, emoteName: data.emoteid, emoteType: data.emotetype});
 }
@@ -57,12 +234,19 @@ function toggleFavorite(button) {
         if (!result.favorites) return;
         const favoritesMenu = document.querySelector(".favorites-menu");
         const favorites = new Set(result.favorites.map((emote) => `${emote.emoteType}:${emote.name}`));
-        document.querySelectorAll(".btn-emote[data-emoteid][data-emotetype]").forEach((emoteButton) => {
-            emoteButton.classList.toggle("btn-emote-favorite", favorites.has(`${emoteButton.dataset.emotetype}:${emoteButton.dataset.emoteid}`));
+        const positionable = new Set([...document.querySelectorAll(".emote-card[data-emoteid]")]
+            .filter((card) => card.querySelector("[data-card-action='position']"))
+            .map((card) => `${card.dataset.emotetype}:${card.dataset.emoteid}`));
+        document.querySelectorAll(".btn-emote[data-emoteid][data-emotetype], .emote-card[data-emoteid][data-emotetype]").forEach((emoteButton) => {
+            const isFavorite = favorites.has(`${emoteButton.dataset.emotetype}:${emoteButton.dataset.emoteid}`);
+            emoteButton.classList.toggle("btn-emote-favorite", isFavorite);
+            emoteButton.classList.toggle("is-favorite", isFavorite);
+            emoteButton.querySelector?.("[data-card-action=favorite]")?.classList.toggle("is-favorite", isFavorite);
+            emoteButton.querySelector?.("[data-card-action=favorite]")?.setAttribute("aria-pressed", String(isFavorite));
         });
         ClearHTMLContainer(".favorites-menu");
         result.favorites.forEach((emote) => {
-            favoritesMenu?.insertAdjacentHTML("beforeend", `<button class="btn btn-emote btn-emote-favorite" data-emoteid="${emote.name}" data-emotetype="${emote.emoteType}" data-label="${emote.label}">${emote.emoteType !== 'Emojis' ? (EMOTE_TYPE_ICONS[emote.emoteType] || "")+" " : ""}${emote.label}</button>`);
+            favoritesMenu?.insertAdjacentHTML("beforeend", createEmoteCardMarkup({...emote, isFavorite: true, canPosition: positionable.has(`${emote.emoteType}:${emote.name}`)}, EMOTE_TYPE_ICONS, {placementEnabled: CONFIG?.PlacementEnabled !== false}));
         });
         if (selectedPreviewButton) {
             document.querySelector("#preview-favorite")?.classList.toggle("is-favorite", selectedPreviewButton.classList.contains("btn-emote-favorite"));
@@ -79,12 +263,12 @@ document.querySelector("#sort-emotes")?.addEventListener("change", (event) => {
     const menu = CONTENT_CONTAINER.querySelector(".grid");
     if (!menu) return;
     const reset = menu.querySelector(".btn-style-reset");
-    const buttons = [...menu.querySelectorAll(".btn-emote:not(.btn-style-reset)")];
-    buttons.sort((a, b) => {
+    const cards = [...menu.querySelectorAll(".emote-card, .btn-emoji")];
+    cards.sort((a, b) => {
         const order = (a.dataset.label || a.dataset.emoteid || "").localeCompare(b.dataset.label || b.dataset.emoteid || "");
         return event.target.value === "desc" ? -order : order;
     });
-    buttons.forEach((button) => menu.appendChild(button));
+    cards.forEach((card) => menu.appendChild(card));
     if (reset) menu.prepend(reset);
 });
 
@@ -104,6 +288,8 @@ window.addEventListener("load", async (e) => {
         if (!CONFIG.WalkingStylesEnabled) document.querySelector('[data-menu="walkstyles-menu"]')?.parentElement?.remove();
         if (!CONFIG.Keybinding) document.querySelector('[data-menu="keybinds-menu"]')?.parentElement?.remove();
         if (CONFIG.MenuPosition === "left") document.body.classList.add("align-left");
+        if (!CONFIG.PlacementEnabled) document.querySelectorAll("[data-card-action='place']").forEach((button) => button.remove());
+        refreshCompactCategories();
     })
     const LOCALES = new Locale(); // We just need to init this after the everything is loaded. The class statics will handle everything.
 })
@@ -147,6 +333,11 @@ SIDE_NAVIGATION.addEventListener("click", (e) => {
         HandleSidebarButtonPress(TARGET);
         const title = document.querySelector("#active-menu-title");
         if (TARGET.dataset.action === "openMenu" && title) title.textContent = TARGET.querySelector(".nav-label")?.textContent || TARGET.textContent.trim();
+        if (TARGET.dataset.action === "openMenu") {
+            refreshCompactCategories(TARGET.dataset.menu);
+            const openedMenu = CONTENT_CONTAINER.querySelector(`.${CSS.escape(TARGET.dataset.menu)}`);
+            if (openedMenu) openedMenu.scrollTop = Number(scrollPositions[TARGET.dataset.menu]) || 0;
+        }
         updateEmoteCount(CONTENT_CONTAINER.querySelector(".grid"));
         return;
     }
@@ -198,6 +389,16 @@ function _setupMenuEventListeners(MENUS) {
         });
         element.addEventListener("click", (e) => {
             e.preventDefault();
+            const cardAction = e.target.closest?.("[data-card-action]");
+            if (cardAction) {
+                const button = getEmoteButton(cardAction);
+                if (!button) return;
+                if (cardAction.dataset.cardAction === "play") routeEmoteButton(button, "emote");
+                if (cardAction.dataset.cardAction === "place") routeEmoteButton(button, "placement");
+                if (cardAction.dataset.cardAction === "position") ExecuteNUICallback("START_EMOTE_POSITIONING", {emoteName: button.dataset.emoteid, emoteType: button.dataset.emotetype});
+                if (cardAction.dataset.cardAction === "favorite") toggleFavorite(button);
+                return;
+            }
             const TARGET = getEmoteButton(e.target);
             if (!TARGET?.dataset?.emoteid || !TARGET.dataset.emotetype) return;
             PlaySoundFrontend("SELECT");
@@ -235,6 +436,30 @@ SEARCH_BAR.addEventListener("input", (e) => {
 
 
 window.addEventListener('message', (event) => {
+    if (event.data.type === "POSITIONING_MODE") {
+        positioningMode = Boolean(event.data.value);
+        if (positioningMode) {
+            positioningPreviousMouse = UsingMouse;
+            displayPositionValues(event.data.values || {x: 0, y: 0, z: 0, rotZ: 0});
+            positionOverlay.hidden = false;
+            document.body.classList.add("positioning-mode");
+        } else {
+            positionOverlay.hidden = true;
+            document.body.classList.remove("positioning-mode");
+        }
+    }
+    if (event.data.type === "POSITIONING_SCREEN_POINT") {
+        if (!positioningMode || !positionGizmo) return;
+        if (event.data.onScreen) {
+            const scale = Math.max(.4, 1 - (Number(event.data.camDist) / 30));
+            positionGizmo.style.transform = `translate(${Number(event.data.screenX) * 100}vw, ${Number(event.data.screenY) * 100}vh) translate(-50%, -50%) scale(${scale})`;
+            positionGizmo.classList.add("gizmo-visible");
+            positionGizmo.classList.remove("gizmo-hidden");
+        } else {
+            positionGizmo.classList.remove("gizmo-visible");
+            positionGizmo.classList.add("gizmo-hidden");
+        }
+    }
     if (event.data.type === 'OPEN_MENU') {
         if (!event.data.value) { PM_PREVIEW.hide(); selectedPreviewButton = null; }
         (event.data.value ? document.body.style.display = "flex" : document.body.style.display = "none")
@@ -268,6 +493,7 @@ window.addEventListener('message', (event) => {
                 </article>
                 `)
         })
+        refreshCompactCategories();
         MENUS = CONTENT_CONTAINER.querySelectorAll(".menu");
         _setupMenuEventListeners(MENUS);
         ExecuteNUICallback("INITIAL_DATA_LOADED", {})
@@ -289,17 +515,18 @@ window.addEventListener('message', (event) => {
                         `)
                 }
                 event.data[key].forEach((el) => {
-                    if (el) {
-                        EMOTES.insertAdjacentHTML("beforeend", `
-                            <button class="btn btn-emote ${el.isFavorite ? "btn-emote-favorite" : ""} ${el.emoteType === "Emojis" ? "noto-color-emoji-regular" : ""}" data-emoteid="${el.emoteName}" data-emotetype="${el.emoteType}" data-label="${el.label}">${el.emoteType !== 'Emojis' ? EMOTE_TYPE_ICONS[el.emoteType]+" " : ""}${el.label}</button>
-                            `)
-                    }
+                    if (el) EMOTES.insertAdjacentHTML("beforeend", createEmoteCardMarkup(el, EMOTE_TYPE_ICONS, {placementEnabled: CONFIG?.PlacementEnabled !== false}));
                 })
             }
         }
         event.data.favorites?.forEach((emote) => {
-            const ELEMENTS = Array.from(document.querySelectorAll(`[data-emoteid="${emote.emoteName}"]`));
-            ELEMENTS.forEach((el) => el?.classList.add("btn-emote-favorite"));
+            const ELEMENTS = Array.from(document.querySelectorAll(".btn-emote[data-emoteid], .emote-card[data-emoteid]"));
+            ELEMENTS.filter((el) => el.dataset.emoteid === emote.emoteName && el.dataset.emotetype === emote.emoteType)
+                .forEach((el) => {
+                    el.classList.add("btn-emote-favorite", "is-favorite");
+                    el.querySelector?.("[data-card-action=\"favorite\"]")?.classList.add("is-favorite");
+                    el.querySelector?.("[data-card-action=\"favorite\"]")?.setAttribute("aria-pressed", "true");
+                });
         })
         Locale.setLocaleStrings();
         updateEmoteCount(CONTENT_CONTAINER.querySelector(".grid"));
