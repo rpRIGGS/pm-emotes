@@ -1,0 +1,62 @@
+/**
+ * PowerMoves RP — experimental EmotePreviewer manifest consumer.
+ * Deliberately not activated until APNG playback is validated in FiveM CEF.
+ * This module never changes RPEmotes gameplay or generates media.
+ */
+export function createPreviewLibrary({ base = "./", placeholder = null } = {}) {
+  let byKey = new Map();
+  let generation = 0;
+  const safeMedia = (value) => typeof value === "string"
+    && /^previews\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+\/preview\.png$/.test(value);
+  const key = (source, category, command) => JSON.stringify([source, category, command]);
+  const validate = (manifest) => {
+    if (!manifest || manifest.schemaVersion !== 1 || !Array.isArray(manifest.entries)) {
+      throw new Error("Unsupported preview manifest");
+    }
+    const next = new Map();
+    for (const item of manifest.entries) {
+      if (!item || typeof item.id !== "string" || typeof item.source !== "string"
+        || typeof item.category !== "string" || typeof item.command !== "string"
+        || !safeMedia(item.media) || item.format !== "apng") continue;
+      const identity = key(item.source, item.category, item.command);
+      if (next.has(identity)) throw new Error("Duplicate preview identity");
+      next.set(identity, { id: item.id, media: item.media });
+    }
+    return next;
+  };
+  return {
+    install(manifest) { byKey = validate(manifest); generation++; return byKey.size; },
+    clear() { byKey.clear(); generation++; },
+    get size() { return byKey.size; },
+    lookup(source, category, command) {
+      const item = byKey.get(key(source, category, command));
+      if (!item) return null;
+      return { ...item, url: new URL(item.media, new URL(base, document.baseURI)).href };
+    },
+    /**
+     * Load only the selected preview. Ignore late image events when selection
+     * changes. Missing/failed media always resolves to a placeholder.
+     */
+    mount(image, source, category, command) {
+      const token = ++generation;
+      const item = this.lookup(source, category, command);
+      image.removeAttribute("src");
+      image.hidden = true;
+      if (!item) { if (placeholder) image.src = placeholder; return false; }
+      image.onload = () => { if (token === generation) image.hidden = false; };
+      image.onerror = () => {
+        if (token !== generation) return;
+        image.hidden = !placeholder;
+        if (placeholder) image.src = placeholder;
+      };
+      image.src = item.url;
+      return true;
+    },
+    unmount(image) {
+      generation++;
+      image.onload = image.onerror = null;
+      image.removeAttribute("src");
+      image.hidden = true;
+    },
+  };
+}
