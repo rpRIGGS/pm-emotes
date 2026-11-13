@@ -129,8 +129,8 @@ function _setupMenuEventListeners(MENUS) {
             FOOTER_TEXT.textContent = `/${TARGET.closest(".walkstyles-menu") ? "walk" : "e"} ${TARGET.dataset.emoteid}`
         })
 
-        element.addEventListener("mouseleave", () => PM_PREVIEW.hide());
-        element.addEventListener("focusout", (e) => { if (!element.contains(e.relatedTarget)) PM_PREVIEW.hide(); });
+        element.addEventListener("mouseleave", () => { if (UsingMouse) PM_PREVIEW.hide(); });
+        element.addEventListener("focusout", (e) => { if (!element.contains(e.relatedTarget) && !UsingMouse) PM_PREVIEW.hide(); });
         element.addEventListener("click", (e) => {
             e.preventDefault();
             const TARGET = e.target;
