@@ -34,3 +34,12 @@ The 2026-11-12 decision **abandons PM AutoShot**, rather than adding another opt
 ## Gate before final integration
 
 Obtain and validate a sample exporter package and manifest schema (including category/ID identity, path rules, versioning and update/removal behavior), then test APNG or selected format in the FiveM NUI for display, failure fallback, performance and stale-media cleanup. Only then authorize final media integration. Continue current PM Emotes live server testing and existing priorities independently.
+
+
+## Milestone 4 source progress — 2026-11-12
+
+The unactivated `client/NUI/js/preview-library.js` adapter now validates the actual EmotePreviewer manifest envelope (`schemaVersion: 1`, `format: "experimental-apng"`), accepts only immutable `previews/<stem>/<run>/preview.png` paths, and indexes exact `source/category/command` triples. It loads only the selected image, isolates cancellation by image element, invalidates callbacks on manifest replacement, and provides an image-load-error placeholder. Source regression cases are in `tests/preview-library.test.mjs`; they have not been executed as part of the deferred Windows/CEF validation.
+
+**Critical identity finding:** The producer's catalog ID and source/category/command come from its parsed PM Emotes catalog, while the existing NUI uses `data-emoteid` and `data-emotetype` with separate menu groupings. A command-only lookup is unsafe: the same command can appear in different categories or sources. Until an exact mapping is verified, do not attach the adapter to the menu or infer a source/category from a button label. The adapter is intentionally inert in the live resource.
+
+**Remaining Milestone 4 gate:** establish a verified ID translation between producer entries and the actual NUI catalog data; then connect the adapter to the approved NUI with a placeholder and a single active animation. Final APNG compatibility and real runtime testing remain in Milestone 5.
