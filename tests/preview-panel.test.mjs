@@ -16,11 +16,15 @@ function harness() {
   return { controller: createPreviewPanel({ root: { querySelector: (selector) => nodes[selector] } }),
     panel, image, placeholder, label };
 }
-const entry = (command, category = "emotes") => ({
+const entry = (command, category = "emotes", media = `previews/${command}/run123/preview.png`) => ({
   id: "rpemotes:" + category + ":" + command, source: "rpemotes", category, command,
-  format: "apng", media: "previews/stem/run123/preview.png",
+  folder: media.slice(0, media.lastIndexOf("/")), media, format: "apng",
+  frameCount: 36, durationSeconds: 3, frameRate: 12, width: 320, height: 320,
 });
-const manifest = (entries) => ({ schemaVersion: 1, format: "experimental-apng", entries });
+// Shape emitted by EmotePreviewer, including exporter metadata not needed by the NUI.
+const manifest = (entries) => ({ schemaVersion: 1, publicationId: "run123",
+  format: "experimental-apng", captureProfile: { width: 320, height: 320, fps: 12 },
+  note: "APNG candidate", entries });
 const button = (id) => ({ dataset: { emoteid: id, emotetype: "Emotes", label: id } });
 test("selected preview loads, releases on hide, and ignores stale image callbacks", async () => {
   const h = harness();
@@ -34,6 +38,22 @@ test("selected preview loads, releases on hide, and ignores stale image callback
   assert.equal(h.panel.hidden, true);
   assert.equal(h.image.hidden, true);
   assert.equal(h.image.src, "");
+});
+test("switching selection ignores the previous image callback", async () => {
+  const h = harness();
+  globalThis.fetch = async () => ({ ok: true, json: async () =>
+    manifest([entry("wave"), entry("dance")]) });
+  await h.controller.initialize();
+  h.controller.select(button("wave"));
+  const staleLoad = h.image.onload;
+  h.controller.select(button("dance"));
+  assert.match(h.image.src, /dance\/run123\/preview\.png/);
+  assert.equal(h.placeholder.hidden, false);
+  staleLoad();
+  assert.equal(h.placeholder.hidden, false);
+  h.image.onload();
+  assert.equal(h.placeholder.hidden, true);
+  assert.equal(h.label.textContent, "dance");
 });
 test("missing and ambiguous identities show the placeholder without loading media", async () => {
   const h = harness();
@@ -76,4 +96,17 @@ test("manifest loading after selection updates only the currently selected emote
   release({ ok: true, json: async () => manifest([entry("wave")]) });
   assert.equal(await pending, true);
   assert.match(h.image.src, /preview.png/);
+});
+test("a slower obsolete manifest response cannot replace the latest library", async () => {
+  const h = harness();
+  const requests = [];
+  globalThis.fetch = () => new Promise((resolve) => requests.push(resolve));
+  const obsolete = h.controller.initialize();
+  const current = h.controller.initialize();
+  requests[1]({ ok: true, json: async () => manifest([entry("dance")]) });
+  assert.equal(await current, true);
+  requests[0]({ ok: true, json: async () => manifest([entry("wave")]) });
+  assert.equal(await obsolete, false);
+  h.controller.select(button("dance"));
+  assert.match(h.image.src, /dance\/run123\/preview\.png/);
 });

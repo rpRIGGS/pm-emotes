@@ -1,7 +1,8 @@
 /**
  * PowerMoves RP — experimental EmotePreviewer manifest consumer.
- * Deliberately not activated until APNG playback is validated in FiveM CEF.
- * This module never changes RPEmotes gameplay or generates media.
+ * The selected-only panel is activated in the existing NUI. APNG playback
+ * still requires FiveM CEF acceptance testing. This module never changes
+ * RPEmotes gameplay or generates media.
  */
 export function createPreviewLibrary({ base = "./", placeholder = null } = {}) {
   let byKey = new Map();

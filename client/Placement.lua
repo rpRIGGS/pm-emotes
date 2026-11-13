@@ -297,11 +297,17 @@ local function positionPreviewPed(emoteName)
                         end
                         SetEntityAlpha(previewPed, 150, false)
 
-                        placementPosition = vector4(targetPosition.x, targetPosition.y, targetPosition.z, initHeading + rotateAmount)
+                        -- Keep the committed player position identical to the
+                        -- preview ped position. The preview ped is lowered by
+                        -- its model-specific height offset below; committing
+                        -- targetPosition directly placed the player up to 1m
+                        -- above the position shown during placement.
+                        local pedPosition = vector3(targetPosition.x, targetPosition.y, targetPosition.z - pedHeightOffset)
+                        placementPosition = vector4(pedPosition.x, pedPosition.y, pedPosition.z, initHeading + rotateAmount)
                         placementRotation = GetEntityRotation(previewPed)
 
                         SetEntityHeading(previewPed, initHeading + rotateAmount)
-                        SetEntityCoords(previewPed, targetPosition.x, targetPosition.y, targetPosition.z - pedHeightOffset, false, false, false, false)
+                        SetEntityCoords(previewPed, pedPosition.x, pedPosition.y, pedPosition.z, false, false, false, false)
                     else
                         -- No valid ground - don't update position, show as invalid
                         isPlacementValid = false

@@ -34,7 +34,7 @@ export function createPreviewPanel({ root = document, manifestUrl = "previews/ma
       if (!response.ok) throw new Error("Preview manifest unavailable");
       const manifest = await response.json();
       const candidate = createPreviewIdentityResolver(manifest);
-      // A later close/rebuild must invalidate this asynchronous response.
+      // A later manifest request must invalidate this asynchronous response.
       if (token !== manifestRequest) return false;
       library.install(manifest);
       resolver = candidate;

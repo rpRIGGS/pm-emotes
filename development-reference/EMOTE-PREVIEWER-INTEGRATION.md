@@ -30,7 +30,7 @@ Producer identity is the full `source/category/command` tuple. The existing NUI 
 
 ## Verification boundary and remaining acceptance
 
-The adapter and its regression tests validate the source-level schema, path rules, identity behavior, fallback and lifecycle. That does **not** establish GTA-backed capture quality or animated APNG playback in FiveM Chromium/CEF. No real export is bundled in this repository, and no FiveM playback is claimed as verified.
+The exporter source was checked at `rpRIGGS/EmotePreviewer` commit `a3d5f9e` (November 13, 2026). Its publication code writes the version-1 `experimental-apng` manifest and the same `previews/<stem>/<runId>/preview.png` path pattern accepted here. The entry's identity and `format: "apng"` fields match; capture profile, frame count, duration, dimensions, publication ID and note are additional fields the consumer safely ignores. No contract mismatch required a producer change. The adapter and its regression tests validate the source-level schema, path rules, identity behavior, fallback and lifecycle. That does **not** establish GTA-backed capture quality or animated APNG playback in FiveM Chromium/CEF. No real export is bundled in this repository, and no FiveM playback is claimed as verified.
 
 Run `node --test tests/preview-*.test.mjs` from the repository root. For desktop/server acceptance, install a real export, inspect identity resolution across duplicate commands, confirm APNG animation and fallback in FiveM, verify cleanup and performance, and confirm ordinary emotes plus the existing in-game preview/placement still work.
 
