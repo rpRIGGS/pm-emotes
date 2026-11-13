@@ -20,7 +20,6 @@ export function HandleSidebarButtonPress(el) {
     switch (el.dataset.action) {
         case "openMenu":
             const PREVIOUS_ACTIVE_BUTTON_CONTAINER = document.querySelector(".sidebar-button-active");
-            const PREVIOUS_ACTIVE_BUTTON = PREVIOUS_ACTIVE_BUTTON_CONTAINER.querySelector(".btn-sidebar");
 
             if (PREVIOUS_ACTIVE_BUTTON_CONTAINER) {
                 PREVIOUS_ACTIVE_BUTTON_CONTAINER.classList.remove("sidebar-button-active");
@@ -44,8 +43,10 @@ export function HandleSidebarButtonPress(el) {
                 if (OPENED_MENU?.classList.contains("keybinds-menu")) {
                     SEARCH_CONTAINER.classList.add("hidden");
                 }
-                OPENED_MENU?.classList.contains("search-menu") ? SEARCH_BAR.placeholder = Locale.translate("searchemotes") : SEARCH_BAR.placeholder = Locale.translate("filteremotes").replace("%s", BUTTON_CONTAINER.querySelector("label").textContent);
+                const categoryLabel = BUTTON_CONTAINER.querySelector(".nav-label")?.textContent || BUTTON_CONTAINER.querySelector("label")?.textContent || "emotes";
+                OPENED_MENU?.classList.contains("search-menu") ? SEARCH_BAR.placeholder = Locale.translate("searchemotes") : SEARCH_BAR.placeholder = Locale.translate("filteremotes").replace("%s", categoryLabel);
             }
+            window.PMUpdateEmoteCount?.(OPENED_MENU);
             if (el.dataset.menu === "search-menu") return SEARCH_CONTAINER.querySelector(".search-input").focus();
             querySelectorVisible(OPENED_MENU)?.focus();
             break;
@@ -67,9 +68,11 @@ export function HandleEmoteFilter(_search, menu = ".grid") {
         const buttons = grid.querySelectorAll("[data-emoteid]");
         buttons.forEach((button) => {
             const emoteId = button.dataset.emoteid.toLowerCase()+button.textContent.toLowerCase();
-            emoteId.includes(searchValue) ? button.classList.remove("hidden") : button.classList.add("hidden");
+            const card = button.closest(".emote-card");
+            (card || button).classList.toggle("hidden", !emoteId.includes(searchValue));
         })
     })
+    window.PMUpdateEmoteCount?.();
 }
 
 export async function HandleEmoteSearch(_search) {
@@ -87,6 +90,7 @@ export async function HandleEmoteSearch(_search) {
             <button class="btn btn-emote" data-emoteid="${emote.name}" data-emotetype="${emote.data.emoteType}" data-label="${emote.data.label}">${emote.data.emoteType !== 'Emojis' ? EMOTE_TYPE_ICONS[emote.data.emoteType]+" " : ""}${emote.data.label}</button>
             `)
     })
+    window.PMUpdateEmoteCount?.(container);
 
 }
 

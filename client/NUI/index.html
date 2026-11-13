@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPEmotes-Reborn</title>
+    <meta name="theme-color" content="#090d18">
+    <title>PowerMoves RP — Emotes</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/dynamic.css">
     <link rel="stylesheet" href="css/overrides.css">
@@ -16,64 +17,65 @@
 <body style="display: none;">
     <div class="main-container noselect">
         <header class="header-container">
-            <img src="/header.png" alt="RP Emotes" class="header-image">
+            <div class="brand-lockup" aria-label="PowerMoves RP Emotes">
+                <span class="brand-mark" aria-hidden="true"><span>PM</span></span>
+                <span class="brand-divider" aria-hidden="true"></span>
+                <span class="brand-copy"><span class="brand-name">POWER<span class="brand-word">MOVES</span><span class="brand-rp">RP</span></span><span class="brand-subtitle">EMOTES</span></span>
+            </div>
+            <div class="close-hint"><kbd>ESC</kbd><span data-locale="btn_close">Close</span></div>
         </header>
+
         <main class="menu-container" tabindex="-1">
-            <nav class="side-navigation">
+            <nav class="side-navigation" aria-label="Emote categories">
                 <ul class="btn-list">
-                    <li class="sidebar-button-container">
-                        <button id="cancel-emote-btn" class="btn btn-sidebar btn-cancel-emote" data-action="cancelEmote">🚷</button>
-                        <label for="cancel-emote-btn" class="btn-sidebar-label" data-locale="cancelemote">Cancel Emote</label>
-                    </li>
-                    <li class="sidebar-button-container">
-                        <button id="search-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="search-menu">🔍</button>
-                        <label for="search-menu-btn" class="btn-sidebar-label" data-locale="searchemotes">Search</label>
-                    </li>
                     <li class="sidebar-button-container sidebar-button-active sidebar-button-anchor">
-                        <button id="emotes-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="emotes-menu">🎬</button>
-                        <label for="emotes-menu-btn" class="btn-sidebar-label" data-locale="emotes">Emotes</label>
-                    </li>
-                    <!-- Custom Emote Groups added here -->
-                    <li class="sidebar-button-container">
-                        <button id="keybinds-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="keybinds-menu">🔢</button>
-                        <label for="keybinds-menu-btn" class="btn-sidebar-label" data-locale="keybinds">Keybinds</label>
+                        <button id="emotes-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="emotes-menu"><span aria-hidden="true">▦</span><span class="nav-label">All Emotes</span></button>
                     </li>
                     <li class="sidebar-button-container">
-                        <button id="favorites-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="favorites-menu">🌟</button>
-                        <label for="favorites-menu-btn" class="btn-sidebar-label" data-locale="favorites">Favorites</label>
+                        <button id="search-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="search-menu"><span aria-hidden="true">⌕</span><span class="nav-label" data-locale="searchemotes">Search</span></button>
+                    </li>
+                    <!-- Custom emote categories are inserted here by the existing RPEmotes menu builder. -->
+                    <li class="sidebar-button-container">
+                        <button id="favorites-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="favorites-menu"><span aria-hidden="true">☆</span><span class="nav-label" data-locale="favorites">Favorites</span></button>
                     </li>
                     <li class="sidebar-button-container">
-                        <button id="walkstyles-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="walkstyles-menu">🚶🏻‍♂️</button>
-                        <label for="walkstyles-menu-btn" class="btn-sidebar-label" data-locale="walkingstyles">Walk Styles</label>
+                        <button id="moods-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="moods-menu"><span aria-hidden="true">☻</span><span class="nav-label">Expressions</span></button>
                     </li>
                     <li class="sidebar-button-container">
-                        <button id="moods-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="moods-menu">🎭</button>
-                        <label for="moods-menu-btn" class="btn-sidebar-label" data-locale="moods">Moods</label>
+                        <button id="walkstyles-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="walkstyles-menu"><span aria-hidden="true">♟</span><span class="nav-label" data-locale="walkingstyles">Walk Styles</span></button>
+                    </li>
+                    <li class="sidebar-button-container">
+                        <button id="keybinds-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="keybinds-menu"><span aria-hidden="true">⌘</span><span class="nav-label" data-locale="keybinds">Keybinds</span></button>
                     </li>
                     <li class="sidebar-button-container emoji-sidebar">
-                        <button id="emojis-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="emojis-menu">😀</button>
-                        <label for="emojis-menu-btn" class="btn-sidebar-label" data-locale="emojis">Emojis</label>
+                        <button id="emojis-menu-btn" class="btn btn-sidebar" data-action="openMenu" data-menu="emojis-menu"><span aria-hidden="true">☺</span><span class="nav-label" data-locale="emojis">Emojis</span></button>
                     </li>
                 </ul>
+                <button id="cancel-emote-btn" class="btn btn-cancel-emote" data-action="cancelEmote"><span aria-hidden="true">■</span><span class="nav-label" data-locale="cancelemote">Cancel Emote</span></button>
             </nav>
-            <section class="content-container">
-                <form class="search-container btn-list">
-                    <input type="text" class="search-input" id="emote_search" autocomplete="rpemotes" placeholder="Search..." data-locale="searchemotes">
-                    <input type="reset" value="x" class="btn btn-clear-search"></input>
-                </form>
+
+            <section class="content-container" aria-label="Emote list">
+                <div class="content-toolbar">
+                    <div class="menu-heading"><h1 id="active-menu-title">All Emotes</h1><span id="emote-count" class="emote-count"></span></div>
+                    <div class="list-tools">
+                        <form class="search-container btn-list">
+                            <span class="search-icon" aria-hidden="true">⌕</span>
+                            <input type="text" class="search-input" id="emote_search" autocomplete="off" placeholder="Search emotes…" data-locale="searchemotes">
+                            <input type="reset" value="×" class="btn btn-clear-search" aria-label="Clear search">
+                        </form>
+                        <button id="quick-favorites" class="tool-button" type="button"><span aria-hidden="true">★</span><span data-locale="favorites">Favorites</span></button>
+                        <label class="sort-control"><span class="sr-only">Sort emotes</span><select id="sort-emotes" aria-label="Sort emotes"><option value="asc">A–Z⌄</option><option value="desc">Z–A⌄</option></select></label>
+                    </div>
+                </div>
+
                 <article class="menu search-menu doublecolumn btn-list">
                     <p class="keybind-description" data-locale="searchemotes"></p>
                 </article>
                 <article class="menu menu-anchor emotes-menu grid doublecolumn btn-list">
                     <button class="btn btn-emote" data-emoteid="emote1">Emote 1</button>
                 </article>
-                <!-- Custom Emote Groups added here -->
                 <article class="menu keybinds-menu singlecolumn">
-                    <ul class="keybinds-list btn-list">
-                        <li>
-                            <p class="keybind-description" data-locale="keybind_description"></p>
-                        </li>
-                    </ul>
+                    <ul class="keybinds-list btn-list"><li><p class="keybind-description" data-locale="keybind_description"></p></li></ul>
                 </article>
                 <article class="menu favorites-menu doublecolumn btn-list">
                     <button class="btn btn-emote btn-emote-favorite" data-emoteid="emote1">Emote 1</button>
@@ -89,10 +91,22 @@
                     <button class="btn btn-emoji" data-emoji="emote1">😀</button>
                 </article>
             </section>
+
+            <aside id="pm-preview-panel" class="pm-preview-panel" aria-label="Selected emote preview" hidden>
+                <div class="preview-heading"><div><span class="eyebrow">SELECTED EMOTE</span><h2 id="pm-preview-label"></h2></div><button id="preview-favorite" class="preview-favorite" type="button" aria-label="Toggle favorite" aria-pressed="false">☆</button></div>
+                <div class="pm-preview-frame"><img id="pm-preview-image" alt="Animated selected emote" hidden><div id="pm-preview-placeholder" class="pm-preview-placeholder"><span class="placeholder-mark" aria-hidden="true">PM</span><span>Preview unavailable</span></div></div>
+                <div class="preview-status"><span class="status-dot"></span><span>Preview</span><span class="preview-source">POWER MOVES RP</span></div>
+                <div class="preview-actions"><button id="preview-use-emote" class="preview-action primary" type="button"><span aria-hidden="true">▷</span><span>Use Emote</span></button><button id="preview-place-emote" class="preview-action secondary" type="button"><span aria-hidden="true">⌖</span><span>Place</span></button></div>
+            </aside>
         </main>
-        <aside id="pm-preview-panel" class="pm-preview-panel" aria-label="Animated emote preview" hidden><div class="pm-preview-frame"><img id="pm-preview-image" alt="Selected emote animation" hidden><div id="pm-preview-placeholder" class="pm-preview-placeholder">Preview unavailable</div></div><div id="pm-preview-label" class="pm-preview-label"></div></aside>
+
         <footer class="footer-container">
-            <span class="footer-text">&nbsp;</span>
+            <div class="footer-count"><strong id="footer-emote-count">—</strong><span>Emotes</span></div>
+            <div class="footer-divider"></div>
+            <div class="control-hint"><kbd>E</kbd><span>Confirm / Use</span></div>
+            <div class="control-hint"><kbd>Q</kbd><span>/</span><kbd>E</kbd><span>Rotate</span></div>
+            <div class="control-hint"><span class="mouse-icon" aria-hidden="true">⌁</span><span>Height</span></div>
+            <div class="control-hint"><kbd>ESC</kbd><span>Cancel / Back</span></div>
         </footer>
     </div>
 </body>
