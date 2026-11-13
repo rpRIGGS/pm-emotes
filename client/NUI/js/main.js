@@ -1,6 +1,7 @@
 "use strict";
 import { ClearHTMLContainer, HandleSidebarButtonPress, ExecuteNUICallback, PlaySoundFrontend, HandleEmoteFilter, HandleEmoteSearch, querySelectorVisible } from './utils.js';
 import { Locale, Popover } from './classes.js'
+import { createPreviewPanel } from './preview-panel.js'
 
 
 const SIDE_NAVIGATION = document.querySelector(".side-navigation");
@@ -9,6 +10,8 @@ const SEARCH_CONTAINER = document.querySelector(".search-container");
 const SEARCH_BAR = SEARCH_CONTAINER.querySelector(".search-input");
 let MENUS = CONTENT_CONTAINER.querySelectorAll(".menu");
 const FOOTER_TEXT = document.querySelector(".footer-text");
+const PM_PREVIEW = createPreviewPanel();
+PM_PREVIEW.initialize();
 
 export let EMOTE_TYPE_ICONS = {}
 export let CONFIG;
@@ -83,6 +86,7 @@ SIDE_NAVIGATION.addEventListener("click", (e) => {
     const TARGET = e.target;
 
     if (TARGET && TARGET.dataset.action) {
+        PM_PREVIEW.hide();
         HandleSidebarButtonPress(TARGET);
         return;
     }
@@ -93,6 +97,7 @@ let sendPreviewRequest = true
 function _setupMenuEventListeners(MENUS) {
     MENUS.forEach((element) => {
         element.addEventListener("mouseover", (e) => {
+            PM_PREVIEW.select(e.target.closest?.("[data-emoteid]"));
             const TARGET = e.target;
             if (!TARGET.dataset.emoteid) {
                 FOOTER_TEXT.innerHTML = "&nbsp;"
@@ -101,6 +106,7 @@ function _setupMenuEventListeners(MENUS) {
         })
 
         element.addEventListener("focusin", (e) => {
+            PM_PREVIEW.select(e.target.closest?.("[data-emoteid]"));
             const TARGET = e.target;
             PlaySoundFrontend("NAV_UP_DOWN")
             if (!TARGET.dataset.emoteid || TARGET.dataset.emotetype === "Emojis" || TARGET.dataset.emotetype === "Expressions" || TARGET.dataset.emotetype === "Walks") {
@@ -123,6 +129,8 @@ function _setupMenuEventListeners(MENUS) {
             FOOTER_TEXT.textContent = `/${TARGET.closest(".walkstyles-menu") ? "walk" : "e"} ${TARGET.dataset.emoteid}`
         })
 
+        element.addEventListener("mouseleave", () => PM_PREVIEW.hide());
+        element.addEventListener("focusout", (e) => { if (!element.contains(e.relatedTarget)) PM_PREVIEW.hide(); });
         element.addEventListener("click", (e) => {
             e.preventDefault();
             const TARGET = e.target;
@@ -163,6 +171,7 @@ SEARCH_BAR.addEventListener("input", (e) => {
 
 window.addEventListener('message', (event) => {
     if (event.data.type === 'OPEN_MENU') {
+        if (!event.data.value) PM_PREVIEW.hide();
         (event.data.value ? document.body.style.display = "flex" : document.body.style.display = "none")
         document.querySelector(".btn-sidebar").focus();
         event.data.shouldShowEmojiMenu ? document.querySelector(".emoji-sidebar")?.classList.remove("hidden") : document.querySelector(".emoji-sidebar")?.classList.add("hidden")
@@ -201,6 +210,7 @@ window.addEventListener('message', (event) => {
     }
 
     if (event.data.type === 'BUILD_EMOTE_MENUS') {
+        PM_PREVIEW.hide();
         const KEYS = Object.keys(event.data);
         for (const key of KEYS) {
             if (key !== "type" && key !== "keybinds") {
