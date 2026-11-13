@@ -10,3 +10,7 @@ Installation contract: copy the producer's `manifest.json` and `previews/` tree 
 ## Verification command
 
 Run `node --test tests/preview-library.test.mjs` from the PM Emotes repository root. This source test uses a lightweight mock image and does not require FiveM or Windows; successful execution is not yet asserted. The panel is imported by `main.js` and preview asset globs are declared in `fxmanifest.lua`. No generated media is bundled. Runtime testing and automated test execution still need verification.
+
+## Source implementation checkpoint — 2026-11-12
+
+The approved NUI now imports `preview-panel.js` from `main.js`; `preview-panel.js` consumes `preview-library.js` and `preview-identity.js`. It shows a single selected/highlighted media element, retains a placeholder for missing/ambiguous/failed previews, and clears media on menu close, menu rebuild, navigation and selection changes. The loader fetches `previews/manifest.json` opportunistically; absence is nonfatal. Preview files are external and are not committed here. Source wiring is present; **automated test execution and FiveM/APNG validation have not been established**. The latter belongs to Milestone 5.
