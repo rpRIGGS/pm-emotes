@@ -5,7 +5,7 @@
  */
 export function createPreviewLibrary({ base = "./", placeholder = null } = {}) {
   let byKey = new Map();
-  let generation = 0;
+  const generations = new WeakMap();
   const safeMedia = (value) => typeof value === "string"
     && /^previews\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+\/preview\.png$/.test(value);
   const key = (source, category, command) => JSON.stringify([source, category, command]);
@@ -25,8 +25,8 @@ export function createPreviewLibrary({ base = "./", placeholder = null } = {}) {
     return next;
   };
   return {
-    install(manifest) { byKey = validate(manifest); generation++; return byKey.size; },
-    clear() { byKey.clear(); generation++; },
+    install(manifest) { byKey = validate(manifest); return byKey.size; },
+    clear() { byKey.clear(); },
     get size() { return byKey.size; },
     lookup(source, category, command) {
       const item = byKey.get(key(source, category, command));
@@ -38,22 +38,27 @@ export function createPreviewLibrary({ base = "./", placeholder = null } = {}) {
      * changes. Missing/failed media always resolves to a placeholder.
      */
     mount(image, source, category, command) {
-      const token = ++generation;
+      const token = (generations.get(image) ?? 0) + 1;
+      generations.set(image, token);
       const item = this.lookup(source, category, command);
+      image.onload = image.onerror = null;
       image.removeAttribute("src");
       image.hidden = true;
       if (!item) { if (placeholder) image.src = placeholder; return false; }
-      image.onload = () => { if (token === generation) image.hidden = false; };
+      image.onload = () => { if (token === generations.get(image)) image.hidden = false; };
       image.onerror = () => {
-        if (token !== generation) return;
+        if (token !== generations.get(image)) return;
         image.hidden = !placeholder;
-        if (placeholder) image.src = placeholder;
+        if (placeholder) {
+          image.onerror = null;
+          image.src = placeholder;
+        }
       };
       image.src = item.url;
       return true;
     },
     unmount(image) {
-      generation++;
+      generations.set(image, (generations.get(image) ?? 0) + 1);
       image.onload = image.onerror = null;
       image.removeAttribute("src");
       image.hidden = true;
