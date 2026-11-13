@@ -33,13 +33,13 @@ This repository does not contain a chair-model-indexed 213-model alignment table
 
 ## Verification
 
-`node --test tests/*.test.mjs` in this repository: **22 passed, 0 failed** (includes card action, callback registration, and RPEmotes/NUI contract checks).
+`node --test tests/*.test.mjs` in this repository: **23 passed, 0 failed** (includes card action, callback registration, RPEmotes/NUI contract, and packaged empty-manifest checks).
 
 ES-module syntax checks for the modified NUI JavaScript files and `git diff --check` also passed. These are source-level validations; they do not execute FiveM APIs or CEF rendering.
 
-Coverage includes card markup and escaping, direct action availability, registered RPEmotes callbacks, supported/unsupported manifests, safe paths, duplicate and ambiguous identity handling, missing manifest/media fallback, selected-only lifecycle, stale image callbacks, out-of-order manifest loads, and an exporter-shaped manifest with extra metadata.
+Coverage includes card markup and escaping, direct action availability, registered RPEmotes callbacks, the packaged empty default manifest, supported/unsupported manifests, safe paths, duplicate and ambiguous identity handling, missing manifest/media fallback, selected-only lifecycle, stale image callbacks, out-of-order manifest loads, and an exporter-shaped manifest with extra metadata.
 
-Static packaging review: `fxmanifest.lua` declares `client/NUI/previews/manifest.json` and `client/NUI/previews/**/*.png`; no preview package is bundled, preserving the optional fallback path.
+Static packaging review: `fxmanifest.lua` declares the manifest and nested PNG paths. A valid empty version-1 manifest ships by default, with no preview media bundled; an installed EmotePreviewer export replaces it. The placeholder remains the normal no-export fallback.
 
 No live FiveM server or FiveM CEF runtime was available for this audit. Therefore NUI appearance and interaction, game animation playback/cleanup, APNG playback in CEF, and chair placement alignment remain unaccepted until the exact server checklist is run. Source callback presence verifies wiring, not runtime success.
 

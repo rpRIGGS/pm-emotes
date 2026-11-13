@@ -20,7 +20,7 @@ To install a sample export for acceptance testing:
 2. Copy the exported `previews/` directory into `client/NUI/`, preserving all names and relative paths.
 3. Ensure the server resource includes the updated `fxmanifest.lua` entries and restart the resource.
 
-The `fxmanifest.lua` already declares `client/NUI/previews/manifest.json` and `client/NUI/previews/**/*.png`. The NUI requests `previews/manifest.json`; absent media is nonfatal and leaves the placeholder active.
+The `fxmanifest.lua` declares `client/NUI/previews/manifest.json` and `client/NUI/previews/**/*.png`. The resource ships a valid empty version-1 manifest so the no-export case is explicit; absent or failed media leaves the placeholder active. Copying an export replaces that empty manifest and adds the referenced files.
 
 ## Consumer behavior and identity
 

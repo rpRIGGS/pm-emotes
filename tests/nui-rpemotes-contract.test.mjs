@@ -82,3 +82,14 @@ test("NUI still receives RPEmotes menu data, locales, and keybind updates", asyn
   assert.match(emoteMenu, /isScenario = data\.scenario ~= nil/);
   assert.match(emoteMenu, /isSittingOrLaying = isSittingOrLayingEmote/);
 });
+
+test("resource packages a valid empty preview manifest for the optional fallback", async () => {
+  const [manifest, fxmanifest] = await Promise.all([
+    read("client/NUI/previews/manifest.json").then(JSON.parse),
+    read("fxmanifest.lua"),
+  ]);
+  assert.equal(manifest.schemaVersion, 1);
+  assert.equal(manifest.format, "experimental-apng");
+  assert.deepEqual(manifest.entries, []);
+  assert.match(fxmanifest, /client\/NUI\/previews\/manifest\.json/);
+});
