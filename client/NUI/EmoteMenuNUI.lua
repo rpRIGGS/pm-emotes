@@ -2,6 +2,7 @@ local nuiReady = false
 local initialDataLoaded = false
 local localesLoaded = false
 local positioningState = nil
+local positioningCameraControl = false
 
 local function closeEmotePositioning(save, restoreMouse)
     if not positioningState then return false end
@@ -16,6 +17,7 @@ local function closeEmotePositioning(save, restoreMouse)
     end
     FreezeEntityPosition(ped, false)
     positioningState = nil
+    positioningCameraControl = false
     SendNUIMessage({type = "POSITIONING_MODE", value = false})
     SetNuiFocus(true, restoreMouse == true)
     SetNuiFocusKeepInput(true)
@@ -229,6 +231,15 @@ RegisterNUICallback("UPDATE_EMOTE_POSITION", function(data, cb)
     local target = positioningState.coords + vector3(rightX * x + forwardX * y, rightY * x + forwardY * y, z)
     SetEntityCoordsNoOffset(ped, target.x, target.y, target.z, false, false, false)
     SetEntityHeading(ped, (positioningState.heading + rotZ + 360) % 360)
+    cb({ok = true})
+end)
+
+RegisterNUICallback("POSITIONING_CAMERA_CONTROL", function(data, cb)
+    if not positioningState then cb({ok = false}); return end
+    positioningCameraControl = data.enabled == true
+    SetNuiFocus(true, not positioningCameraControl)
+    SetNuiFocusKeepInput(true)
+    SendNUIMessage({type = "TOGGLE_CURSOR_INPUT", value = not positioningCameraControl})
     cb({ok = true})
 end)
 
@@ -461,8 +472,10 @@ AddEventHandler("rpemotes:internal:handleNUIOpened", function()
             setCursorActive(false)
         end
         if cursorActive then
-            DisableControlAction(0,1,true)
-            DisableControlAction(0,2,true)
+            if not positioningCameraControl then
+                DisableControlAction(0,1,true)
+                DisableControlAction(0,2,true)
+            end
             DisableControlAction(0,14,true)
             DisableControlAction(0,15,true)
             DisableControlAction(0,24,true)

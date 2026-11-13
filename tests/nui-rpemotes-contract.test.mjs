@@ -54,7 +54,7 @@ test("NUI callback calls are registered by the RPEmotes Lua bridge", async () =>
     assert.ok(calls.has(feature), `${feature} remains wired from NUI`);
     assert.ok(registrations.has(feature), `${feature} remains registered in Lua`);
   }
-  for (const callback of ["START_EMOTE_POSITIONING", "UPDATE_EMOTE_POSITION", "FINISH_EMOTE_POSITIONING"]) {
+  for (const callback of ["START_EMOTE_POSITIONING", "UPDATE_EMOTE_POSITION", "POSITIONING_CAMERA_CONTROL", "FINISH_EMOTE_POSITIONING"]) {
     assert.ok(registrations.has(callback), `Lua registers ${callback}`);
   }
   assert.match(lua, /SetEntityCoordsNoOffset\(ped, positioningState\.coords/);

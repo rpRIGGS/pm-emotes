@@ -16,7 +16,7 @@ PM Emotes uses the approved PowerMoves-branded dark NUI and keeps the existing R
 | Per-category scroll restoration | NUI stores and restores each category's scroll position in local storage. |
 | Play emote from a card | Direct card action and the RPEmotes `ROUTE_EMOTE` callback. |
 | Place emote | Direct card and selected-panel actions call the existing RPEmotes placement flow. The existing right-click menu action remains. |
-| Adjust an eligible emote's position | Direct action is exposed only for non-shared emotes with loop/stuck flags. A screen-positioned axis gizmo and bounded sliders update the active player's position and heading; Save keeps the adjusted position, Cancel restores its starting transform. Other clients receive a validated server relay of the final transform. |
+| Adjust an eligible emote's position | Direct action is exposed only for non-shared emotes with loop/stuck flags. A screen-positioned axis gizmo, right-mouse camera control, and bounded sliders update the active player's position and heading; Save keeps the adjusted position, Cancel restores its starting transform. Other clients receive a validated server relay of the final transform. |
 | Bind, replace, and clear keybinds | Existing RPEmotes right-click popover and keybind menu call the existing KVP-backed callbacks. |
 | Shared/group emotes | Existing RPEmotes shared-emote menu and group request path remain active. |
 | Expressions, walks, emojis, props, scenarios and other emote types | Existing RPEmotes catalog and callbacks remain the source of truth; expression/walk reset actions remain available. |
@@ -25,7 +25,7 @@ PM Emotes uses the approved PowerMoves-branded dark NUI and keeps the existing R
 
 ## Important boundaries
 
-- The position editor provides a screen-positioned gizmo plus sliders. It does not include the reference's right-mouse camera-control gesture; verify that the branded editor is usable at the intended server resolution and camera setup.
+- The position editor uses the branded SVG axis gizmo and also offers sliders for precise adjustment. It intentionally uses RPEmotes' existing catalog and eligibility metadata rather than the reference's separate animation data model.
 - EmotePreviewer remains a separate Windows application. FiveM only reads its manifest and APNG assets.
 - Source tests assert callback/message wiring and deterministic NUI helpers. They do not prove FiveM CEF rendering, network synchronization, animation compatibility, or the quality of position adjustments in-game.
 - NoPixel code is a behavior reference, not a replacement for RPEmotes. QBCore/RPEmotes permissions, catalog behavior, keybind storage, prop lifecycle, and group synchronization continue to use this resource's existing implementation.

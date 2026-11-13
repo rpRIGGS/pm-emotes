@@ -19,7 +19,7 @@ Starting commit: `e3f6df0f15f7fe3b94b806a6da31490dbc2a3d40` (`e3f6df0`)
 - Corrected placement destination Z to match the lowered position displayed by the translucent preview ped. This fixes the source-level preview/commit mismatch; it does not establish chair alignment.
 - Compared the NUI against the supplied NoPixel-style reference script, then filled source-level gaps: direct card play/favorite/place actions, compact draggable mode, resettable layout, per-category scroll restoration, dedicated scenario and sitting/laying categories, and a bounded position editor for eligible active emotes. The position editor routes through RPEmotes, restores the transform on cancel, retains it on save, and relays the final transform to other clients through a server-validated event.
 - Kept RPEmotes' existing Lua catalog, playback/cancel, favorites, keybinds, search, group-emote, preview-ped, and placement implementations. The PM animated selection panel intentionally replaces per-card WebP animation previews from the reference with EmotePreviewer's selected-only APNG export.
-- The position editor has a screen-positioned gizmo plus bounded sliders. It does not include the reference's right-mouse camera-control gesture; both adjustment and multiplayer replication still need in-game acceptance.
+- The position editor has a screen-positioned gizmo, right-mouse camera control, and bounded sliders. Adjustment and multiplayer replication still need in-game acceptance.
 
 ## Producer contract review
 

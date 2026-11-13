@@ -155,6 +155,12 @@ window.addEventListener("mousemove", (event) => {
 });
 window.addEventListener("mouseup", () => { gizmoDrag = null; });
 positionOverlay?.addEventListener("contextmenu", (event) => event.preventDefault());
+positionOverlay?.addEventListener("mousedown", (event) => {
+    if (positioningMode && event.button === 2) ExecuteNUICallback("POSITIONING_CAMERA_CONTROL", {enabled: true});
+});
+window.addEventListener("mouseup", (event) => {
+    if (positioningMode && event.button === 2) ExecuteNUICallback("POSITIONING_CAMERA_CONTROL", {enabled: false});
+});
 document.querySelector("#position-save")?.addEventListener("click", () => finishPositioning(true));
 document.querySelector("#position-cancel")?.addEventListener("click", () => finishPositioning(false));
 document.addEventListener("keyup", (event) => {
