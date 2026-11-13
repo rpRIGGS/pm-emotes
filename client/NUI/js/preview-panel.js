@@ -10,6 +10,7 @@ export function createPreviewPanel({ root = document, manifestUrl = "previews/ma
   const library = createPreviewLibrary({ base: "./" });
   let resolver = null;
   let generation = 0;
+  let manifestRequest = 0;
   let selected = null;
   let visible = false;
 
@@ -27,20 +28,20 @@ export function createPreviewPanel({ root = document, manifestUrl = "previews/ma
     panel.hidden = true;
   }
   async function initialize() {
-    const token = ++generation;
+    const token = ++manifestRequest;
     try {
       const response = await fetch(manifestUrl, { cache: "no-cache" });
       if (!response.ok) throw new Error("Preview manifest unavailable");
       const manifest = await response.json();
       const candidate = createPreviewIdentityResolver(manifest);
       // A later close/rebuild must invalidate this asynchronous response.
-      if (token !== generation) return false;
+      if (token !== manifestRequest) return false;
       library.install(manifest);
       resolver = candidate;
       if (visible && selected) render(selected);
       return true;
     } catch (_) {
-      if (token === generation) {
+      if (token === manifestRequest) {
         resolver = null;
         library.clear();
         clearImage();
