@@ -6,11 +6,12 @@
 export function createPreviewLibrary({ base = "./", placeholder = null } = {}) {
   let byKey = new Map();
   const generations = new WeakMap();
+  let revision = 0;
   const safeMedia = (value) => typeof value === "string"
     && /^previews\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+\/preview\.png$/.test(value);
   const key = (source, category, command) => JSON.stringify([source, category, command]);
   const validate = (manifest) => {
-    if (!manifest || manifest.schemaVersion !== 1 || !Array.isArray(manifest.entries)) {
+    if (!manifest || manifest.schemaVersion !== 1 || manifest.format !== "experimental-apng" || !Array.isArray(manifest.entries)) {
       throw new Error("Unsupported preview manifest");
     }
     const next = new Map();
@@ -25,8 +26,8 @@ export function createPreviewLibrary({ base = "./", placeholder = null } = {}) {
     return next;
   };
   return {
-    install(manifest) { byKey = validate(manifest); return byKey.size; },
-    clear() { byKey.clear(); },
+    install(manifest) { byKey = validate(manifest); revision++; return byKey.size; },
+    clear() { byKey.clear(); revision++; },
     get size() { return byKey.size; },
     lookup(source, category, command) {
       const item = byKey.get(key(source, category, command));
@@ -39,18 +40,23 @@ export function createPreviewLibrary({ base = "./", placeholder = null } = {}) {
      */
     mount(image, source, category, command) {
       const token = (generations.get(image) ?? 0) + 1;
+      const activeRevision = revision;
       generations.set(image, token);
       const item = this.lookup(source, category, command);
       image.onload = image.onerror = null;
       image.removeAttribute("src");
       image.hidden = true;
-      if (!item) { if (placeholder) image.src = placeholder; return false; }
-      image.onload = () => { if (token === generations.get(image)) image.hidden = false; };
+      if (!item) {
+        if (placeholder) { image.onload = () => { if (token === generations.get(image) && activeRevision === revision) image.hidden = false; }; image.src = placeholder; }
+        return false;
+      }
+      image.onload = () => { if (token === generations.get(image) && activeRevision === revision) image.hidden = false; };
       image.onerror = () => {
-        if (token !== generations.get(image)) return;
+        if (token !== generations.get(image) || activeRevision !== revision) return;
         image.hidden = !placeholder;
         if (placeholder) {
           image.onerror = null;
+          image.onload = () => { if (token === generations.get(image) && activeRevision === revision) image.hidden = false; };
           image.src = placeholder;
         }
       };
