@@ -53,7 +53,10 @@ export function createPreviewLibrary({ base = "./", placeholder = null } = {}) {
       image.onload = () => { if (token === generations.get(image) && activeRevision === revision) image.hidden = false; };
       image.onerror = () => {
         if (token !== generations.get(image) || activeRevision !== revision) return;
-        image.hidden = !placeholder;
+        // Keep a failed image hidden until the fallback itself has loaded.
+        // Showing it immediately can expose a broken-image glyph while the
+        // placeholder request is still in flight.
+        image.hidden = true;
         if (placeholder) {
           image.onerror = null;
           image.onload = () => { if (token === generations.get(image) && activeRevision === revision) image.hidden = false; };

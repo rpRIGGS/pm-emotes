@@ -1,45 +1,37 @@
-# EmotePreviewer — animated preview integration handoff
+# EmotePreviewer — producer/consumer integration
 
-Recorded: 2026-11-12
-Source: PowerMoves Development — [EmotePreviewer](https://github.com/rpRIGGS/EmotePreviewer)
-Status: **Approved replacement for PM AutoShot; final media integration deferred pending exporter format and manifest validation.**
+Updated: 2026-11-13
+
+Status: **The producer/consumer contract and PM Emotes NUI source integration are implemented. Real exported-media and FiveM CEF acceptance tests remain outstanding.**
 
 ## Responsibility boundary
 
-- **PM Emotes:** consume preview manifest in existing NUI; match original emote identifiers; render preview or placeholder; handle missing/failed media; load efficiently.
-- **EmotePreviewer (Windows desktop tool):** scan existing RPEmotes-based PM Emotes catalog; render animations; generate media; track incremental changes; export media and versioned manifest/package.
-- Do not implement exporter/rendering inside PM Emotes. Do not redesign the NUI as part of this handoff.
+- **EmotePreviewer** is a separate Windows desktop application. It reads the PM Emotes resource catalog and the user's GTA V Legacy files, previews supported catalog entries, and exports APNG files plus a manifest and producer-side index/report.
+- **PM Emotes** consumes an installed manifest and media in its existing NUI. It maps menu commands conservatively, shows the selected/highlighted preview or a placeholder, and leaves emote gameplay and the existing in-game ped preview/placement behavior alone.
+- Preview rendering and generation do not run inside FiveM. PM AutoShot was retired.
 
-## Integration requirements
+## Export and install contract
 
-1. **Stable identity:** manifest associates each preview with its original emote ID/command and category/type as needed to avoid collisions. Generated filenames are not authoritative identifiers.
-2. **Media format undecided:** APNG is being implemented and evaluated, but is **not approved** as the final FiveM NUI format. Do not assume existing WebP preview handling is the final contract.
-3. **Fallback:** display a standard placeholder when a manifest entry is absent, media is missing, or loading/decoding fails. Normal emote playback must continue unaffected.
-4. **Incremental updates:** adding or replacing individual media/manifest entries must not require rebuilding the entire library or NUI.
-5. **Manifest-driven paths:** consume exporter-provided ID-to-media-path mapping; do not derive paths solely from filenames.
-6. **Performance:** avoid decoding or playing thousands of animations at once. Load only necessary/visible previews and limit active playback to the selected/highlighted emote, with cleanup when focus/menu changes.
+EmotePreviewer produces `manifest.json` at the export root, with `schemaVersion: 1`, `format: "experimental-apng"`, and entries containing `id`, `source`, `category`, `command`, `format: "apng"`, and an immutable media path such as `previews/<stem>/<runId>/preview.png`. Exports also contain `preview-index.json` and `report.json`; PM Emotes consumes the manifest and preview files, not the producer index/report.
 
-## Exporter status reported in handoff
+To install a sample export for acceptance testing:
 
-- Automated catalog batch processing exists at source-code level.
-- APNG export exists but is not FiveM NUI-validated.
-- Incremental classification covers new, changed, failed, unchanged and removed emotes.
-- Versioned persistent preview index is under development.
-- Windows rendering, media compatibility and final output structure remain unverified.
+1. Copy the export root `manifest.json` to `client/NUI/previews/manifest.json`.
+2. Copy the exported `previews/` directory into `client/NUI/`, preserving all names and relative paths.
+3. Ensure the server resource includes the updated `fxmanifest.lua` entries and restart the resource.
 
-## Superseded architecture and cleanup
+The `fxmanifest.lua` already declares `client/NUI/previews/manifest.json` and `client/NUI/previews/**/*.png`. The NUI requests `previews/manifest.json`; absent media is nonfatal and leaves the placeholder active.
 
-The 2026-11-12 decision **abandons PM AutoShot**, rather than adding another optional exporter. The legacy `client/NUI/js/autoshot-previews.js`, its HTML script hook, the legacy preview asset declaration in `fxmanifest.lua`, and the old PM AutoShot development reference have been removed. No AutoShot WebP or manifest assumptions carry forward as requirements. Preserve the approved NoPixel-style NUI and all unrelated RPEmotes functionality, including **in-game emote preview and placement**. Do not add a replacement overlay or generation pipeline before the exporter contract is approved.
+## Consumer behavior and identity
 
-## Gate before final integration
+`main.js` initializes `preview-panel.js` at NUI startup. The panel loads only the selected/highlighted preview and releases image requests on selection changes, navigation, menu rebuild and close. Missing, ambiguous or failed entries retain the placeholder. Normal emote playback and the in-game ped preview/placement flow remain separate.
 
-Obtain and validate a sample exporter package and manifest schema (including category/ID identity, path rules, versioning and update/removal behavior), then test APNG or selected format in the FiveM NUI for display, failure fallback, performance and stale-media cleanup. Only then authorize final media integration. Continue current PM Emotes live server testing and existing priorities independently.
+Producer identity is the full `source/category/command` tuple. The existing NUI menu supplies an emote command and menu type, but menu type is not a verified producer category. `preview-identity.js` therefore resolves a command only when it maps to exactly one manifest entry; duplicates intentionally receive no animated preview instead of risking a mismatched animation.
 
+## Verification boundary and remaining acceptance
 
-## Milestone 4 source progress — 2026-11-12
+The adapter and its regression tests validate the source-level schema, path rules, identity behavior, fallback and lifecycle. That does **not** establish GTA-backed capture quality or animated APNG playback in FiveM Chromium/CEF. No real export is bundled in this repository, and no FiveM playback is claimed as verified.
 
-The unactivated `client/NUI/js/preview-library.js` adapter now validates the actual EmotePreviewer manifest envelope (`schemaVersion: 1`, `format: "experimental-apng"`), accepts only immutable `previews/<stem>/<run>/preview.png` paths, and indexes exact `source/category/command` triples. It loads only the selected image, isolates cancellation by image element, invalidates callbacks on manifest replacement, and provides an image-load-error placeholder. Source regression cases are in `tests/preview-library.test.mjs`; they have not been executed as part of the deferred Windows/CEF validation.
+Run `node --test tests/preview-*.test.mjs` from the repository root. For desktop/server acceptance, install a real export, inspect identity resolution across duplicate commands, confirm APNG animation and fallback in FiveM, verify cleanup and performance, and confirm ordinary emotes plus the existing in-game preview/placement still work.
 
-**Critical identity finding:** The producer's catalog ID and source/category/command come from its parsed PM Emotes catalog, while the existing NUI uses `data-emoteid` and `data-emotetype` with separate menu groupings. A command-only lookup is unsafe: the same command can appear in different categories or sources. Until an exact mapping is verified, do not attach the adapter to the menu or infer a source/category from a button label. The adapter is intentionally inert in the live resource.
-
-**Remaining Milestone 4 gate:** establish a verified ID translation between producer entries and the actual NUI catalog data; then connect the adapter to the approved NUI with a placeholder and a single active animation. Final APNG compatibility and real runtime testing remain in Milestone 5.
+See [PREVIEW-IDENTITY-RECONCILIATION.md](PREVIEW-IDENTITY-RECONCILIATION.md), [PREVIEW-MANIFEST-ADAPTER.md](PREVIEW-MANIFEST-ADAPTER.md), and [SERVER-TEST-ACCEPTANCE.md](SERVER-TEST-ACCEPTANCE.md).
