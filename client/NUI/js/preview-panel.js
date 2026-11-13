@@ -1,8 +1,7 @@
 import { createPreviewLibrary } from "./preview-library.js";
 import { createPreviewIdentityResolver } from "./preview-identity.js";
 
-// Experimental Milestone 4 consumer. Media is produced by the Windows EmotePreviewer.
-// No GTA rendering, capture, encoding or gameplay callbacks occur here.
+/** Selected-only media consumer. Never changes the gameplay preview ped. */
 export function createPreviewPanel({ root = document, manifestUrl = "previews/manifest.json" } = {}) {
   const panel = root.querySelector("#pm-preview-panel");
   const image = root.querySelector("#pm-preview-image");
@@ -11,12 +10,19 @@ export function createPreviewPanel({ root = document, manifestUrl = "previews/ma
   const library = createPreviewLibrary({ base: "./" });
   let resolver = null;
   let generation = 0;
-  let current = null;
+  let selected = null;
+  let visible = false;
+
+  function clearImage() {
+    library.unmount(image);
+    image.hidden = true;
+    placeholder.hidden = false;
+  }
   function reset() {
     generation++;
-    current = null;
-    library.unmount(image);
-    placeholder.hidden = false;
+    selected = null;
+    visible = false;
+    clearImage();
     label.textContent = "Preview unavailable";
     panel.hidden = true;
   }
@@ -27,44 +33,52 @@ export function createPreviewPanel({ root = document, manifestUrl = "previews/ma
       if (!response.ok) throw new Error("Preview manifest unavailable");
       const manifest = await response.json();
       const candidate = createPreviewIdentityResolver(manifest);
-      library.install(manifest);
+      // A later close/rebuild must invalidate this asynchronous response.
       if (token !== generation) return false;
+      library.install(manifest);
       resolver = candidate;
+      if (visible && selected) render(selected);
       return true;
     } catch (_) {
-      if (token === generation) { resolver = null; library.clear(); }
+      if (token === generation) {
+        resolver = null;
+        library.clear();
+        clearImage();
+      }
       return false;
     }
   }
-  function select(button) {
-    if (!button?.dataset?.emoteid || !button.dataset.emotetype || button.dataset.emoteid === "_reset") {
-      reset(); return;
-    }
-    const identityKey = button.dataset.emotetype + ":" + button.dataset.emoteid;
-    if (identityKey === current) return;
-    current = identityKey;
-    generation++;
-    panel.hidden = false;
-    placeholder.hidden = false;
-    label.textContent = button.dataset.label || button.dataset.emoteid;
-    library.unmount(image);
+  function render(button) {
     const identity = resolver?.resolve(button.dataset.emoteid) ?? null;
+    clearImage();
     if (!identity) return;
-    const mounted = library.mount(image, identity.source, identity.category, identity.command);
-    if (!mounted) return;
-    // A successful image load hides the placeholder; errors retain it.
+    if (!library.mount(image, identity.source, identity.category, identity.command)) return;
     const token = generation;
-    const originalOnload = image.onload;
+    const originalLoad = image.onload;
     image.onload = (event) => {
-      originalOnload?.(event);
+      originalLoad?.(event);
       if (token === generation && !image.hidden) placeholder.hidden = true;
     };
-    const originalOnerror = image.onerror;
+    const originalError = image.onerror;
     image.onerror = (event) => {
-      originalOnerror?.(event);
+      originalError?.(event);
       if (token === generation) placeholder.hidden = false;
     };
   }
-  function hide() { reset(); }
-  return { initialize, select, hide, reset };
+  function select(button) {
+    if (!button?.dataset?.emoteid || !button.dataset.emotetype ||
+        button.dataset.emoteid === "_reset" || button.dataset.emotetype === "Emojis") {
+      reset();
+      return;
+    }
+    const identityKey = JSON.stringify([button.dataset.emotetype, button.dataset.emoteid]);
+    if (visible && selected?.key === identityKey) return;
+    generation++;
+    visible = true;
+    selected = { key: identityKey, dataset: { ...button.dataset } };
+    panel.hidden = false;
+    label.textContent = button.dataset.label || button.dataset.emoteid;
+    render(selected);
+  }
+  return { initialize, select, hide: reset, reset };
 }
