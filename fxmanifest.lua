@@ -19,6 +19,8 @@ files {
     'header.png',
     'locales/*.lua',
     'client/NUI/js/*.js',
+    'client/NUI/previews/manifest.json',
+    'client/NUI/previews/**/*.png',
     'client/NUI/css/*.css',
     'client/NUI/index.html',
 }
