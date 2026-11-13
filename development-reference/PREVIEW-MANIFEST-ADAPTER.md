@@ -14,3 +14,9 @@ Run `node --test tests/preview-library.test.mjs` from the PM Emotes repository r
 ## Source implementation checkpoint — 2026-11-12
 
 The approved NUI now imports `preview-panel.js` from `main.js`; `preview-panel.js` consumes `preview-library.js` and `preview-identity.js`. It shows a single selected/highlighted media element, retains a placeholder for missing/ambiguous/failed previews, and clears media on menu close, menu rebuild, navigation and selection changes. The loader fetches `previews/manifest.json` opportunistically; absence is nonfatal. Preview files are external and are not committed here. Source wiring is present; **automated test execution and FiveM/APNG validation have not been established**. The latter belongs to Milestone 5.
+
+## Milestone 4 source completion handoff
+
+Source wiring now covers manifest loading, full producer-identity lookup via conservative unique-command resolution, selected/highlighted APNG display in the existing NUI, missing/ambiguous/failed-media placeholder, stale-image cancellation, and teardown on menu close/rebuild/navigation. Tests include `tests/preview-library.test.mjs`, `tests/preview-identity.test.mjs`, and `tests/preview-panel.test.mjs` (new panel cases: load, hide, stale callback, ambiguity, missing media, failed media, absent manifest and delayed manifest).
+
+**Verification limitation:** GitHub repository was accessible through the connected GitHub API, but the local clone failed because the runtime could not resolve `github.com`; Node tests were not executed. Run `node --test tests/preview-*.test.mjs` in a local checkout before considering source tests passed. Do not claim FiveM APNG compatibility until Milestone 5 Windows/FiveM validation. No preview media is generated inside the resource. The approved NUI and existing gameplay preview ped remain separate.
