@@ -3,6 +3,11 @@ on:
   workflow_dispatch:
   push:
     branches: [development/powermoves-nui]
+    paths:
+      - 'client/**'
+      - 'fxmanifest.lua'
+      - 'development/verify-ui-contract.py'
+      - '.github/workflows/pm-emotes-nui.yml'
   pull_request:
     paths:
       - 'client/NUI/**'
