@@ -549,3 +549,8 @@ All animation creators have **_specifically_** asked that their content remain f
 - [corbs](https://www.gta5-mods.com/users/corbs)
 - [jaysigx](https://www.gta5-mods.com/misc/improved-umbrella)
 - [Payzee](https://pazeee.tebex.io/)
+
+
+## GitHub Actions usage
+
+Pushes and pull requests on the active NUI development branch run the static validation workflow without uploading a resource ZIP. Full FiveM resource and server-test packages are generated only by manually dispatching their respective workflows and are retained for 30 days for acceptance testing. Use a manual package run when a new test distribution is actually needed; superseded artifacts should be removed after the required replacement is confirmed.
