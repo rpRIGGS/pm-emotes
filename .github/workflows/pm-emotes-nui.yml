@@ -1,11 +1,16 @@
 name: PM Emotes NUI static checks
 on:
+  workflow_dispatch:
   push:
     branches: [development/powermoves-nui]
   pull_request:
     paths:
       - 'client/NUI/**'
       - '.github/workflows/pm-emotes-nui.yml'
+concurrency:
+  group: pm-emotes-nui-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
+
 jobs:
   nui:
     runs-on: ubuntu-latest
@@ -130,6 +135,7 @@ jobs:
           PY
 
   package:
+    if: github.event_name == 'workflow_dispatch'
     name: Package complete FiveM resource
     runs-on: ubuntu-latest
     steps:
@@ -159,4 +165,4 @@ jobs:
           name: pm-emotes-fivem
           path: pm-emotes-fivem.zip
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 30 # Manual acceptance/test package.
