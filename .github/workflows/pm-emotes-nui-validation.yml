@@ -1,11 +1,12 @@
 name: PM Emotes release validation
 
 on:
-  push:
-    branches:
-      - development/powermoves-nui
-  pull_request:
+  # Full server-test packaging is an explicit acceptance action.
   workflow_dispatch:
+
+concurrency:
+  group: pm-emotes-server-acceptance-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   release-validation:
@@ -37,4 +38,4 @@ jobs:
           name: pm-emotes-server-test
           path: dist/pm-emotes-server-test.zip
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 30 # Manual server-test package.
